@@ -40,11 +40,82 @@ namespace Keepsake.Cli
 
         public Repository OpenRepository()
         {
-            var storage = StorageFactory.Open(RepositoryLocation);
-            if (!Repository.Exists(storage))
-                throw new KeepsakeException("No Keepsake repository found at " + storage.Location + ".");
-            return Repository.Open(storage, Credential());
+            var storage = OpenStorage();
+            try
+            {
+                if (!Repository.Exists(storage))
+                    throw new KeepsakeException("No Keepsake repository found at " + storage.Location + ".");
+                return Repository.Open(storage, Credential());
+            }
+            catch
+            {
+                storage.Dispose();
+                throw;
+            }
         }
+
+        /// <summary>Folder, share, USB path or <c>sftp://user@host[:port]/path</c>.</summary>
+        public IStorage OpenStorage()
+        {
+            string location = RepositoryLocation;
+            if (!StorageFactory.IsSftp(location))
+                return StorageFactory.Open(location);
+
+            var options = StorageFactory.ParseSftp(location);
+            string keyFile = Args.Value("sftp-key-file");
+            if (keyFile != null)
+            {
+                options.PrivateKey = ReadFile(keyFile, "SFTP key");
+                string passFile = Args.Value("sftp-key-passphrase-file");
+                options.KeyPassphrase = passFile != null ? FirstLine(passFile, "SFTP key passphrase") : Environment.GetEnvironmentVariable("KEEPSAKE_SFTP_KEY_PASSPHRASE");
+            }
+            else
+            {
+                string pwFile = Args.Value("sftp-password-file");
+                options.Password = pwFile != null ? FirstLine(pwFile, "SFTP password") : Environment.GetEnvironmentVariable("KEEPSAKE_SFTP_PASSWORD");
+                if (string.IsNullOrEmpty(options.Password))
+                {
+                    if (NonInteractive)
+                        throw new UsageException("No SFTP password given. Use --sftp-password-file, KEEPSAKE_SFTP_PASSWORD or --sftp-key-file.");
+                    options.Password = ConsoleUi.ReadSecret("SFTP password for " + options.User + "@" + options.Host + ": ");
+                }
+            }
+            options.HostKeyFingerprint = Args.Value("sftp-host-key") ?? Environment.GetEnvironmentVariable("KEEPSAKE_SFTP_HOST_KEY");
+
+            for (int attempt = 0; ; attempt++)
+            {
+                var storage = new SftpStorage(options);
+                try
+                {
+                    storage.Connect();
+                    return storage;
+                }
+                catch (HostKeyException ex) when (attempt == 0 && !ex.Mismatch && !NonInteractive)
+                {
+                    storage.Dispose();
+                    Console.Error.WriteLine("The host key of " + options.Host + " is not known yet:");
+                    Console.Error.WriteLine("    " + ex.Fingerprint);
+                    Console.Error.WriteLine("Compare it with the fingerprint shown on the server (ssh-keygen -lf <host key file>).");
+                    string answer = ConsoleUi.ReadLine("Trust this key and continue? [y/N] ");
+                    if (!answer.Trim().StartsWith("y", StringComparison.OrdinalIgnoreCase))
+                        throw new KeepsakeException("Host key not trusted.");
+                    Console.Error.WriteLine("Tip: pass --sftp-host-key " + ex.Fingerprint + " to skip this question next time.");
+                    options.HostKeyFingerprint = ex.Fingerprint;
+                }
+                catch (HostKeyException ex)
+                {
+                    storage.Dispose();
+                    throw new KeepsakeException(ex.Message + (ex.Mismatch ? "" : " Pass --sftp-host-key " + ex.Fingerprint + " after verifying it."));
+                }
+                catch
+                {
+                    storage.Dispose();
+                    throw;
+                }
+            }
+        }
+
+        private static string FirstLine(string path, string what) => ReadFile(path, what).Split('\n')[0].TrimEnd('\r');
 
         public RepoCredential Credential()
         {

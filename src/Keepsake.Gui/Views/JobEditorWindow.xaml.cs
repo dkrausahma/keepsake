@@ -29,7 +29,7 @@ namespace Keepsake.Gui.Views
             SaveButton.IsEnabled = false;
             try
             {
-                if (await _vm.Save(RepoPassword.Password, RepoConfirm.Password))
+                if (await _vm.Save())
                     DialogResult = true;
             }
             catch (System.Exception ex)

@@ -20,9 +20,6 @@ namespace Keepsake.Gui.ViewModels
         private bool _enabled = true;
         private string _patterns;
         private bool _useDefaultExcludes = true;
-        private string _destination;
-        private string _destinationStatus;
-        private bool _destinationOk;
         private string _newPath;
         private ScheduleItemViewModel _selectedSchedule;
         private bool _runMissed = true;
@@ -37,7 +34,6 @@ namespace Keepsake.Gui.ViewModels
         {
             _connection = connection;
             _original = detail?.Job;
-            HasStoredPassword = detail?.HasRepositoryPassword ?? false;
             Selection.Changed += () =>
             {
                 foreach (var root in Roots)
@@ -47,6 +43,7 @@ namespace Keepsake.Gui.ViewModels
             };
             foreach (var drive in FileTreeNode.Drives(Selection))
                 Roots.Add(drive);
+            Destination = new DestinationEditorViewModel(connection, detail, () => Name);
 
             if (_original != null)
             {
@@ -54,7 +51,6 @@ namespace Keepsake.Gui.ViewModels
                 _enabled = _original.Enabled;
                 _patterns = string.Join(Environment.NewLine, Selection.Load(_original.Sources, _original.Excludes));
                 _useDefaultExcludes = _original.UseDefaultExcludes;
-                _destination = _original.Destination?.Path;
                 foreach (var s in _original.Schedules)
                     Schedules.Add(new ScheduleItemViewModel(s));
                 _runMissed = _original.RunMissed;
@@ -63,25 +59,21 @@ namespace Keepsake.Gui.ViewModels
                 _preCommand = _original.PreCommand;
                 _postCommand = _original.PostCommand;
                 _commandTimeout = _original.CommandTimeoutMinutes;
-                _destinationStatus = HasStoredPassword ? "Repository password is stored. Leave the password empty to keep it." : "No password stored – enter the repository password.";
-                _destinationOk = HasStoredPassword;
+                var own = Destination.ShareCredential();
+                foreach (var c in _original.ShareCredentials ?? new List<ShareCredential>())
+                {
+                    if (own == null || !string.Equals(own.Share, c.Share, StringComparison.OrdinalIgnoreCase))
+                        ExtraShares.Add(new ShareCredentialRow(c, detail.SharesWithPassword.Any(s => string.Equals(s, c.Share, StringComparison.OrdinalIgnoreCase))));
+                }
             }
             else
             {
                 Schedules.Add(new ScheduleItemViewModel(new ScheduleEntry { Kind = ScheduleKind.Daily, Times = { "22:00" } }));
-                _destinationStatus = "Choose a folder, network share or USB disk. A new repository is created there when you save.";
             }
             SelectedSchedule = Schedules.FirstOrDefault();
 
             AddPathCommand = new RelayCommand(AddPath, () => !string.IsNullOrWhiteSpace(NewPath));
             RemoveSourceCommand = new RelayCommand(p => Selection.Remove((string)p));
-            BrowseDestinationCommand = new RelayCommand(() =>
-            {
-                string picked = Ui.PickFolder("Where should the backups be stored?", Destination);
-                if (picked != null)
-                    Destination = picked;
-            });
-            CheckDestinationCommand = new AsyncCommand(p => CheckDestination(((System.Windows.Controls.PasswordBox)p).Password), _ => !string.IsNullOrWhiteSpace(Destination));
             AddScheduleCommand = new RelayCommand(() =>
             {
                 var s = new ScheduleItemViewModel(new ScheduleEntry { Kind = ScheduleKind.Daily, Times = { "22:00" } });
@@ -93,18 +85,21 @@ namespace Keepsake.Gui.ViewModels
                 Schedules.Remove(SelectedSchedule);
                 SelectedSchedule = Schedules.FirstOrDefault();
             }, () => SelectedSchedule != null);
+            AddShareCommand = new RelayCommand(() => ExtraShares.Add(new ShareCredentialRow(new ShareCredential { Share = @"\\server\share" }, false)));
+            RemoveShareCommand = new RelayCommand(p => ExtraShares.Remove((ShareCredentialRow)p));
         }
 
         public bool IsNew => _original == null;
         public string Title => IsNew ? "New backup job" : "Edit job – " + _original.Name;
-        public bool HasStoredPassword { get; }
 
         public SourceSelection Selection { get; } = new SourceSelection();
         public ObservableCollection<FileTreeNode> Roots { get; } = new ObservableCollection<FileTreeNode>();
         public List<string> SelectedSources => Selection.Sources;
         public List<string> SelectedExclusions => Selection.Exclusions;
         public ObservableCollection<ScheduleItemViewModel> Schedules { get; } = new ObservableCollection<ScheduleItemViewModel>();
+        public ObservableCollection<ShareCredentialRow> ExtraShares { get; } = new ObservableCollection<ShareCredentialRow>();
         public IReadOnlyList<string> DefaultExcludes => Core.Backup.ExcludeMatcher.Defaults.ToList();
+        public DestinationEditorViewModel Destination { get; }
 
         public string Name { get => _name; set => Set(ref _name, value); }
         public bool Enabled { get => _enabled; set => Set(ref _enabled, value); }
@@ -120,31 +115,12 @@ namespace Keepsake.Gui.ViewModels
         public int CommandTimeout { get => _commandTimeout; set => Set(ref _commandTimeout, value); }
         public string Error { get => _error; set => Set(ref _error, value); }
 
-        public string Destination
-        {
-            get => _destination;
-            set
-            {
-                if (Set(ref _destination, value))
-                {
-                    DestinationOk = false;
-                    DestinationStatus = "Not checked yet.";
-                }
-            }
-        }
-
-        public string DestinationStatus { get => _destinationStatus; private set => Set(ref _destinationStatus, value); }
-        public bool DestinationOk { get => _destinationOk; private set => Set(ref _destinationOk, value); }
-
-        private bool DestinationChanged => _original == null ||
-                                           !string.Equals(_original.Destination?.Path, Destination, StringComparison.OrdinalIgnoreCase);
-
         public ICommand AddPathCommand { get; }
         public ICommand RemoveSourceCommand { get; }
-        public ICommand BrowseDestinationCommand { get; }
-        public ICommand CheckDestinationCommand { get; }
         public ICommand AddScheduleCommand { get; }
         public ICommand RemoveScheduleCommand { get; }
+        public ICommand AddShareCommand { get; }
+        public ICommand RemoveShareCommand { get; }
 
         private void AddPath()
         {
@@ -158,39 +134,21 @@ namespace Keepsake.Gui.ViewModels
             NewPath = null;
         }
 
-        private async Task<RepoTestResult> CheckDestination(string password)
+        private List<ShareCredential> ExtraShareCredentials() =>
+            ExtraShares.Where(s => !string.IsNullOrWhiteSpace(s.Share))
+                .Select(s => new ShareCredential { Share = s.Share.Trim().TrimEnd('\\'), User = s.User?.Trim() })
+                .ToList();
+
+        private JobSecrets ExtraSecrets()
         {
-            Error = null;
-            if (string.IsNullOrEmpty(password) && HasStoredPassword && !DestinationChanged)
-            {
-                DestinationStatus = "Repository password is stored. Enter it here to check it again.";
-                return null;
-            }
-            try
-            {
-                var result = await _connection.Call<RepoTestResult>(Methods.RepoTest, new RepoParams { Path = Destination, Password = password });
-                if (result.Exists)
-                {
-                    DestinationOk = true;
-                    DestinationStatus = "Repository found, password correct – " + result.Snapshots + " snapshot(s).";
-                }
-                else
-                {
-                    DestinationOk = false;
-                    DestinationStatus = "No repository here yet. A new encrypted repository will be created when you save.";
-                }
-                return result;
-            }
-            catch (ApiException ex)
-            {
-                DestinationOk = false;
-                DestinationStatus = ex.Message;
-                throw;
-            }
+            var secrets = new JobSecrets();
+            foreach (var s in ExtraShares.Where(s => !string.IsNullOrWhiteSpace(s.Share) && !string.IsNullOrEmpty(s.Password)))
+                secrets.SharePasswords[s.Share.Trim().TrimEnd('\\')] = s.Password;
+            return secrets;
         }
 
         /// <summary>Validates, creates the repository if needed and saves. Returns true when saved.</summary>
-        public async Task<bool> Save(string password, string confirm)
+        public async Task<bool> Save()
         {
             Error = null;
             var job = Build();
@@ -201,46 +159,17 @@ namespace Keepsake.Gui.ViewModels
                 return false;
             }
 
-            string passwordToSend = string.IsNullOrEmpty(password) ? null : password;
-            if (DestinationChanged || !HasStoredPassword)
-            {
-                if (passwordToSend == null)
-                {
-                    Error = "Enter the repository password (Destination tab).";
-                    return false;
-                }
-                RepoTestResult test;
-                try
-                {
-                    test = await CheckDestination(password);
-                }
-                catch (ApiException ex)
-                {
-                    Error = ex.Message;
-                    return false;
-                }
-                if (test != null && !test.Exists)
-                {
-                    if (password.Length < 8)
-                    {
-                        Error = "The repository password must have at least 8 characters.";
-                        return false;
-                    }
-                    if (password != confirm)
-                    {
-                        Error = "The repository passwords do not match.";
-                        return false;
-                    }
-                    if (!Ui.Confirm("Create a new encrypted repository in\n" + Destination + " ?"))
-                        return false;
-                    var init = await _connection.Call<RepoInitResult>(Methods.RepoInit, new RepoParams { Path = Destination, Password = password });
-                    RecoveryKeyWindow.ShowKey(init.RecoveryKey, Destination);
-                }
-            }
-
             try
             {
-                await _connection.Call<JobDetail>(Methods.JobsSave, new JobSaveParams { Job = job, RepositoryPassword = passwordToSend });
+                string problem = await Destination.EnsureRepository(ExtraShareCredentials(), ExtraSecrets());
+                if (problem != null)
+                {
+                    Error = problem;
+                    return false;
+                }
+                var secrets = ExtraSecrets();
+                Destination.FillSecrets(secrets);
+                await _connection.Call<JobDetail>(Methods.JobsSave, new JobSaveParams { Job = job, Secrets = secrets });
                 return true;
             }
             catch (ApiException ex)
@@ -255,6 +184,10 @@ namespace Keepsake.Gui.ViewModels
             var excludes = Selection.Exclusions.ToList();
             excludes.AddRange((Patterns ?? "").Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(l => l.Trim()).Where(l => l.Length > 0 && !l.StartsWith("#", StringComparison.Ordinal)));
+            var shares = ExtraShareCredentials();
+            var own = Destination.ShareCredential();
+            if (own != null && !shares.Any(s => string.Equals(s.Share, own.Share, StringComparison.OrdinalIgnoreCase)))
+                shares.Add(own);
             return new JobDefinition
             {
                 Id = _original?.Id,
@@ -263,7 +196,8 @@ namespace Keepsake.Gui.ViewModels
                 Sources = Selection.Sources,
                 Excludes = excludes.Distinct(StringComparer.OrdinalIgnoreCase).ToList(),
                 UseDefaultExcludes = UseDefaultExcludes,
-                Destination = new Destination { Type = "folder", Path = Destination?.Trim() },
+                Destination = Destination.Build(),
+                ShareCredentials = shares,
                 Schedules = Schedules.Select(s => s.ToEntry()).ToList(),
                 RunMissed = RunMissed,
                 RetryCount = RetryCount,

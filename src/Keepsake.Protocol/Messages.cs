@@ -32,6 +32,7 @@ namespace Keepsake.Protocol
 
         public const string RepoInit = "repo.init";
         public const string RepoTest = "repo.test";
+        public const string VolumesList = "volumes.list";
 
         public const string SnapshotsList = "snapshots.list";
         public const string TreeList = "tree.list";
@@ -128,14 +129,23 @@ namespace Keepsake.Protocol
     {
         public JobDefinition Job { get; set; }
 
-        /// <summary>Repository password; null keeps the stored one.</summary>
+        /// <summary>Repository password; null keeps the stored one. (Same as Secrets.RepositoryPassword.)</summary>
         public string RepositoryPassword { get; set; }
+
+        /// <summary>Destination and share secrets; null fields keep the stored values.</summary>
+        public JobSecrets Secrets { get; set; }
     }
 
     public sealed class JobDetail
     {
         public JobDefinition Job { get; set; }
         public bool HasRepositoryPassword { get; set; }
+        public bool HasSftpPassword { get; set; }
+        public bool HasSftpKey { get; set; }
+
+        /// <summary>Shares that have a stored password.</summary>
+        public List<string> SharesWithPassword { get; set; } = new List<string>();
+
         public DateTime? NextRun { get; set; }
         public List<string> ScheduleText { get; set; } = new List<string>();
     }
@@ -244,10 +254,19 @@ namespace Keepsake.Protocol
 
     // ---- Repositories / restore ----------------------------------------------------------------
 
+    /// <summary>
+    /// A repository location for repo.init / repo.test. With <see cref="JobId"/>, secrets that are not given
+    /// are taken from that job (editing an existing job without re-entering every password).
+    /// </summary>
     public sealed class RepoParams
     {
-        public string Path { get; set; }
-        public string Password { get; set; }
+        public string JobId { get; set; }
+        public Destination Destination { get; set; }
+        public List<ShareCredential> ShareCredentials { get; set; } = new List<ShareCredential>();
+        public JobSecrets Secrets { get; set; } = new JobSecrets();
+
+        /// <summary>USB: the disk to use (default: the first connected disk of the destination).</summary>
+        public string VolumeId { get; set; }
     }
 
     public sealed class RepoInitResult
@@ -258,9 +277,21 @@ namespace Keepsake.Protocol
 
     public sealed class RepoTestResult
     {
+        /// <summary>Where the destination resolved to (e.g. the current drive of a USB disk).</summary>
+        public string Location { get; set; }
+
+        public bool Reachable { get; set; }
         public bool Exists { get; set; }
         public string RepositoryId { get; set; }
         public int Snapshots { get; set; }
+        public bool CanWrite { get; set; }
+        public bool CanDelete { get; set; }
+        public long? FreeBytes { get; set; }
+        public List<string> Problems { get; set; } = new List<string>();
+
+        /// <summary>SFTP host key that is not trusted yet (or changed). The client asks the user and retries with it pinned.</summary>
+        public string UntrustedHostKey { get; set; }
+        public bool HostKeyChanged { get; set; }
     }
 
     public sealed class SnapshotInfo

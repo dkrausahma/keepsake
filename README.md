@@ -12,7 +12,7 @@ Encrypted, compressed, deduplicated file backup for Windows Server 2008 R2 SP1 a
 | 1 | Core + format: chunking, AES-256-GCM, key slots, file system destination, CLI | **done** |
 | 2 | Windows service, scheduler, job store, run logs, named-pipe API | **done** (console mode tested; not yet installed as a real service) |
 | 3 | WPF GUI | **done** (tested on Windows 11; disaster-recovery mode without the service still CLI-only) |
-| 4 | Destinations: share credentials, USB by volume ID, SFTP | open |
+| 4 | Destinations: share credentials, USB by volume ID, SFTP | **done** (SFTP tested against OpenSSH in Docker; share credentials not tested against a real domain share) |
 | 5 | VSS, retention/prune, scheduled checks, notifications, Event Log | open |
 | 6 | 2008 R2 test pass, installer, DR runbook | open |
 | 7 | PostgreSQL / MariaDB sources | open |
@@ -119,6 +119,13 @@ dotnet build Keepsake.slnx -c Release
 dotnet test tests/Keepsake.Core.Tests
 ```
 
+The SFTP tests run when a server is reachable on `localhost:2222` (otherwise they pass without doing
+anything):
+
+```bash
+docker run -d --name keepsake-sftp -p 2222:22 atmoz/sftp:alpine kuser:Sftp-Pass-1:1001:1001:backups
+```
+
 `src/Keepsake.Cli/bin/Release/net48/` is a portable folder: copy it to any machine with
 .NET Framework 4.8 and run `keepsake.exe`.
 
@@ -144,6 +151,15 @@ keepsake restore latest --repo E:\Backups\fileserver --target D:\Restore --inclu
 keepsake check --repo E:\Backups\fileserver --read-data-percent 10
 ```
 
+Restore from an SFTP repository on any machine (disaster recovery, no service needed):
+
+```bash
+keepsake restore latest --repo sftp://backup@nas.example.org/backups/fileserver --sftp-password-file sftp.txt --recovery-key-file key.txt --target D:\Restore
+```
+
+The first connection shows the server's host key fingerprint and asks to trust it; pass
+`--sftp-host-key SHA256:...` to pin it for unattended use.
+
 For automation use `--password-file` (or `KEEPSAKE_PASSWORD`), `--non-interactive` and `--json`.
 Exit codes: 0 success, 1 warnings, 2 failed, 3 usage error, 4 wrong password/key, 5 locked, 6 cancelled.
 
@@ -151,6 +167,7 @@ Exit codes: 0 success, 1 warnings, 2 failed, 3 usage error, 4 wrong password/key
 
 | Package | Why |
 |---|---|
-| BouncyCastle.Cryptography 2.6.2 | AES-256-GCM and Argon2id (not in .NET Framework 4.8) |
+| BouncyCastle.Cryptography 2.7.0 | AES-256-GCM and Argon2id (not in .NET Framework 4.8) |
+| SSH.NET 2026.0.0 | SFTP destinations |
 | ZstdSharp.Port 0.8.1 | Zstandard compression (managed) |
 | System.Text.Json 8.0.5 | JSON serialization |

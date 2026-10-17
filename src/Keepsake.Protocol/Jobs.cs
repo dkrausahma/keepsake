@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Keepsake.Core.Repo;
 
 namespace Keepsake.Protocol
@@ -36,10 +37,78 @@ namespace Keepsake.Protocol
     /// <summary>Where a job's repository lives. Milestone 4 adds share credentials, USB volumes and SFTP.</summary>
     public sealed class Destination
     {
-        public string Type { get; set; } = "folder";
+        public string Type { get; set; } = DestinationTypes.Folder;
+
+        /// <summary>
+        /// folder: absolute local or UNC path. usb: folder on the disk, relative (<c>Keepsake\Fileserver</c>).
+        /// sftp: remote folder (<c>/backups/fileserver</c>).
+        /// </summary>
         public string Path { get; set; }
 
-        public override string ToString() => Path;
+        /// <summary>USB disks that may hold this job's backups (rotation). Identified by volume ID, not drive letter.</summary>
+        public List<UsbVolume> Volumes { get; set; } = new List<UsbVolume>();
+
+        public string Host { get; set; }
+        public int Port { get; set; } = 22;
+        public string User { get; set; }
+
+        /// <summary>SFTP: <c>password</c> or <c>key</c>.</summary>
+        public string Auth { get; set; } = "password";
+
+        /// <summary>SFTP: pinned host key, <c>SHA256:...</c>.</summary>
+        public string HostKeyFingerprint { get; set; }
+
+        public override string ToString()
+        {
+            switch (Type)
+            {
+                case DestinationTypes.Usb:
+                    return "USB disk " + string.Join(" / ", (Volumes ?? new List<UsbVolume>()).Select(v => v.Label ?? v.VolumeId)) + " \\" + (Path ?? "").TrimStart('\\');
+                case DestinationTypes.Sftp:
+                    return "sftp://" + User + "@" + Host + (Port == 22 ? "" : ":" + Port) + "/" + (Path ?? "").TrimStart('/');
+                default:
+                    return Path;
+            }
+        }
+    }
+
+    public static class DestinationTypes
+    {
+        public const string Folder = "folder";
+        public const string Usb = "usb";
+        public const string Sftp = "sftp";
+    }
+
+    public sealed class UsbVolume
+    {
+        /// <summary><c>Volume{GUID}</c> as reported by Windows; survives drive letter changes.</summary>
+        public string VolumeId { get; set; }
+        public string Label { get; set; }
+        public long TotalBytes { get; set; }
+    }
+
+    /// <summary>Credentials for one network share, used only for the connection (not the service account).</summary>
+    public sealed class ShareCredential
+    {
+        /// <summary><c>\\server\share</c></summary>
+        public string Share { get; set; }
+
+        /// <summary><c>DOMAIN\user</c> or <c>server\user</c>.</summary>
+        public string User { get; set; }
+    }
+
+    /// <summary>
+    /// Secrets sent to the service (never returned). Null = keep the stored value, empty string = remove it.
+    /// </summary>
+    public sealed class JobSecrets
+    {
+        public string RepositoryPassword { get; set; }
+        public string SftpPassword { get; set; }
+        public string SftpPrivateKey { get; set; }
+        public string SftpKeyPassphrase { get; set; }
+
+        /// <summary>Share (<c>\\server\share</c>) → password.</summary>
+        public Dictionary<string, string> SharePasswords { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     }
 
     /// <summary>A backup job as stored by the service. Secrets (repository password) are kept separately.</summary>
@@ -52,6 +121,10 @@ namespace Keepsake.Protocol
         public List<string> Excludes { get; set; } = new List<string>();
         public bool UseDefaultExcludes { get; set; } = true;
         public Destination Destination { get; set; } = new Destination();
+
+        /// <summary>Credentials for network shares used as source or destination (SRC-02, DST-02).</summary>
+        public List<ShareCredential> ShareCredentials { get; set; } = new List<ShareCredential>();
+
         public List<ScheduleEntry> Schedules { get; set; } = new List<ScheduleEntry>();
 
         /// <summary>Run once after start-up if a scheduled run was missed while the service was stopped.</summary>
@@ -92,12 +165,14 @@ namespace Keepsake.Protocol
                         errors.Add("'" + s + "' is not an absolute path.");
                 }
             }
-            if (job.Destination == null || string.IsNullOrWhiteSpace(job.Destination.Path))
-                errors.Add("Choose where the backups are stored.");
-            else if (job.Destination.Type != "folder")
-                errors.Add("Destination type '" + job.Destination.Type + "' is not supported yet.");
-            else if (!IsAbsolute(job.Destination.Path))
-                errors.Add("The backup destination must be an absolute path.");
+            errors.AddRange(ValidateDestination(job.Destination));
+            foreach (var c in job.ShareCredentials ?? new List<ShareCredential>())
+            {
+                if (string.IsNullOrWhiteSpace(c.Share) || !c.Share.StartsWith(@"\\", StringComparison.Ordinal) || c.Share.Trim('\\').Split('\\').Length != 2)
+                    errors.Add("'" + c.Share + "' is not a network share (use \\\\server\\share).");
+                if (string.IsNullOrWhiteSpace(c.User))
+                    errors.Add("Enter the user name for " + c.Share + ".");
+            }
             if (job.RetryCount < 0 || job.RetryCount > 10)
                 errors.Add("Retries must be between 0 and 10.");
             if (job.RetryDelayMinutes < 1 || job.RetryDelayMinutes > 24 * 60)
@@ -106,6 +181,47 @@ namespace Keepsake.Protocol
                 errors.Add("The command timeout must be between 1 minute and 24 hours.");
             foreach (var s in job.Schedules ?? new List<ScheduleEntry>())
                 errors.AddRange(ScheduleMath.Validate(s));
+            return errors;
+        }
+
+        public static List<string> ValidateDestination(Destination d)
+        {
+            var errors = new List<string>();
+            if (d == null)
+            {
+                errors.Add("Choose where the backups are stored.");
+                return errors;
+            }
+            switch (d.Type)
+            {
+                case DestinationTypes.Folder:
+                    if (string.IsNullOrWhiteSpace(d.Path))
+                        errors.Add("Choose where the backups are stored.");
+                    else if (!IsAbsolute(d.Path))
+                        errors.Add("The backup destination must be an absolute path.");
+                    break;
+                case DestinationTypes.Usb:
+                    if (d.Volumes == null || d.Volumes.Count == 0)
+                        errors.Add("Add at least one USB disk.");
+                    if (string.IsNullOrWhiteSpace(d.Path) || IsAbsolute(d.Path))
+                        errors.Add("Enter the folder on the USB disk without drive letter, e.g. Keepsake\\Fileserver.");
+                    break;
+                case DestinationTypes.Sftp:
+                    if (string.IsNullOrWhiteSpace(d.Host))
+                        errors.Add("Enter the SFTP server.");
+                    if (d.Port < 1 || d.Port > 65535)
+                        errors.Add("The SFTP port must be between 1 and 65535.");
+                    if (string.IsNullOrWhiteSpace(d.User))
+                        errors.Add("Enter the SFTP user name.");
+                    if (string.IsNullOrWhiteSpace(d.Path) || !d.Path.StartsWith("/", StringComparison.Ordinal))
+                        errors.Add("Enter the remote folder as an absolute path, e.g. /backups/fileserver.");
+                    if (d.Auth != "password" && d.Auth != "key")
+                        errors.Add("SFTP authentication must be 'password' or 'key'.");
+                    break;
+                default:
+                    errors.Add("Unknown destination type '" + d.Type + "'.");
+                    break;
+            }
             return errors;
         }
 

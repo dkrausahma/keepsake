@@ -14,6 +14,49 @@ namespace Keepsake.Service
 
         /// <summary>Repository password, DPAPI-protected.</summary>
         public string RepositoryPassword { get; set; }
+
+        /// <summary>Other secrets (SFTP, share passwords), DPAPI-protected. Keys: see <see cref="SecretKeys"/>.</summary>
+        public Dictionary<string, string> Secrets { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+    }
+
+    internal static class SecretKeys
+    {
+        public const string SftpPassword = "sftp.password";
+        public const string SftpKey = "sftp.key";
+        public const string SftpPassphrase = "sftp.passphrase";
+        public static string Share(string share) => "share:" + share.TrimEnd('\\').ToLowerInvariant();
+    }
+
+    /// <summary>Decrypted secrets of one job, used only while a run or a test is in progress.</summary>
+    internal sealed class ResolvedSecrets
+    {
+        public string RepositoryPassword { get; set; }
+        public string SftpPassword { get; set; }
+        public string SftpKey { get; set; }
+        public string SftpPassphrase { get; set; }
+        public Dictionary<string, string> SharePasswords { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Values in <paramref name="given"/> win over this (stored) set; null means "not given".</summary>
+        public ResolvedSecrets Merge(JobSecrets given)
+        {
+            if (given == null)
+                return this;
+            var r = new ResolvedSecrets
+            {
+                RepositoryPassword = given.RepositoryPassword ?? RepositoryPassword,
+                SftpPassword = given.SftpPassword ?? SftpPassword,
+                SftpKey = given.SftpPrivateKey ?? SftpKey,
+                SftpPassphrase = given.SftpKeyPassphrase ?? SftpPassphrase,
+            };
+            foreach (var kv in SharePasswords)
+                r.SharePasswords[kv.Key] = kv.Value;
+            foreach (var kv in given.SharePasswords ?? new Dictionary<string, string>())
+            {
+                if (kv.Value != null)
+                    r.SharePasswords[kv.Key.TrimEnd('\\')] = kv.Value;
+            }
+            return r;
+        }
     }
 
     internal sealed class JobsFile
@@ -33,7 +76,57 @@ namespace Keepsake.Service
         {
             _file = file;
             _data = File.Exists(file) ? Json.FromBytes<JobsFile>(File.ReadAllBytes(file)) : new JobsFile();
+            foreach (var j in _data.Jobs)
+            {
+                j.Secrets = new Dictionary<string, string>(j.Secrets ?? new Dictionary<string, string>(), StringComparer.OrdinalIgnoreCase);
+                j.Job.ShareCredentials = j.Job.ShareCredentials ?? new List<ShareCredential>();
+                j.Job.Destination.Volumes = j.Job.Destination.Volumes ?? new List<UsbVolume>();
+            }
         }
+
+        public bool HasSecret(string id, string key)
+        {
+            lock (_lock)
+            {
+                var stored = Find(id);
+                return stored != null && stored.Secrets.TryGetValue(key, out var v) && !string.IsNullOrEmpty(v);
+            }
+        }
+
+        /// <summary>All secrets of a job, decrypted. Empty (not null) for unknown jobs.</summary>
+        public ResolvedSecrets GetSecrets(string id)
+        {
+            StoredJob stored;
+            lock (_lock)
+                stored = id == null ? null : Find(id);
+            var r = new ResolvedSecrets();
+            if (stored == null)
+                return r;
+            r.RepositoryPassword = Secrets.Unprotect(stored.RepositoryPassword);
+            r.SftpPassword = GetSecret(stored, SecretKeys.SftpPassword);
+            r.SftpKey = GetSecret(stored, SecretKeys.SftpKey);
+            r.SftpPassphrase = GetSecret(stored, SecretKeys.SftpPassphrase);
+            foreach (var c in stored.Job.ShareCredentials ?? new List<ShareCredential>())
+            {
+                string pw = GetSecret(stored, SecretKeys.Share(c.Share));
+                if (pw != null)
+                    r.SharePasswords[c.Share.TrimEnd('\\')] = pw;
+            }
+            return r;
+        }
+
+        private static void ApplySecret(StoredJob stored, string key, string value)
+        {
+            if (value == null)
+                return;
+            if (value.Length == 0)
+                stored.Secrets.Remove(key);
+            else
+                stored.Secrets[key] = Secrets.Protect(value);
+        }
+
+        private static string GetSecret(StoredJob stored, string key) =>
+            stored.Secrets.TryGetValue(key, out var v) && !string.IsNullOrEmpty(v) ? Secrets.Unprotect(v) : null;
 
         public List<JobDefinition> List()
         {
@@ -74,9 +167,10 @@ namespace Keepsake.Service
             return Secrets.Unprotect(stored);
         }
 
-        /// <summary>Creates or updates a job. <paramref name="repositoryPassword"/> null keeps the stored password.</summary>
-        public JobDefinition Save(JobDefinition job, string repositoryPassword)
+        /// <summary>Creates or updates a job. Null secrets keep the stored values, empty strings remove them.</summary>
+        public JobDefinition Save(JobDefinition job, string repositoryPassword, JobSecrets secrets = null)
         {
+            repositoryPassword = repositoryPassword ?? secrets?.RepositoryPassword;
             lock (_lock)
             {
                 var now = DateTime.UtcNow;
@@ -104,6 +198,18 @@ namespace Keepsake.Service
                 stored.Job = copy;
                 if (!string.IsNullOrEmpty(repositoryPassword))
                     stored.RepositoryPassword = Secrets.Protect(repositoryPassword);
+                if (secrets != null)
+                {
+                    ApplySecret(stored, SecretKeys.SftpPassword, secrets.SftpPassword);
+                    ApplySecret(stored, SecretKeys.SftpKey, secrets.SftpPrivateKey);
+                    ApplySecret(stored, SecretKeys.SftpPassphrase, secrets.SftpKeyPassphrase);
+                    foreach (var kv in secrets.SharePasswords ?? new Dictionary<string, string>())
+                        ApplySecret(stored, SecretKeys.Share(kv.Key), kv.Value);
+                }
+                // Drop passwords of shares that are no longer configured.
+                var keep = new HashSet<string>((copy.ShareCredentials ?? new List<ShareCredential>()).Select(c => SecretKeys.Share(c.Share)), StringComparer.OrdinalIgnoreCase);
+                foreach (string key in stored.Secrets.Keys.Where(k => k.StartsWith("share:", StringComparison.OrdinalIgnoreCase) && !keep.Contains(k)).ToList())
+                    stored.Secrets.Remove(key);
                 Persist();
                 return Clone(copy);
             }

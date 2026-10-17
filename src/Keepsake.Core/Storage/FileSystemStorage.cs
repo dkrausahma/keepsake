@@ -6,7 +6,7 @@ using Keepsake.Core.Util;
 namespace Keepsake.Core.Storage
 {
     /// <summary>Repository on a local disk, a USB disk or a network share (UNC path).</summary>
-    public sealed class FileSystemStorage : IStorage
+    public sealed class FileSystemStorage : IStorage, IFreeSpace
     {
         private const string TempMarker = ".tmp-";
         private readonly string _root;
@@ -96,6 +96,16 @@ namespace Keepsake.Core.Storage
                 yield return new StorageEntry(relative, file.Length);
             }
         }
+
+        public long? FreeBytes()
+        {
+            string dir = Location.EndsWith("\\", StringComparison.Ordinal) ? Location : Location + "\\";
+            return GetDiskFreeSpaceEx(dir, out ulong free, out _, out _) ? (long?)(long)free : null;
+        }
+
+        [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        private static extern bool GetDiskFreeSpaceEx(string directory, out ulong freeForCaller, out ulong total, out ulong totalFree);
 
         public void Dispose()
         {

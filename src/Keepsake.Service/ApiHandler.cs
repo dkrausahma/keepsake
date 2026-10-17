@@ -135,6 +135,8 @@ namespace Keepsake.Service
                     return InitRepository(P<RepoParams>(r));
                 case Methods.RepoTest:
                     return TestRepository(P<RepoParams>(r));
+                case Methods.VolumesList:
+                    return LocalVolumes.List();
                 case Methods.SnapshotsList:
                     return Snapshots(Job(P<IdParams>(r).Id));
                 case Methods.TreeList:
@@ -170,7 +172,7 @@ namespace Keepsake.Service
             Id = job.Id,
             Name = job.Name,
             Enabled = job.Enabled,
-            Destination = job.Destination?.Path,
+            Destination = job.Destination?.ToString(),
             ScheduleText = job.Schedules.Select(ScheduleMath.Describe).ToList(),
             NextRun = _ctx.Scheduler.NextRun(job),
             LastRun = _ctx.History.Last(job.Id),
@@ -183,6 +185,9 @@ namespace Keepsake.Service
         {
             Job = job,
             HasRepositoryPassword = _ctx.Jobs.HasPassword(job.Id),
+            HasSftpPassword = _ctx.Jobs.HasSecret(job.Id, SecretKeys.SftpPassword),
+            HasSftpKey = _ctx.Jobs.HasSecret(job.Id, SecretKeys.SftpKey),
+            SharesWithPassword = job.ShareCredentials.Where(c => _ctx.Jobs.HasSecret(job.Id, SecretKeys.Share(c.Share))).Select(c => c.Share).ToList(),
             NextRun = _ctx.Scheduler.NextRun(job),
             ScheduleText = job.Schedules.Select(ScheduleMath.Describe).ToList(),
         };
@@ -196,15 +201,39 @@ namespace Keepsake.Service
                 throw new ApiException(ErrorCodes.Invalid, string.Join(" ", errors));
             p.Job.Name = p.Job.Name.Trim();
             p.Job.Sources = p.Job.Sources.Select(LongPath.Normalize).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-            p.Job.Destination.Path = LongPath.Normalize(p.Job.Destination.Path);
+            var d = p.Job.Destination;
+            if (d.Type == DestinationTypes.Folder)
+                d.Path = LongPath.Normalize(d.Path);
+            else if (d.Type == DestinationTypes.Usb)
+                d.Path = d.Path.Trim().Trim('\\');
+            else if (d.Type == DestinationTypes.Sftp)
+                d.Path = "/" + d.Path.Trim().Trim('/');
+            p.Job.ShareCredentials = (p.Job.ShareCredentials ?? new List<ShareCredential>())
+                .Select(c => new ShareCredential { Share = c.Share.Trim().TrimEnd('\\'), User = c.User.Trim() }).ToList();
             p.Job.Excludes = (p.Job.Excludes ?? new List<string>()).Where(e => !string.IsNullOrWhiteSpace(e)).Select(e => e.Trim()).ToList();
-            if (!string.IsNullOrEmpty(p.Job.Id) && _ctx.Jobs.Get(p.Job.Id) != null && _ctx.Runner.IsBusy(p.Job.Id))
+            var existing = string.IsNullOrEmpty(p.Job.Id) ? null : _ctx.Jobs.Get(p.Job.Id);
+            if (existing != null && _ctx.Runner.IsBusy(p.Job.Id))
                 throw new ApiException(ErrorCodes.Conflict, "The job cannot be changed while it is running.");
 
+            var secrets = p.Secrets ?? new JobSecrets();
             if (!string.IsNullOrEmpty(p.RepositoryPassword))
-                VerifyPassword(p.Job.Destination.Path, p.RepositoryPassword);
+                secrets.RepositoryPassword = p.RepositoryPassword;
+            if (!string.IsNullOrEmpty(secrets.RepositoryPassword))
+            {
+                // A wrong password must never be stored: check it against the repository if it exists.
+                var resolved = _ctx.Jobs.GetSecrets(existing?.Id).Merge(secrets);
+                using (var opened = DestinationResolver.Open(p.Job.Destination, p.Job.ShareCredentials, resolved))
+                {
+                    if (Repository.Exists(opened.Storage))
+                    {
+                        using (Repository.Open(opened.Storage, RepoCredential.FromPassword(resolved.RepositoryPassword)))
+                        {
+                        }
+                    }
+                }
+            }
 
-            var saved = _ctx.Jobs.Save(p.Job, p.RepositoryPassword);
+            var saved = _ctx.Jobs.Save(p.Job, null, secrets);
             Evict(saved.Id);
             ServiceLog.Info("Job '" + saved.Name + "' saved.");
             return Detail(saved);
@@ -231,40 +260,81 @@ namespace Keepsake.Service
 
         // ---- Repositories ----------------------------------------------------------------------
 
+        private OpenedDestination OpenFor(RepoParams p, out ResolvedSecrets secrets)
+        {
+            if (p?.Destination == null)
+                throw new ApiException(ErrorCodes.Invalid, "No destination given.");
+            var errors = JobValidation.ValidateDestination(p.Destination);
+            if (errors.Count > 0)
+                throw new ApiException(ErrorCodes.Invalid, string.Join(" ", errors));
+            secrets = _ctx.Jobs.GetSecrets(string.IsNullOrEmpty(p.JobId) ? null : p.JobId).Merge(p.Secrets);
+            return DestinationResolver.Open(p.Destination, p.ShareCredentials, secrets, p.VolumeId);
+        }
+
         private RepoInitResult InitRepository(RepoParams p)
         {
-            if (p == null || string.IsNullOrWhiteSpace(p.Path))
-                throw new ApiException(ErrorCodes.Invalid, "No repository location given.");
-            if (string.IsNullOrEmpty(p.Password) || p.Password.Length < 8)
-                throw new ApiException(ErrorCodes.Invalid, "The repository password must have at least 8 characters.");
-            var storage = StorageFactory.Open(p.Path);
-            if (Repository.Exists(storage))
-                throw new ApiException(ErrorCodes.Conflict, "A Keepsake repository already exists at " + storage.Location + ".");
-            var init = Repository.Init(storage, p.Password);
-            using (init.Repository)
+            using (var opened = OpenFor(p, out var secrets))
             {
-                ServiceLog.Info("Repository created at " + storage.Location + ".");
+                if (string.IsNullOrEmpty(secrets.RepositoryPassword) || secrets.RepositoryPassword.Length < 8)
+                    throw new ApiException(ErrorCodes.Invalid, "The repository password must have at least 8 characters.");
+                if (Repository.Exists(opened.Storage))
+                    throw new ApiException(ErrorCodes.Conflict, "A Keepsake repository already exists at " + opened.Storage.Location + ".");
+                var init = Repository.Init(opened.Storage, secrets.RepositoryPassword);
+                ServiceLog.Info("Repository created at " + opened.Storage.Location + ".");
                 return new RepoInitResult { RepositoryId = init.Repository.Header.Id, RecoveryKey = init.RecoveryKey };
             }
         }
 
+        /// <summary>Destination check (DST-06): reachable, writable, deletable, free space, repository and password.</summary>
         private RepoTestResult TestRepository(RepoParams p)
         {
-            var storage = StorageFactory.Open(p.Path);
-            if (!Repository.Exists(storage))
-                return new RepoTestResult { Exists = false };
-            using (var repo = Repository.Open(storage, RepoCredential.FromPassword(p.Password ?? "")))
-                return new RepoTestResult { Exists = true, RepositoryId = repo.Header.Id, Snapshots = repo.ListSnapshots().Count };
-        }
-
-        private static void VerifyPassword(string path, string password)
-        {
-            var storage = StorageFactory.Open(path);
-            if (!Repository.Exists(storage))
-                return; // repository is created separately (repo.init)
-            using (Repository.Open(storage, RepoCredential.FromPassword(password)))
+            var result = new RepoTestResult();
+            OpenedDestination opened;
+            ResolvedSecrets secrets;
+            try
             {
+                opened = OpenFor(p, out secrets);
             }
+            catch (HostKeyException ex)
+            {
+                result.UntrustedHostKey = ex.Fingerprint;
+                result.HostKeyChanged = ex.Mismatch;
+                result.Problems.Add(ex.Message);
+                return result;
+            }
+            catch (KeepsakeException ex) when (!(ex is ApiException))
+            {
+                result.Problems.Add(ex.Message);
+                return result;
+            }
+
+            using (opened)
+            {
+                result.Location = opened.Storage.Location;
+                var probe = StorageProbe.Test(opened.Storage);
+                result.Reachable = probe.Reachable;
+                result.Exists = probe.RepositoryExists;
+                result.CanWrite = probe.CanWrite;
+                result.CanDelete = probe.CanDelete;
+                result.FreeBytes = probe.FreeBytes;
+                result.Problems.AddRange(probe.Problems);
+                if (result.Exists && !string.IsNullOrEmpty(secrets.RepositoryPassword))
+                {
+                    try
+                    {
+                        using (var repo = Repository.Open(opened.Storage, RepoCredential.FromPassword(secrets.RepositoryPassword)))
+                        {
+                            result.RepositoryId = repo.Header.Id;
+                            result.Snapshots = repo.ListSnapshots().Count;
+                        }
+                    }
+                    catch (WrongCredentialException ex)
+                    {
+                        result.Problems.Add(ex.Message);
+                    }
+                }
+            }
+            return result;
         }
 
         // ---- Browsing --------------------------------------------------------------------------
@@ -323,21 +393,21 @@ namespace Keepsake.Service
             {
                 foreach (var stale in _repoCache.Where(c => DateTime.UtcNow - c.Value.LastUse > BrowseCacheIdle).Select(c => c.Key).ToList())
                 {
-                    _repoCache[stale].Repository.Dispose();
+                    _repoCache[stale].Opened.Dispose();
                     _repoCache.Remove(stale);
                 }
                 if (_repoCache.TryGetValue(job.Id, out var cached))
                 {
                     cached.LastUse = DateTime.UtcNow;
-                    return cached.Repository;
+                    return cached.Opened.Repository;
                 }
             }
-            var repo = _ctx.Runner.OpenRepository(job); // Argon2: done outside the lock
+            var opened = _ctx.Runner.OpenRepository(job); // Argon2 and network: done outside the lock
             lock (_cacheLock)
             {
-                _repoCache[job.Id] = new CachedRepo { Repository = repo, LastUse = DateTime.UtcNow };
+                _repoCache[job.Id] = new CachedRepo { Opened = opened, LastUse = DateTime.UtcNow };
             }
-            return repo;
+            return opened.Repository;
         }
 
         private void Evict(string jobId)
@@ -346,7 +416,7 @@ namespace Keepsake.Service
             {
                 if (jobId != null && _repoCache.TryGetValue(jobId, out var cached))
                 {
-                    cached.Repository.Dispose();
+                    cached.Opened.Dispose();
                     _repoCache.Remove(jobId);
                 }
             }
@@ -373,7 +443,7 @@ namespace Keepsake.Service
 
         private sealed class CachedRepo
         {
-            public Repository Repository;
+            public OpenedRepository Opened;
             public DateTime LastUse;
         }
     }

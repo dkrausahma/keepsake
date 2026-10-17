@@ -11,7 +11,7 @@ namespace Keepsake.Cli
 {
     internal static class Program
     {
-        internal static readonly string[] GlobalValueOptions = { "repo", "password-file", "recovery-key-file", "log" };
+        internal static readonly string[] GlobalValueOptions = { "repo", "password-file", "recovery-key-file", "log", "sftp-password-file", "sftp-key-file", "sftp-key-passphrase-file", "sftp-host-key" };
         internal static readonly string[] GlobalFlags = { "json", "non-interactive", "use-recovery-key", "quiet", "help" };
 
         private static int Main(string[] args)
@@ -152,7 +152,9 @@ namespace Keepsake.Cli
                 Console.WriteLine("  " + c.Name.PadRight(11) + c.Summary);
             Console.WriteLine();
             Console.WriteLine("Common options:");
-            Console.WriteLine("  --repo <path>               Repository folder (local, USB disk or \\\\server\\share). Env: KEEPSAKE_REPOSITORY");
+            Console.WriteLine("  --repo <path>               Repository folder (local, USB disk, \\\\server\\share) or sftp://user@host[:port]/path. Env: KEEPSAKE_REPOSITORY");
+            Console.WriteLine("  --sftp-password-file <file> SFTP password, or --sftp-key-file <file> [--sftp-key-passphrase-file <file>]. Env: KEEPSAKE_SFTP_PASSWORD");
+            Console.WriteLine("  --sftp-host-key <SHA256:..> Trusted SFTP host key (asked interactively if missing). Env: KEEPSAKE_SFTP_HOST_KEY");
             Console.WriteLine("  --password-file <file>      Read the password from the first line of a file. Env: KEEPSAKE_PASSWORD");
             Console.WriteLine("  --recovery-key-file <file>  Unlock with the recovery key (KS1-...) from a file. Env: KEEPSAKE_RECOVERY_KEY");
             Console.WriteLine("  --use-recovery-key          Ask for the recovery key instead of the password");

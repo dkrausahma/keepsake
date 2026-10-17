@@ -141,7 +141,7 @@ namespace Keepsake.Cli
 
         private static int Init(CommandContext ctx)
         {
-            var storage = StorageFactory.Open(ctx.RepositoryLocation);
+            var storage = ctx.OpenStorage();
             string password = ctx.NewPassword("password-file", "repository password");
             var result = Repository.Init(storage, password);
             string keyOut = ctx.Args.Value("recovery-key-out");

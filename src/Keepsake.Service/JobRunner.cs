@@ -252,7 +252,7 @@ namespace Keepsake.Service
                 ["KEEPSAKE_JOB"] = job.Name,
                 ["KEEPSAKE_RUN_ID"] = record.Id,
                 ["KEEPSAKE_MODE"] = record.Mode.ToString().ToLowerInvariant(),
-                ["KEEPSAKE_REPOSITORY"] = job.Destination.Path,
+                ["KEEPSAKE_REPOSITORY"] = job.Destination.ToString(),
             };
             var timeout = TimeSpan.FromMinutes(Math.Max(1, job.CommandTimeoutMinutes));
             BackupResult result = null;
@@ -269,7 +269,7 @@ namespace Keepsake.Service
                 }
 
                 SetPhase(active, "Opening repository");
-                using (var repo = OpenRepository(job))
+                using (var opened = OpenRepository(job))
                 {
                     var options = new BackupOptions
                     {
@@ -278,7 +278,7 @@ namespace Keepsake.Service
                         UseDefaultExcludes = job.UseDefaultExcludes,
                         Mode = record.Mode,
                         Job = job.Name,
-                        Parent = ParentSnapshot(repo, job),
+                        Parent = ParentSnapshot(opened.Repository, job),
                     };
                     if (job.Workers > 0)
                         options.Workers = job.Workers;
@@ -293,7 +293,7 @@ namespace Keepsake.Service
                             Phase = "Backing up", Files = p.Files, BytesRead = p.BytesRead, BytesStored = p.BytesStored, CurrentPath = p.CurrentPath,
                         };
                     });
-                    result = new BackupEngine(repo).Run(options, progress, active.Cancel.Token);
+                    result = new BackupEngine(opened.Repository).Run(options, progress, active.Cancel.Token);
                 }
 
                 record.SnapshotId = result.SnapshotId;
@@ -336,7 +336,7 @@ namespace Keepsake.Service
                 throw new KeepsakeException("No restore options given.");
             SetPhase(active, "Opening repository");
             RestoreResult result;
-            using (var repo = OpenRepository(job))
+            using (var opened = OpenRepository(job))
             {
                 SetPhase(active, "Restoring");
                 var progress = new RestoreProgressSink(p =>
@@ -348,7 +348,7 @@ namespace Keepsake.Service
                         Phase = "Restoring", Files = p.Files, BytesRead = p.BytesWritten, CurrentPath = p.CurrentPath,
                     };
                 });
-                result = new RestoreEngine(repo).Run(options, progress, active.Cancel.Token);
+                result = new RestoreEngine(opened.Repository).Run(options, progress, active.Cancel.Token);
             }
             var record = active.Record;
             record.SnapshotId = result.SnapshotId;
@@ -359,13 +359,25 @@ namespace Keepsake.Service
             return result;
         }
 
-        internal Repository OpenRepository(JobDefinition job)
+        /// <summary>Opens the job's repository, connecting shares and finding the USB disk as needed.</summary>
+        internal OpenedRepository OpenRepository(JobDefinition job)
         {
-            string password = _jobs.GetPassword(job.Id) ?? throw new KeepsakeException("No repository password is stored for this job.");
-            var storage = StorageFactory.Open(job.Destination.Path);
-            if (!Repository.Exists(storage))
-                throw new KeepsakeException("No Keepsake repository found at " + storage.Location + ". Create it in the job settings first.");
-            return Repository.Open(storage, RepoCredential.FromPassword(password));
+            var secrets = _jobs.GetSecrets(job.Id);
+            if (string.IsNullOrEmpty(secrets.RepositoryPassword))
+                throw new KeepsakeException("No repository password is stored for this job.");
+            var destination = DestinationResolver.Open(job.Destination, job.ShareCredentials, secrets);
+            try
+            {
+                if (!Repository.Exists(destination.Storage))
+                    throw new KeepsakeException("No Keepsake repository found at " + destination.Storage.Location + ". Create it in the job settings first.");
+                var repo = Repository.Open(destination.Storage, RepoCredential.FromPassword(secrets.RepositoryPassword));
+                return new OpenedRepository(repo, destination);
+            }
+            catch
+            {
+                destination.Dispose();
+                throw;
+            }
         }
 
         /// <summary>Last snapshot written by this job – keeps incremental backups working after a job is renamed.</summary>
