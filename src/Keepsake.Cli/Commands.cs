@@ -14,7 +14,7 @@ namespace Keepsake.Cli
 {
     internal static class Commands
     {
-        public static readonly List<Command> All = new List<Command>
+        private static readonly List<Command> Offline = new List<Command>
         {
             new Command
             {
@@ -130,6 +130,12 @@ namespace Keepsake.Cli
                 Run = HelpCommand,
             },
         };
+
+        /// <summary>Repository commands, then service commands, then version/help.</summary>
+        public static readonly List<Command> All = Offline.Take(Offline.Count - 2)
+            .Concat(ServiceCommands.All())
+            .Concat(Offline.Skip(Offline.Count - 2))
+            .ToList();
 
         // ---- init ------------------------------------------------------------------------------
 

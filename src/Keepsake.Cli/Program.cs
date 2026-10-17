@@ -50,6 +50,14 @@ namespace Keepsake.Cli
                 {
                     return Fail(json, ExitCodes.WrongCredential, ex.Message, null);
                 }
+                catch (Keepsake.Protocol.ApiException ex)
+                {
+                    int code = ex.Code == Keepsake.Protocol.ErrorCodes.Unauthorized || ex.Code == Keepsake.Protocol.ErrorCodes.LockedOut ? ExitCodes.WrongCredential
+                        : ex.Code == Keepsake.Protocol.ErrorCodes.Conflict ? ExitCodes.Locked
+                        : ex.Code == Keepsake.Protocol.ErrorCodes.Invalid || ex.Code == Keepsake.Protocol.ErrorCodes.NotFound ? ExitCodes.Usage
+                        : ExitCodes.Failed;
+                    return Fail(json, code, ex.Message, null);
+                }
                 catch (RepositoryLockedException ex)
                 {
                     return Fail(json, ExitCodes.Locked, ex.Message, null);

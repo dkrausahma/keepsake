@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 
 namespace Keepsake.Core.Util
 {
-    internal static class Bytes
+    public static class Bytes
     {
         public static void WriteUInt32(Stream s, uint value)
         {

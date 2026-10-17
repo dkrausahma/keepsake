@@ -45,7 +45,7 @@ namespace Keepsake.Core.Backup
 
         public long BlobsAdded => Interlocked.Read(ref _blobsAdded);
 
-        /// <summary>Plaintext bytes of new (not deduplicated) blobs.</summary>
+        /// <summary>Plaintext bytes of new (not deduplicated) file data; folder listings are not counted.</summary>
         public long BytesAdded => Interlocked.Read(ref _bytesAdded);
 
         /// <summary>Bytes written to storage (compressed and encrypted packs).</summary>
@@ -99,7 +99,8 @@ namespace Keepsake.Core.Backup
                 }
             }
             Interlocked.Increment(ref _blobsAdded);
-            Interlocked.Add(ref _bytesAdded, count);
+            if (type == BlobType.Data)
+                Interlocked.Add(ref _bytesAdded, count);
             if (full != null)
                 Enqueue(full);
             return true;

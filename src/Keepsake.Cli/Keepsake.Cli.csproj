@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Keepsake.Core\Keepsake.Core.csproj" />
+    <ProjectReference Include="..\Keepsake.Protocol\Keepsake.Protocol.csproj" />
   </ItemGroup>
 
 </Project>

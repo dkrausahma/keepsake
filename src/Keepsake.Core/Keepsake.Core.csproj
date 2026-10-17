@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Keepsake.Core.Tests" />
+    <InternalsVisibleTo Include="Keepsake.Service.Tests" />
   </ItemGroup>
 
 </Project>

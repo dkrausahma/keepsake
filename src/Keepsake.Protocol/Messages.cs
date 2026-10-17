@@ -1,0 +1,291 @@
+using System;
+using System.Collections.Generic;
+using System.Text.Json;
+using Keepsake.Core.Repo;
+using Keepsake.Core.Reporting;
+using Keepsake.Core.Restore;
+
+namespace Keepsake.Protocol
+{
+    /// <summary>API method names. Every method except <c>auth.*</c> requires a session token.</summary>
+    public static class Methods
+    {
+        public const string AuthStatus = "auth.status";
+        public const string AuthSetup = "auth.setup";
+        public const string AuthLogin = "auth.login";
+        public const string AuthLogout = "auth.logout";
+        public const string AuthChangePassword = "auth.changePassword";
+
+        public const string Status = "service.status";
+
+        public const string JobsList = "jobs.list";
+        public const string JobsGet = "jobs.get";
+        public const string JobsSave = "jobs.save";
+        public const string JobsDelete = "jobs.delete";
+        public const string JobsRun = "jobs.run";
+        public const string JobsCancel = "jobs.cancel";
+
+        public const string RunsList = "runs.list";
+        public const string RunsGet = "runs.get";
+
+        public const string RepoInit = "repo.init";
+        public const string RepoTest = "repo.test";
+
+        public const string SnapshotsList = "snapshots.list";
+        public const string TreeList = "tree.list";
+        public const string RestoreStart = "restore.start";
+    }
+
+    public static class ErrorCodes
+    {
+        public const string SetupRequired = "setup_required";
+        public const string Unauthorized = "unauthorized";
+        public const string LockedOut = "locked_out";
+        public const string NotFound = "not_found";
+        public const string Invalid = "invalid";
+        public const string Conflict = "conflict";
+        public const string Failed = "failed";
+    }
+
+    // ---- Wire envelope -------------------------------------------------------------------------
+
+    public sealed class Request
+    {
+        public int Id { get; set; }
+        public string Method { get; set; }
+        public string Token { get; set; }
+        public JsonElement? Params { get; set; }
+    }
+
+    public sealed class Response
+    {
+        public int Id { get; set; }
+        public bool Ok { get; set; }
+        public ApiError Error { get; set; }
+        public JsonElement? Result { get; set; }
+    }
+
+    public sealed class ApiError
+    {
+        public string Code { get; set; }
+        public string Message { get; set; }
+    }
+
+    // ---- Auth ----------------------------------------------------------------------------------
+
+    public sealed class AuthStatusResult
+    {
+        public bool PasswordSet { get; set; }
+    }
+
+    public sealed class PasswordParams
+    {
+        public string Password { get; set; }
+    }
+
+    public sealed class ChangePasswordParams
+    {
+        public string OldPassword { get; set; }
+        public string NewPassword { get; set; }
+    }
+
+    public sealed class LoginResult
+    {
+        public string Token { get; set; }
+        public DateTime ExpiresIdle { get; set; }
+    }
+
+    // ---- Service status ------------------------------------------------------------------------
+
+    public sealed class ServiceStatus
+    {
+        public string Version { get; set; }
+        public string Host { get; set; }
+        public DateTime StartedAt { get; set; }
+        public string DataFolder { get; set; }
+        public int MaxConcurrentJobs { get; set; }
+        public List<RunProgress> Running { get; set; } = new List<RunProgress>();
+        public List<string> Queued { get; set; } = new List<string>();
+    }
+
+    // ---- Jobs ----------------------------------------------------------------------------------
+
+    public sealed class IdParams
+    {
+        public string Id { get; set; }
+    }
+
+    public sealed class JobSaveParams
+    {
+        public JobDefinition Job { get; set; }
+
+        /// <summary>Repository password; null keeps the stored one.</summary>
+        public string RepositoryPassword { get; set; }
+    }
+
+    public sealed class JobDetail
+    {
+        public JobDefinition Job { get; set; }
+        public bool HasRepositoryPassword { get; set; }
+        public DateTime? NextRun { get; set; }
+        public List<string> ScheduleText { get; set; } = new List<string>();
+    }
+
+    public sealed class JobSummary
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public bool Enabled { get; set; }
+        public string Destination { get; set; }
+        public List<string> ScheduleText { get; set; } = new List<string>();
+        public DateTime? NextRun { get; set; }
+        public RunRecord LastRun { get; set; }
+        public RunRecord LastSuccess { get; set; }
+        public bool Queued { get; set; }
+        public RunProgress Progress { get; set; }
+    }
+
+    public sealed class RunJobParams
+    {
+        public string Id { get; set; }
+        public BackupMode Mode { get; set; } = BackupMode.Incremental;
+    }
+
+    public sealed class RunStarted
+    {
+        public string RunId { get; set; }
+    }
+
+    // ---- Runs ----------------------------------------------------------------------------------
+
+    public enum RunKind
+    {
+        Backup,
+        Restore,
+        Check,
+    }
+
+    public enum RunTrigger
+    {
+        Manual,
+        Schedule,
+        Missed,
+        Retry,
+    }
+
+    public enum RunState
+    {
+        Queued,
+        Running,
+        Success,
+        Warning,
+        Failed,
+        Cancelled,
+    }
+
+    /// <summary>One entry of a job's run history.</summary>
+    public sealed class RunRecord
+    {
+        public string Id { get; set; }
+        public string JobId { get; set; }
+        public string JobName { get; set; }
+        public RunKind Kind { get; set; }
+        public RunTrigger Trigger { get; set; }
+        public BackupMode Mode { get; set; }
+        public RunState State { get; set; }
+        public DateTime Start { get; set; }
+        public DateTime? End { get; set; }
+        public double DurationSeconds { get; set; }
+        public string SnapshotId { get; set; }
+        public SnapshotSummary Summary { get; set; }
+        public RestoreStats RestoreStats { get; set; }
+        public int Errors { get; set; }
+        public int Warnings { get; set; }
+        public string Message { get; set; }
+        public int Attempt { get; set; } = 1;
+    }
+
+    public sealed class RunDetail
+    {
+        public RunRecord Record { get; set; }
+        public List<PhaseTiming> Phases { get; set; } = new List<PhaseTiming>();
+        public List<Issue> Issues { get; set; } = new List<Issue>();
+        public string Log { get; set; }
+    }
+
+    public sealed class RunProgress
+    {
+        public string RunId { get; set; }
+        public string JobId { get; set; }
+        public string JobName { get; set; }
+        public RunKind Kind { get; set; }
+        public string Phase { get; set; }
+        public DateTime Start { get; set; }
+        public long Files { get; set; }
+        public long BytesRead { get; set; }
+        public long BytesStored { get; set; }
+        public string CurrentPath { get; set; }
+    }
+
+    public sealed class RunsListParams
+    {
+        public string JobId { get; set; }
+        public int Limit { get; set; } = 50;
+    }
+
+    // ---- Repositories / restore ----------------------------------------------------------------
+
+    public sealed class RepoParams
+    {
+        public string Path { get; set; }
+        public string Password { get; set; }
+    }
+
+    public sealed class RepoInitResult
+    {
+        public string RepositoryId { get; set; }
+        public string RecoveryKey { get; set; }
+    }
+
+    public sealed class RepoTestResult
+    {
+        public bool Exists { get; set; }
+        public string RepositoryId { get; set; }
+        public int Snapshots { get; set; }
+    }
+
+    public sealed class SnapshotInfo
+    {
+        public string Id { get; set; }
+        public DateTime Time { get; set; }
+        public string Job { get; set; }
+        public string Host { get; set; }
+        public BackupMode Mode { get; set; }
+        public List<string> Paths { get; set; }
+        public SnapshotSummary Summary { get; set; }
+    }
+
+    public sealed class TreeParams
+    {
+        public string JobId { get; set; }
+        public string SnapshotId { get; set; }
+
+        /// <summary>Path inside the snapshot (<c>D/Data</c>); empty for the root.</summary>
+        public string Path { get; set; }
+    }
+
+    public sealed class TreeEntry
+    {
+        public string Name { get; set; }
+        public string Path { get; set; }
+        public bool IsFolder { get; set; }
+        public long Size { get; set; }
+        public DateTime Modified { get; set; }
+    }
+
+    public sealed class RestoreParams
+    {
+        public string JobId { get; set; }
+        public RestoreOptions Options { get; set; }
+    }
+}
