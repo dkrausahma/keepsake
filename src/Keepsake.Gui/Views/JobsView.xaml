@@ -12,15 +12,6 @@
         </Grid>
 
         <Grid>
-            <!-- Empty state -->
-            <Border Style="{StaticResource Card}" Padding="32" VerticalAlignment="Top" Visibility="{Binding IsEmpty, Converter={StaticResource Visible}}">
-                <StackPanel>
-                    <TextBlock Text="No backup jobs yet" Style="{StaticResource SectionTitle}" FontSize="16" />
-                    <TextBlock Style="{StaticResource Muted}" Text="Create a job: choose the folders to protect, where the encrypted backups go (folder, network share or USB disk) and when it runs." />
-                    <Button Content="Create the first job" Command="{Binding NewJobCommand}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Margin="0,16,0,0" />
-                </StackPanel>
-            </Border>
-
             <ScrollViewer VerticalScrollBarVisibility="Auto" FocusVisualStyle="{x:Null}">
                 <ItemsControl ItemsSource="{Binding Items}" Focusable="False">
                     <ItemsControl.ItemTemplate>
@@ -89,6 +80,15 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
+
+            <!-- Empty state: after the list so it is on top and receives the clicks (the list's ScrollViewer covers the whole area). -->
+            <Border Style="{StaticResource Card}" Padding="32" VerticalAlignment="Top" Visibility="{Binding IsEmpty, Converter={StaticResource Visible}}">
+                <StackPanel>
+                    <TextBlock Text="No backup jobs yet" Style="{StaticResource SectionTitle}" FontSize="16" />
+                    <TextBlock Style="{StaticResource Muted}" Text="Create a job: choose the folders to protect, where the encrypted backups go (folder, network share or USB disk) and when it runs." />
+                    <Button Content="Create the first job" Command="{Binding NewJobCommand}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Margin="0,16,0,0" />
+                </StackPanel>
+            </Border>
         </Grid>
     </DockPanel>
 </UserControl>
