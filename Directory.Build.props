@@ -5,8 +5,8 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Version>0.9.0</Version>
     <Product>Keepsake</Product>
-    <Company>Keepsake</Company>
-    <Copyright>Internal use only</Copyright>
+    <Company>Kraus-Ahma IT Consulting</Company>
+    <Copyright>© 2026 Kraus-Ahma IT Consulting &amp; Anwendungsentwicklung</Copyright>
     <Deterministic>true</Deterministic>
     <!-- BouncyCastle marks some engines obsolete in favour of .NET Core APIs that do not exist on .NET Framework. -->
     <NoWarn>$(NoWarn);CS0618</NoWarn>

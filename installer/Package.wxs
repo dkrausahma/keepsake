@@ -4,7 +4,7 @@
      xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
 
   <Package Name="Keepsake Backup"
-           Manufacturer="Keepsake"
+           Manufacturer="Kraus-Ahma IT Consulting"
            Version="$(ProductVersion)"
            UpgradeCode="{6C0D3B1E-5E41-4B3C-9F2A-7D1E2A9C4B10}"
            Scope="perMachine"
@@ -26,6 +26,9 @@
 
     <Icon Id="KeepsakeIcon" SourceFile="$(StageDir)\KeepsakeGui.exe" />
     <Property Id="ARPPRODUCTICON" Value="KeepsakeIcon" />
+    <Property Id="ARPCONTACT" Value="Kraus-Ahma IT Consulting &amp; Anwendungsentwicklung, Kapuzinerstraße 2d, 94032 Passau" />
+    <Property Id="ARPHELPTELEPHONE" Value="+49 172 1853648" />
+    <Property Id="ARPURLINFOABOUT" Value="https://www.kraus-ahma.com" />
 
     <StandardDirectory Id="ProgramFiles64Folder">
       <Directory Id="INSTALLFOLDER" Name="Keepsake" />

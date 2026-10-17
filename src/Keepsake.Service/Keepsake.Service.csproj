@@ -9,6 +9,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>..\Keepsake.Gui\Assets\keepsake.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

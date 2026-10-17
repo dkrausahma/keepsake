@@ -7,6 +7,7 @@
     <RootNamespace>Keepsake.Gui</RootNamespace>
     <AssemblyName>KeepsakeGui</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\keepsake.ico</ApplicationIcon>
     <ApplicationManifest Condition="'$(Configuration)' == 'Debug'">app.debug.manifest</ApplicationManifest>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
@@ -16,6 +17,13 @@
   <ItemGroup>
     <ProjectReference Include="..\Keepsake.Core\Keepsake.Core.csproj" />
     <ProjectReference Include="..\Keepsake.Protocol\Keepsake.Protocol.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\logo-color.png" />
+    <Resource Include="Assets\logo-on-dark.png" />
+    <Resource Include="Assets\mark.png" />
+    <Resource Include="Assets\keepsake.ico" />
   </ItemGroup>
 
   <ItemGroup>

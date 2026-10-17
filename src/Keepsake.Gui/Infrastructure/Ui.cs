@@ -80,7 +80,7 @@ namespace Keepsake.Gui.Infrastructure
                 case "Warning": key = "WarningBrush"; break;
                 case "Failed": key = "DangerBrush"; break;
                 case "Running":
-                case "Queued": key = "AccentBrush"; break;
+                case "Queued": key = "InfoBrush"; break;
                 default: key = "MutedBrush"; break;
             }
             return Application.Current.TryFindResource(key) as Brush ?? Brushes.Gray;

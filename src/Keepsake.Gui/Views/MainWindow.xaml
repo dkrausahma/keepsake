@@ -4,7 +4,7 @@
         xmlns:vm="clr-namespace:Keepsake.Gui.ViewModels"
         xmlns:v="clr-namespace:Keepsake.Gui.Views"
         xmlns:infra="clr-namespace:Keepsake.Gui.Infrastructure"
-        Title="Keepsake Backup" Width="1180" Height="760" MinWidth="900" MinHeight="600"
+        Title="Keepsake Backup" Icon="/Assets/keepsake.ico" Width="1180" Height="760" MinWidth="900" MinHeight="600"
         WindowStartupLocation="CenterScreen" Style="{StaticResource KeepsakeWindow}">
     <Window.Resources>
         <infra:ArrayConverter x:Key="Array" />
@@ -14,7 +14,10 @@
             <Grid>
                 <Border Style="{StaticResource Card}" Width="480" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="28">
                     <StackPanel>
-                        <TextBlock Text="Keepsake" FontSize="26" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" />
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Assets/mark.png" Width="38" Height="38" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
+                            <TextBlock Text="Keepsake" FontSize="26" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </StackPanel>
                         <TextBlock Text="{Binding Title}" FontSize="15" Margin="0,16,0,0" TextWrapping="Wrap" />
                         <TextBlock Text="{Binding Details}" Style="{StaticResource Muted}" Margin="0,8,0,0"
                                    Visibility="{Binding Details, Converter={StaticResource Visible}}" />
@@ -22,6 +25,8 @@
                                 Margin="0,20,0,0" Visibility="{Binding CanRetry, Converter={StaticResource Visible}}" />
                     </StackPanel>
                 </Border>
+                <Image Source="/Assets/logo-color.png" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,28"
+                       RenderOptions.BitmapScalingMode="HighQuality" ToolTip="Kraus-Ahma IT Consulting" Opacity="0.9" />
             </Grid>
         </DataTemplate>
 
@@ -30,7 +35,10 @@
             <Grid>
                 <Border Style="{StaticResource Card}" Width="400" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="28">
                     <StackPanel FocusManager.FocusedElement="{Binding ElementName=Pwd}">
-                        <TextBlock Text="Keepsake" FontSize="26" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" />
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Assets/mark.png" Width="38" Height="38" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
+                            <TextBlock Text="Keepsake" FontSize="26" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </StackPanel>
                         <TextBlock Text="Enter the application password to manage backups." Style="{StaticResource Muted}" Margin="0,6,0,0" />
                         <TextBlock Text="Application password" Style="{StaticResource FieldLabel}" Margin="0,20,0,4" />
                         <PasswordBox x:Name="Pwd">
@@ -44,6 +52,8 @@
                                 Style="{StaticResource PrimaryButton}" HorizontalAlignment="Stretch" Margin="0,18,0,0" Padding="14,8" />
                     </StackPanel>
                 </Border>
+                <Image Source="/Assets/logo-color.png" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,28"
+                       RenderOptions.BitmapScalingMode="HighQuality" ToolTip="Kraus-Ahma IT Consulting" Opacity="0.9" />
             </Grid>
         </DataTemplate>
 
@@ -52,7 +62,10 @@
             <Grid>
                 <Border Style="{StaticResource Card}" Width="460" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="28">
                     <StackPanel FocusManager.FocusedElement="{Binding ElementName=First}">
-                        <TextBlock Text="Welcome to Keepsake" FontSize="22" FontWeight="SemiBold" />
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Assets/mark.png" Width="34" Height="34" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
+                            <TextBlock Text="Welcome to Keepsake" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </StackPanel>
                         <TextBlock Style="{StaticResource Muted}" Margin="0,8,0,0"
                                    Text="Choose an application password. It protects access to Keepsake on this server. It is not the encryption password of your backups – that one is set per backup job." />
                         <TextBlock Text="Application password (at least 8 characters)" Style="{StaticResource FieldLabel}" Margin="0,18,0,4" />
@@ -72,6 +85,8 @@
                         </Button>
                     </StackPanel>
                 </Border>
+                <Image Source="/Assets/logo-color.png" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,28"
+                       RenderOptions.BitmapScalingMode="HighQuality" ToolTip="Kraus-Ahma IT Consulting" Opacity="0.9" />
             </Grid>
         </DataTemplate>
 
@@ -80,5 +95,7 @@
         </DataTemplate>
     </Window.Resources>
 
-    <ContentControl Content="{Binding Screen}" Focusable="False" />
+    <Grid>
+        <ContentControl Content="{Binding Screen}" Focusable="False" />
+    </Grid>
 </Window>

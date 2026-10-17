@@ -2,22 +2,30 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:infra="clr-namespace:Keepsake.Gui.Infrastructure">
 
-    <!-- Palette: calm neutrals, one accent, status colours used only for status. -->
-    <Color x:Key="AccentColor">#1F5FAD</Color>
+    <!--
+        Kraus-Ahma IT Consulting corporate colours (claudeinput/Logo/Farbwerte.txt):
+          red #B11E22 · pink #F38594 · light pink #F7ACBC · logo charcoal #282C2F · tagline grey #787B80.
+        Red is the accent (actions, links, focus); pink marks the active place and progress.
+        Status colours stay semantic; "running" uses a blue-grey so it never reads as an error.
+    -->
+    <Color x:Key="AccentColor">#B11E22</Color>
     <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
-    <SolidColorBrush x:Key="AccentHoverBrush" Color="#184C8C" />
-    <SolidColorBrush x:Key="AccentSoftBrush" Color="#E8F0FA" />
-    <SolidColorBrush x:Key="WindowBrush" Color="#F3F4F6" />
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#8E181B" />
+    <SolidColorBrush x:Key="AccentSoftBrush" Color="#FBEEF0" />
+    <SolidColorBrush x:Key="BrandPinkBrush" Color="#F38594" />
+    <SolidColorBrush x:Key="BrandLightPinkBrush" Color="#F7ACBC" />
+    <SolidColorBrush x:Key="WindowBrush" Color="#F5F5F6" />
     <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="SidebarBrush" Color="#1C2430" />
-    <SolidColorBrush x:Key="SidebarTextBrush" Color="#C9D1DB" />
-    <SolidColorBrush x:Key="SidebarActiveBrush" Color="#2B3645" />
-    <SolidColorBrush x:Key="BorderBrush" Color="#DADDE2" />
-    <SolidColorBrush x:Key="TextBrush" Color="#1D232B" />
-    <SolidColorBrush x:Key="MutedBrush" Color="#5E6875" />
-    <SolidColorBrush x:Key="SuccessBrush" Color="#1E7A3A" />
+    <SolidColorBrush x:Key="SidebarBrush" Color="#282C2F" />
+    <SolidColorBrush x:Key="SidebarTextBrush" Color="#C8CBCF" />
+    <SolidColorBrush x:Key="SidebarActiveBrush" Color="#373B3F" />
+    <SolidColorBrush x:Key="BorderBrush" Color="#DCDDE0" />
+    <SolidColorBrush x:Key="TextBrush" Color="#282C2F" />
+    <SolidColorBrush x:Key="MutedBrush" Color="#6B6E73" />
+    <SolidColorBrush x:Key="InfoBrush" Color="#3D6C8E" />
+    <SolidColorBrush x:Key="SuccessBrush" Color="#2E7D32" />
     <SolidColorBrush x:Key="WarningBrush" Color="#A86400" />
-    <SolidColorBrush x:Key="DangerBrush" Color="#B42323" />
+    <SolidColorBrush x:Key="DangerBrush" Color="#B11E22" />
     <SolidColorBrush x:Key="DangerSoftBrush" Color="#FBEAEA" />
     <SolidColorBrush x:Key="WarningSoftBrush" Color="#FDF3E2" />
 
@@ -148,7 +156,7 @@
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{StaticResource SidebarActiveBrush}" />
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="#6FA3E0" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource BrandPinkBrush}" />
                             <Setter Property="Foreground" Value="White" />
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -162,11 +170,55 @@
         <Setter Property="Padding" Value="6,5" />
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
+        <!-- Own template so hover/focus use the brand colours instead of the system blue. -->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True">
+                        <ScrollViewer x:Name="PART_ContentHost" Focusable="False" HorizontalScrollBarVisibility="{TemplateBinding HorizontalScrollBarVisibility}" VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.56" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource MutedBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
     <Style TargetType="PasswordBox">
         <Setter Property="Padding" Value="6,5" />
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
+        <!-- Own template so hover/focus use the brand colours instead of the system blue. -->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="PasswordBox">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True">
+                        <ScrollViewer x:Name="PART_ContentHost" Focusable="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.56" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource MutedBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
     <Style TargetType="ComboBox">
         <Setter Property="Padding" Value="6,4" />
@@ -231,7 +283,7 @@
 
     <Style TargetType="ProgressBar">
         <Setter Property="Height" Value="6" />
-        <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource BrandPinkBrush}" />
         <Setter Property="Background" Value="#E5E8EC" />
         <Setter Property="BorderThickness" Value="0" />
     </Style>

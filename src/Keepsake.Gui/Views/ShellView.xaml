@@ -22,12 +22,21 @@
 
         <!-- Sidebar -->
         <DockPanel Grid.RowSpan="2" Background="{StaticResource SidebarBrush}">
-            <StackPanel DockPanel.Dock="Top" Margin="20,22,20,26">
-                <TextBlock Text="Keepsake" FontSize="22" FontWeight="SemiBold" Foreground="White" />
-                <TextBlock Text="Encrypted backups" Foreground="{StaticResource SidebarTextBrush}" Margin="0,2,0,0" />
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="18,22,18,26">
+                <Image Source="/Assets/mark.png" Width="34" Height="34" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Keepsake" FontSize="21" FontWeight="SemiBold" Foreground="White" />
+                    <TextBlock Text="Encrypted backups" Foreground="{StaticResource SidebarTextBrush}" />
+                </StackPanel>
             </StackPanel>
-            <Button DockPanel.Dock="Bottom" Content="Log out" Command="{Binding LogoutCommand}" Style="{StaticResource LinkButton}"
-                    Foreground="{StaticResource SidebarTextBrush}" Margin="20,0,20,18" HorizontalAlignment="Left" />
+            <StackPanel DockPanel.Dock="Bottom" Margin="20,0,20,16">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                    <Button x:Name="AboutButton" Content="About" Click="OnAbout" Style="{StaticResource LinkButton}" Foreground="{StaticResource SidebarTextBrush}" Margin="0,0,18,0" />
+                    <Button Content="Log out" Command="{Binding LogoutCommand}" Style="{StaticResource LinkButton}" Foreground="{StaticResource SidebarTextBrush}" />
+                </StackPanel>
+                <Image Source="/Assets/logo-on-dark.png" Width="150" HorizontalAlignment="Left" RenderOptions.BitmapScalingMode="HighQuality"
+                       ToolTip="Kraus-Ahma IT Consulting" Cursor="Hand" MouseLeftButtonUp="OnAbout" />
+            </StackPanel>
             <StackPanel>
                 <RadioButton x:Name="NavJobs" Style="{StaticResource NavButton}" Content="Backup jobs" GroupName="Nav"
                              IsChecked="{Binding Jobs.IsActive, Mode=TwoWay}" />

@@ -8,5 +8,7 @@ namespace Keepsake.Gui.Views
         {
             InitializeComponent();
         }
+
+        private void OnAbout(object sender, System.Windows.RoutedEventArgs e) => AboutWindow.ShowAbout();
     }
 }

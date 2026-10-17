@@ -6,3 +6,6 @@ TestResults/
 artifacts/
 bin/
 obj/
+
+# Raw brand material (licensed fonts, PSD/PDF); only the generated Assets are committed.
+claudeinput/
