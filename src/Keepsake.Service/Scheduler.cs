@@ -28,9 +28,11 @@ namespace Keepsake.Service
         private readonly Dictionary<string, Retry> _retries = new Dictionary<string, Retry>(StringComparer.Ordinal);
         private SchedulerState _state;
         private Timer _timer;
+        private readonly Notifier _notifier;
 
-        public Scheduler(JobStore jobs, JobRunner runner, RunHistory history, SettingsStore settings, string stateFile)
+        public Scheduler(JobStore jobs, JobRunner runner, RunHistory history, SettingsStore settings, string stateFile, Notifier notifier = null)
         {
+            _notifier = notifier;
             _jobs = jobs;
             _runner = runner;
             _history = history;
@@ -132,9 +134,35 @@ namespace Keepsake.Service
                     Trigger(job, retry.Mode, RunTrigger.Retry, retry.Attempt);
             }
 
+            if (CheckNoSuccess(now))
+                changed = true;
             if (changed)
                 SaveState();
             PruneHistoryDaily(now);
+        }
+
+        /// <summary>"No successful backup for X hours" (NOT-02); repeated once per alert period while it lasts.</summary>
+        private bool CheckNoSuccess(DateTime now)
+        {
+            bool changed = false;
+            var nowUtc = now.ToUniversalTime();
+            foreach (var job in _jobs.List().Where(j => j.Enabled && j.AlertNoSuccessHours > 0))
+            {
+                var last = _history.Last(job.Id, r => r.State == RunState.Success || r.State == RunState.Warning);
+                var reference = last?.Start ?? job.Created;
+                var period = TimeSpan.FromHours(job.AlertNoSuccessHours);
+                if (nowUtc - reference < period || _runner.IsBusy(job.Id))
+                    continue;
+                lock (_lock)
+                {
+                    if (_state.LastNoSuccessAlert.TryGetValue(job.Id, out var sent) && sent > reference && nowUtc - sent < period)
+                        continue;
+                    _state.LastNoSuccessAlert[job.Id] = nowUtc;
+                }
+                changed = true;
+                (_notifier ?? new Notifier(_settings, _jobs, _history)).NoSuccessAlert(job, last?.Start);
+            }
+            return changed;
         }
 
         private void Trigger(JobDefinition job, BackupMode mode, RunTrigger trigger, int attempt)
@@ -142,11 +170,13 @@ namespace Keepsake.Service
             if (trigger == RunTrigger.Missed && !job.RunMissed)
             {
                 ServiceLog.Info("Missed scheduled run of '" + job.Name + "' skipped (catch-up is disabled for this job).");
+                EventLogWriter.Warning(1003, "Keepsake: a scheduled backup of '" + job.Name + "' was missed while the service was not running (catch-up is disabled).");
                 return;
             }
             if (_runner.IsBusy(job.Id))
             {
                 ServiceLog.Warn("Scheduled run of '" + job.Name + "' skipped: the job is still running.");
+                EventLogWriter.Warning(1003, "Keepsake: scheduled backup of '" + job.Name + "' skipped because the previous run is still running.");
                 return;
             }
             try

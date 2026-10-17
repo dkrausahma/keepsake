@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,15 +15,64 @@ namespace Keepsake.Gui.ViewModels
         private ServiceStatus _status;
         private string _passwordMessage;
         private string _settingsMessage;
+        private SmtpSettings _smtp = new SmtpSettings();
+        private string _smtpPassword;
+        private string _smtpMessage;
 
         public SettingsViewModel(ShellViewModel shell) : base(shell)
         {
             SaveCommand = new AsyncCommand(Save);
             ChangePasswordCommand = new AsyncCommand(ChangePassword);
+            SaveSmtpCommand = new AsyncCommand(SaveSmtp);
+            TestSmtpCommand = new AsyncCommand(TestSmtp);
         }
 
         public ICommand SaveCommand { get; }
         public ICommand ChangePasswordCommand { get; }
+        public ICommand SaveSmtpCommand { get; }
+        public ICommand TestSmtpCommand { get; }
+
+        public IReadOnlyList<string> SecurityOptions { get; } = new[] { "starttls", "ssl", "none" };
+        public string SmtpHost { get => _smtp.Host; set { _smtp.Host = value; OnPropertyChanged(); } }
+        public int SmtpPort { get => _smtp.Port; set { _smtp.Port = value; OnPropertyChanged(); } }
+        public string SmtpSecurity { get => _smtp.Security; set { _smtp.Security = value; OnPropertyChanged(); } }
+        public string SmtpUser { get => _smtp.User; set { _smtp.User = value; OnPropertyChanged(); } }
+        public string SmtpFrom { get => _smtp.From; set { _smtp.From = value; OnPropertyChanged(); } }
+        public string SmtpTo { get => string.Join("; ", _smtp.To ?? new List<string>()); set { _smtp.To = (value ?? "").Split(new[] { ';', ',' }, System.StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim()).ToList(); OnPropertyChanged(); } }
+        public string SmtpPassword { get => _smtpPassword; set => Set(ref _smtpPassword, value); }
+        public string SmtpPasswordHint => _smtp.HasPassword ? "A password is stored; leave empty to keep it." : "";
+        public string SmtpMessage { get => _smtpMessage; private set => Set(ref _smtpMessage, value); }
+
+        private async Task SaveSmtp()
+        {
+            try
+            {
+                _smtp.Password = string.IsNullOrEmpty(SmtpPassword) ? null : SmtpPassword;
+                await Connection.Call(Methods.SmtpSave, _smtp);
+                SmtpPassword = null;
+                _smtp = await Connection.Call<SmtpSettings>(Methods.SmtpGet);
+                OnAllChanged();
+                SmtpMessage = "Saved.";
+            }
+            catch (ApiException ex)
+            {
+                SmtpMessage = ex.Message;
+            }
+        }
+
+        private async Task TestSmtp()
+        {
+            SmtpMessage = "Sending…";
+            try
+            {
+                await Connection.Call(Methods.SmtpTest);
+                SmtpMessage = "Test e-mail sent to " + SmtpTo + ".";
+            }
+            catch (Core.KeepsakeException ex)
+            {
+                SmtpMessage = ex.Message;
+            }
+        }
 
         public int MaxConcurrentJobs { get => _settings.MaxConcurrentJobs; set { _settings.MaxConcurrentJobs = value; OnPropertyChanged(); } }
         public int LogRetentionDays { get => _settings.LogRetentionDays; set { _settings.LogRetentionDays = value; OnPropertyChanged(); } }
@@ -37,6 +88,7 @@ namespace Keepsake.Gui.ViewModels
         {
             _settings = await Connection.Call<ServiceSettings>(Methods.SettingsGet);
             _status = await Connection.Call<ServiceStatus>(Methods.Status);
+            _smtp = await Connection.Call<SmtpSettings>(Methods.SmtpGet) ?? new SmtpSettings();
             SettingsMessage = null;
             OnAllChanged();
         }

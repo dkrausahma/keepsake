@@ -118,7 +118,75 @@ namespace Keepsake.Service
                 {
                     var p = P<RunJobParams>(r);
                     var job = Job(p.Id);
-                    return new RunStarted { RunId = _ctx.Runner.Enqueue(job.Id, RunKind.Backup, p.Mode, RunTrigger.Manual).Id };
+                    if (p.Kind == RunKind.Restore)
+                        throw new ApiException(ErrorCodes.Invalid, "Use restore.start for restores.");
+                    if (p.Kind == RunKind.Prune && (job.Retention == null || job.Retention.IsEmpty))
+                        throw new ApiException(ErrorCodes.Invalid, "The job has no retention rules, so there is nothing to clean up.");
+                    return new RunStarted { RunId = _ctx.Runner.Enqueue(job.Id, p.Kind, p.Mode, RunTrigger.Manual, fullCheck: p.FullCheck).Id };
+                }
+                case Methods.SmtpGet:
+                {
+                    var s = _ctx.Settings.Get();
+                    var smtp = s.Smtp ?? new SmtpSettings();
+                    smtp.Password = null;
+                    smtp.HasPassword = !string.IsNullOrEmpty(s.SmtpPassword);
+                    return smtp;
+                }
+                case Methods.SmtpSave:
+                {
+                    var p = P<SmtpSettings>(r);
+                    if (!string.IsNullOrWhiteSpace(p.Host) && (p.Port < 1 || p.Port > 65535))
+                        throw new ApiException(ErrorCodes.Invalid, "The SMTP port must be between 1 and 65535.");
+                    if (p.Security != "none" && p.Security != "starttls" && p.Security != "ssl")
+                        throw new ApiException(ErrorCodes.Invalid, "SMTP security must be none, starttls or ssl.");
+                    p.To = (p.To ?? new List<string>()).Select(t => t.Trim()).Where(t => t.Length > 0).ToList();
+                    foreach (string address in p.To.Concat(string.IsNullOrWhiteSpace(p.From) ? new string[0] : new[] { p.From }))
+                    {
+                        if (!MimeKit.MailboxAddress.TryParse(address, out _))
+                            throw new ApiException(ErrorCodes.Invalid, "'" + address + "' is not a valid e-mail address.");
+                    }
+                    string password = p.Password;
+                    p.Password = null;
+                    p.HasPassword = false;
+                    _ctx.Settings.Update(s =>
+                    {
+                        s.Smtp = p;
+                        if (password != null)
+                            s.SmtpPassword = password.Length == 0 ? null : Secrets.Protect(password);
+                    });
+                    ServiceLog.Info("SMTP settings changed (" + (p.Enabled ? p.Host + ", " + p.To.Count + " recipient(s)" : "notifications off") + ").");
+                    return null;
+                }
+                case Methods.SmtpTest:
+                    _ctx.Notifier.Send("[Keepsake] Test message from " + ProgramInfo.Host,
+                        "This is a test message from the Keepsake backup service on " + ProgramInfo.Host + ".\r\nIf you can read it, notifications work.");
+                    return null;
+                case Methods.SnapshotsProtect:
+                {
+                    var p = P<ProtectParams>(r);
+                    var job = Job(p.JobId);
+                    if (_ctx.Runner.IsBusy(job.Id))
+                        throw new ApiException(ErrorCodes.Conflict, "The job is running; try again when it has finished.");
+                    using (var opened = _ctx.Runner.OpenRepository(job))
+                    {
+                        var updated = opened.Repository.SetProtected(opened.Repository.FindSnapshot(p.SnapshotId), p.Protect);
+                        Evict(job.Id);
+                        ServiceLog.Info("Snapshot " + updated.ShortId + " of '" + job.Name + "' " + (p.Protect ? "protected." : "no longer protected."));
+                        return new IdParams { Id = updated.Id };
+                    }
+                }
+                case Methods.RetentionPreview:
+                {
+                    var p = P<RetentionPreviewParams>(r);
+                    var job = Job(p.JobId);
+                    var repo = Browse(job);
+                    lock (repo)
+                    {
+                        var scoped = repo.ListSnapshots().Where(s => string.Equals(s.Snapshot.Job, job.Name, StringComparison.OrdinalIgnoreCase));
+                        return Core.Maintenance.Retention.Apply(scoped, p.Policy, DateTime.UtcNow)
+                            .Select(d => new RetentionPreviewItem { SnapshotId = d.Snapshot.Id, Time = d.Snapshot.Snapshot.Time, Keep = d.Keep, Reasons = d.Reasons })
+                            .ToList();
+                    }
                 }
                 case Methods.JobsCancel:
                     _ctx.Runner.Cancel(Job(P<IdParams>(r).Id).Id);
@@ -354,6 +422,7 @@ namespace Keepsake.Service
                         Host = s.Snapshot.Host,
                         Mode = s.Snapshot.Mode,
                         Paths = s.Snapshot.Paths,
+                        Protected = Repository.IsProtected(s.Snapshot),
                         Summary = s.Snapshot.Summary,
                     })
                     .ToList();

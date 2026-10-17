@@ -295,6 +295,31 @@ namespace Keepsake.Core.Repo
 
         public string SaveSnapshot(Snapshot snapshot) => SaveObject(Layout.Snapshots, "snapshot", snapshot);
 
+        public const string ProtectedTag = "protected";
+
+        /// <summary>
+        /// Snapshots are content-addressed, so changing one (e.g. its tags) writes a new file and removes the old one.
+        /// Returns the new snapshot.
+        /// </summary>
+        public SnapshotRef UpdateSnapshot(SnapshotRef snapshot, Action<Snapshot> change)
+        {
+            var copy = Json.FromBytes<Snapshot>(Json.ToBytes(snapshot.Snapshot));
+            change(copy);
+            string id = SaveSnapshot(copy);
+            if (id != snapshot.Id)
+                Storage.Delete(Layout.SnapshotPath(snapshot.Id));
+            return new SnapshotRef(id, copy);
+        }
+
+        public SnapshotRef SetProtected(SnapshotRef snapshot, bool isProtected) => UpdateSnapshot(snapshot, s =>
+        {
+            s.Tags = (s.Tags ?? new List<string>()).Where(t => !string.Equals(t, ProtectedTag, StringComparison.OrdinalIgnoreCase)).ToList();
+            if (isProtected)
+                s.Tags.Add(ProtectedTag);
+        });
+
+        public static bool IsProtected(Snapshot s) => s.Tags != null && s.Tags.Any(t => string.Equals(t, ProtectedTag, StringComparison.OrdinalIgnoreCase));
+
         /// <summary>All snapshots, oldest first.</summary>
         public List<SnapshotRef> ListSnapshots()
         {

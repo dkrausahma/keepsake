@@ -74,6 +74,8 @@ namespace Keepsake.Gui.ViewModels
             EditCommand = new AsyncCommand(() => _page.Edit(Id), () => !IsBusy);
             DeleteCommand = new AsyncCommand(Delete, () => !IsBusy);
             HistoryCommand = new RelayCommand(() => _page.Shell.ShowHistory(Id));
+            CheckCommand = new AsyncCommand(() => RunKindNow(RunKind.Check), () => !IsBusy);
+            PruneCommand = new AsyncCommand(() => RunKindNow(RunKind.Prune), () => !IsBusy);
             RestoreCommand = new RelayCommand(() => _page.Shell.ShowRestore(Id));
         }
 
@@ -137,6 +139,8 @@ namespace Keepsake.Gui.ViewModels
         public ICommand EditCommand { get; }
         public ICommand DeleteCommand { get; }
         public ICommand HistoryCommand { get; }
+        public ICommand CheckCommand { get; }
+        public ICommand PruneCommand { get; }
         public ICommand RestoreCommand { get; }
 
         public void Update(JobSummary job)
@@ -149,6 +153,12 @@ namespace Keepsake.Gui.ViewModels
         private async Task Run(BackupMode mode)
         {
             await _page.Shell.Connection.Call<RunStarted>(Methods.JobsRun, new RunJobParams { Id = Id, Mode = mode });
+            await _page.Refresh();
+        }
+
+        private async Task RunKindNow(RunKind kind)
+        {
+            await _page.Shell.Connection.Call<RunStarted>(Methods.JobsRun, new RunJobParams { Id = Id, Kind = kind });
             await _page.Refresh();
         }
 

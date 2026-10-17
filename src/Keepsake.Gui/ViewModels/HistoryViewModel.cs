@@ -107,7 +107,9 @@ namespace Keepsake.Gui.ViewModels
         public RunRecord Record { get; }
         public string State => Record.State.ToString();
         public string Job => Record.JobName;
-        public string Kind => Record.Kind == RunKind.Backup ? (Record.Mode == Core.Repo.BackupMode.Full ? "Full backup" : "Backup") : Record.Kind.ToString();
+        public string Kind => Record.Kind == RunKind.Backup ? (Record.Mode == Core.Repo.BackupMode.Full ? "Full backup" : "Backup")
+            : Record.Kind == RunKind.Prune ? "Cleanup"
+            : Record.Kind.ToString();
         public string Trigger => Record.Trigger == RunTrigger.Retry ? "Retry " + Record.Attempt : Record.Trigger.ToString();
         public string Start => Format.LocalTime(Record.Start);
         public string Duration => Record.State == RunState.Running || Record.State == RunState.Queued ? "…" : Format.Duration(Record.DurationSeconds);

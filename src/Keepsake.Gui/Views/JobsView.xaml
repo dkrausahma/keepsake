@@ -76,6 +76,8 @@
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
                                             <Button Content="Edit" Command="{Binding EditCommand}" Style="{StaticResource LinkButton}" Margin="0,0,16,0" />
+                                            <Button Content="Check" Command="{Binding CheckCommand}" Style="{StaticResource LinkButton}" Margin="0,0,16,0" ToolTip="Verify the repository now" />
+                                            <Button Content="Clean up" Command="{Binding PruneCommand}" Style="{StaticResource LinkButton}" Margin="0,0,16,0" ToolTip="Apply the retention rules and free space now" />
                                             <Button Content="History" Command="{Binding HistoryCommand}" Style="{StaticResource LinkButton}" Margin="0,0,16,0" />
                                             <Button Content="Restore" Command="{Binding RestoreCommand}" Style="{StaticResource LinkButton}" Margin="0,0,16,0" />
                                             <Button Content="Delete" Command="{Binding DeleteCommand}" Style="{StaticResource LinkButton}" Foreground="{StaticResource DangerBrush}" />

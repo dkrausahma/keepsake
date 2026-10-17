@@ -1,6 +1,7 @@
 using System;
 using System.Security.Principal;
 using Keepsake.Core;
+using Keepsake.Core.Util;
 using Keepsake.Protocol;
 
 namespace Keepsake.Service
@@ -15,6 +16,7 @@ namespace Keepsake.Service
         public AuthService Auth;
         public JobRunner Runner;
         public Scheduler Scheduler;
+        public Notifier Notifier;
         public DateTime StartedAt;
     }
 
@@ -47,8 +49,18 @@ namespace Keepsake.Service
             var jobs = new JobStore(_paths.JobsFile);
             var history = new RunHistory(_paths.Runs);
             history.MarkInterrupted();
-            var runner = new JobRunner(jobs, settings, history);
-            var scheduler = new Scheduler(jobs, runner, history, settings, _paths.SchedulerFile);
+            EventLogWriter.Init();
+            if (WindowsFiles.EnablePrivilege("SeBackupPrivilege"))
+                ServiceLog.Info("Backup privilege enabled: files are read regardless of their permissions.");
+            else
+                ServiceLog.Warn("Backup privilege not available (run as LocalSystem or administrator): files that deny access are skipped.");
+            var shadows = new ShadowTracker(System.IO.Path.Combine(_paths.State, "vss.json"));
+            shadows.CleanUpLeftovers();
+            var runner = new JobRunner(jobs, settings, history, shadows);
+            runner.RunFinished += EventLogWriter.RunFinished;
+            var notifier = new Notifier(settings, jobs, history);
+            runner.RunFinished += notifier.OnRunFinished;
+            var scheduler = new Scheduler(jobs, runner, history, settings, _paths.SchedulerFile, notifier);
 
             Context = new ServiceContext
             {
@@ -59,6 +71,7 @@ namespace Keepsake.Service
                 Auth = new AuthService(settings),
                 Runner = runner,
                 Scheduler = scheduler,
+                Notifier = notifier,
                 StartedAt = DateTime.UtcNow,
             };
 

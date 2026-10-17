@@ -47,11 +47,13 @@ namespace Keepsake.Cli
             yield return new Command
             {
                 Name = "run",
-                Summary = "Start a job now",
-                Usage = "keepsake run <job> [--full] [--wait]",
-                Details = "--wait shows progress until the run ends and returns its exit code. Ctrl+C then cancels the run.",
+                Summary = "Start a job now (backup, check or cleanup)",
+                Usage = "keepsake run <job> [--full | --check | --full-check | --prune] [--wait]",
+                Details = "--full re-reads every file. --check verifies the repository (the job's sample of the data),\n" +
+                          "--full-check reads all data, --prune applies the job's retention rules and frees space.\n" +
+                          "--wait shows progress until the run ends and returns its exit code. Ctrl+C then cancels the run.",
                 ValueOptions = new[] { "app-password-file", "pipe" },
-                Flags = new[] { "full", "wait" },
+                Flags = new[] { "full", "wait", "check", "full-check", "prune" },
                 Run = RunJob,
             };
             yield return new Command
@@ -275,7 +277,14 @@ namespace Keepsake.Cli
             using (var client = Connect(ctx))
             {
                 var job = FindJob(client, Arg(ctx, 0, "keepsake run <job> [--full] [--wait]"));
-                var started = client.Call<RunStarted>(Methods.JobsRun, new RunJobParams { Id = job.Id, Mode = ctx.Args.Flag("full") ? BackupMode.Full : BackupMode.Incremental });
+                var kind = ctx.Args.Flag("prune") ? RunKind.Prune : ctx.Args.Flag("check") || ctx.Args.Flag("full-check") ? RunKind.Check : RunKind.Backup;
+                var started = client.Call<RunStarted>(Methods.JobsRun, new RunJobParams
+                {
+                    Id = job.Id,
+                    Kind = kind,
+                    Mode = ctx.Args.Flag("full") ? BackupMode.Full : BackupMode.Incremental,
+                    FullCheck = ctx.Args.Flag("full-check"),
+                });
                 if (!ctx.Args.Flag("wait"))
                 {
                     ctx.WriteJson(new { status = "started", runId = started.RunId });

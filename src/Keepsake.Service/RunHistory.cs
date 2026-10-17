@@ -92,6 +92,18 @@ namespace Keepsake.Service
             }
         }
 
+        /// <summary>Most recent finished run of a kind (any result).</summary>
+        public RunRecord LastOfKind(string jobId, RunKind kind)
+        {
+            lock (_lock)
+            {
+                if (!_cache.TryGetValue(jobId, out var list))
+                    return null;
+                var r = list.FirstOrDefault(x => x.Kind == kind && x.State != RunState.Queued && x.State != RunState.Running);
+                return r == null ? null : Clone(r);
+            }
+        }
+
         public RunDetail Get(string runId)
         {
             lock (_lock)

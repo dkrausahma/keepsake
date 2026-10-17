@@ -13,7 +13,7 @@ Encrypted, compressed, deduplicated file backup for Windows Server 2008 R2 SP1 a
 | 2 | Windows service, scheduler, job store, run logs, named-pipe API | **done** (console mode tested; not yet installed as a real service) |
 | 3 | WPF GUI | **done** (tested on Windows 11; disaster-recovery mode without the service still CLI-only) |
 | 4 | Destinations: share credentials, USB by volume ID, SFTP | **done** (SFTP tested against OpenSSH in Docker; share credentials not tested against a real domain share) |
-| 5 | VSS, retention/prune, scheduled checks, notifications, Event Log | open |
+| 5 | VSS, retention/prune, scheduled checks, notifications, Event Log | **done** (VSS fallback tested; real shadow copies need an elevated test on 2008 R2) |
 | 6 | 2008 R2 test pass, installer, DR runbook | open |
 | 7 | PostgreSQL / MariaDB sources | open |
 
@@ -71,6 +71,22 @@ keepsake run fileserver --wait
 keepsake status
 ```
 
+### Robustness features
+
+- **VSS**: each backup takes a shadow copy of the source volumes (per job, default on), so open and
+  locked files are backed up consistently. If that fails, files are read directly and the run gets a
+  warning. Shadow copies left over after a crash are removed at the next service start.
+- **Backup privilege**: the service enables SeBackupPrivilege and opens files with backup semantics,
+  so files are read even when their permissions exclude administrators.
+- **Retention and cleanup**: per job "keep last / daily / weekly / monthly / yearly / within N days";
+  protected snapshots are never removed. After a backup, cleanup runs when it is due
+  (default every 7 days) and frees the space of removed snapshots (repacking mostly-empty packs).
+- **Integrity checks**: after a backup when due (default every 7 days), verifying the structure and
+  decrypting a random share of the data (default 10 %).
+- **E-mail**: on failure / warning / success per job, plus "no successful backup for N hours".
+- **Event Log** (Application, source `Keepsake`): 1000 success, 1001 failed, 1002 warnings,
+  1003 scheduled run missed or skipped, 1004 no successful backup for too long, 1005 mail failed.
+
 ## GUI
 
 `Keepsake.exe` (elevated) connects to the service. First start asks for the application password; after
@@ -126,6 +142,12 @@ anything):
 docker run -d --name keepsake-sftp -p 2222:22 atmoz/sftp:alpine kuser:Sftp-Pass-1:1001:1001:backups
 ```
 
+The e-mail test needs an SMTP test server (Mailpit) on `localhost:1025`:
+
+```bash
+docker run -d --name keepsake-mail -p 1025:1025 -p 8025:8025 axllent/mailpit
+```
+
 `src/Keepsake.Cli/bin/Release/net48/` is a portable folder: copy it to any machine with
 .NET Framework 4.8 and run `keepsake.exe`.
 
@@ -169,5 +191,6 @@ Exit codes: 0 success, 1 warnings, 2 failed, 3 usage error, 4 wrong password/key
 |---|---|
 | BouncyCastle.Cryptography 2.7.0 | AES-256-GCM and Argon2id (not in .NET Framework 4.8) |
 | SSH.NET 2026.0.0 | SFTP destinations |
+| MailKit 4.18.0 | E-mail notifications (STARTTLS, SSL, plain) |
 | ZstdSharp.Port 0.8.1 | Zstandard compression (managed) |
 | System.Text.Json 8.0.5 | JSON serialization |

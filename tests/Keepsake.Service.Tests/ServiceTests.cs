@@ -64,6 +64,7 @@ namespace Keepsake.Service.Tests
             Name = name,
             Sources = { Source },
             Destination = new Destination { Path = RepoPath },
+            UseVss = false, // VSS needs elevation; covered by its own test
         };
 
         public RunRecord WaitForRun(KeepsakeClient client, string runId, int timeoutSeconds = 30)
@@ -245,7 +246,7 @@ namespace Keepsake.Service.Tests
 
                 // Nothing more is due right after.
                 t.Ctx.Scheduler.RunOnce(now.AddDays(2).AddMinutes(1));
-                Assert.Single(client.Call<List<RunRecord>>(Methods.RunsList, new RunsListParams { JobId = saved.Job.Id }));
+                Assert.Single(client.Call<List<RunRecord>>(Methods.RunsList, new RunsListParams { JobId = saved.Job.Id }), r => r.Kind == RunKind.Backup);
             }
         }
 

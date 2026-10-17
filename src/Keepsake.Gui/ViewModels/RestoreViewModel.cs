@@ -41,6 +41,7 @@ namespace Keepsake.Gui.ViewModels
             });
             StartCommand = new AsyncCommand(Start, () => _snapshot != null && _checked.Count > 0 && (ToOriginal || !string.IsNullOrWhiteSpace(TargetFolder)) && !IsRunning);
             ShowLogCommand = new AsyncCommand(ShowLog, () => _runId != null && !IsRunning);
+            ProtectCommand = new AsyncCommand(ToggleProtect, () => _snapshot != null && !IsRunning);
         }
 
         public ObservableCollection<JobChoice> Jobs { get; } = new ObservableCollection<JobChoice>();
@@ -58,6 +59,8 @@ namespace Keepsake.Gui.ViewModels
         public ICommand BrowseTargetCommand { get; }
         public ICommand StartCommand { get; }
         public ICommand ShowLogCommand { get; }
+        public ICommand ProtectCommand { get; }
+        public string ProtectLabel => _snapshot?.Info.Protected == true ? "Remove protection" : "Protect this backup";
         public override bool AutoRefresh => IsRunning;
 
         public JobChoice Job
@@ -76,7 +79,11 @@ namespace Keepsake.Gui.ViewModels
             set
             {
                 if (Set(ref _snapshot, value))
+                {
+                    OnPropertyChanged(nameof(ProtectLabel));
+                    CommandManager.InvalidateRequerySuggested();
                     _ = LoadRoot();
+                }
             }
         }
 
@@ -257,6 +264,15 @@ namespace Keepsake.Gui.ViewModels
             RunStatus = "Starting restore…";
         }
 
+        private async Task ToggleProtect()
+        {
+            bool protect = !_snapshot.Info.Protected;
+            await Connection.Call<IdParams>(Methods.SnapshotsProtect, new ProtectParams { JobId = Job.Id, SnapshotId = _snapshot.Id, Protect = protect });
+            string keepTime = _snapshot.Info.Time.ToString("o");
+            await LoadSnapshots();
+            Snapshot = Snapshots.FirstOrDefault(s => s.Info.Time.ToString("o") == keepTime) ?? Snapshots.FirstOrDefault();
+        }
+
         private async Task ShowLog()
         {
             var detail = await Connection.Call<RunDetail>(Methods.RunsGet, new IdParams { Id = _runId });
@@ -285,7 +301,7 @@ namespace Keepsake.Gui.ViewModels
 
         public SnapshotInfo Info { get; }
         public string Id => Info.Id;
-        public string Label => Format.LocalTime(Info.Time) + "  ·  " + Info.Mode.ToString().ToLowerInvariant() +
+        public string Label => Format.LocalTime(Info.Time) + (Info.Protected ? "  ·  protected" : "") + "  ·  " + Info.Mode.ToString().ToLowerInvariant() +
                                (Info.Summary != null ? "  ·  " + Format.Count(Info.Summary.Files) + " files, " + Format.Bytes(Info.Summary.TotalBytes) : "");
     }
 

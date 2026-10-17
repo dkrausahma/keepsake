@@ -341,10 +341,82 @@
                 </Grid>
             </TabItem>
 
-            <!-- 5. Options -->
+            <!-- 5. Retention and checks -->
+            <TabItem Header="  Retention &amp; checks  ">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="360" />
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Which backups to keep" Style="{StaticResource SectionTitle}" />
+                            <TextBlock Style="{StaticResource Muted}" Text="A backup is kept if any rule keeps it; 0 turns a rule off. All 0 = keep everything. Protected backups are never removed." />
+                            <Grid Margin="0,8,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200" />
+                                    <ColumnDefinition Width="70" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Last backups" VerticalAlignment="Center" />
+                                <TextBox Grid.Column="1" Text="{Binding KeepLast}" Margin="0,2" />
+                                <TextBlock Grid.Row="1" Text="One per day, for … days" VerticalAlignment="Center" />
+                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding KeepDaily}" Margin="0,2" />
+                                <TextBlock Grid.Row="2" Text="One per week, for … weeks" VerticalAlignment="Center" />
+                                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding KeepWeekly}" Margin="0,2" />
+                                <TextBlock Grid.Row="3" Text="One per month, for … months" VerticalAlignment="Center" />
+                                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding KeepMonthly}" Margin="0,2" />
+                                <TextBlock Grid.Row="4" Text="One per year, for … years" VerticalAlignment="Center" />
+                                <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding KeepYearly}" Margin="0,2" />
+                                <TextBlock Grid.Row="5" Text="Everything from the last … days" VerticalAlignment="Center" />
+                                <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding KeepWithinDays}" Margin="0,2" />
+                            </Grid>
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <TextBlock Text="Clean up every" VerticalAlignment="Center" />
+                                <TextBox Text="{Binding PruneEveryDays}" Width="48" Margin="8,0" />
+                                <TextBlock Text="days (after a backup; 0 = never)" VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <TextBlock Text="Integrity checks" Style="{StaticResource SectionTitle}" Margin="0,22,0,8" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Check every" VerticalAlignment="Center" />
+                                <TextBox Text="{Binding CheckEveryDays}" Width="48" Margin="8,0" />
+                                <TextBlock Text="days, reading" VerticalAlignment="Center" />
+                                <TextBox Text="{Binding CheckPercent}" Width="48" Margin="8,0" />
+                                <TextBlock Text="% of the data" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <TextBlock Style="{StaticResource Muted}" Margin="0,6,0,0" Text="Every check verifies the structure; the sample is decrypted and compared. A random sample each time covers all data over time." />
+
+                            <TextBlock Text="Notifications (e-mail, see Settings)" Style="{StaticResource SectionTitle}" Margin="0,22,0,8" />
+                            <CheckBox Content="When a run fails" IsChecked="{Binding NotifyOnFailure}" />
+                            <CheckBox Content="When a run has warnings (files not backed up)" IsChecked="{Binding NotifyOnWarning}" />
+                            <CheckBox Content="After every successful backup" IsChecked="{Binding NotifyOnSuccess}" />
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <TextBlock Text="Alert if no successful backup for" VerticalAlignment="Center" />
+                                <TextBox Text="{Binding AlertNoSuccessHours}" Width="48" Margin="8,0" />
+                                <TextBlock Text="hours (0 = off)" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <DockPanel Grid.Column="2">
+                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+                                <Button Content="Preview cleanup" Command="{Binding PreviewRetentionCommand}" />
+                                <TextBlock Text="(for saved jobs with backups)" Style="{StaticResource Muted}" VerticalAlignment="Center" Margin="10,0,0,0" />
+                            </StackPanel>
+                            <TextBox Text="{Binding PreviewText, Mode=OneWay}" Style="{StaticResource Mono}" MinHeight="200" />
+                        </DockPanel>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 6. Options -->
             <TabItem Header="  Options  ">
                 <StackPanel MaxWidth="640" HorizontalAlignment="Left">
                     <CheckBox Content="Run a missed backup once after the server starts (e.g. after it was switched off)" IsChecked="{Binding RunMissed}" />
+                    <CheckBox Content="Use VSS snapshots so open and locked files are backed up (recommended)" IsChecked="{Binding UseVss}" />
 
                     <TextBlock Text="When a scheduled backup fails" Style="{StaticResource FieldLabel}" Margin="0,16,0,4" />
                     <StackPanel Orientation="Horizontal">

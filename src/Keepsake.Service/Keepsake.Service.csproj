@@ -18,6 +18,11 @@
   <ItemGroup>
     <Reference Include="System.Security" />
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Management" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.18.0" />
   </ItemGroup>
 
   <ItemGroup>

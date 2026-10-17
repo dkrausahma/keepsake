@@ -144,6 +144,28 @@ namespace Keepsake.Protocol
         /// <summary>Parallel file workers; 0 = automatic.</summary>
         public int Workers { get; set; }
 
+        /// <summary>Read from VSS snapshots so open files are backed up (SRC-08).</summary>
+        public bool UseVss { get; set; } = true;
+
+        /// <summary>Which snapshots to keep. Null or empty = keep all (RET-01).</summary>
+        public Core.Maintenance.RetentionPolicy Retention { get; set; }
+
+        /// <summary>After a backup: apply retention and free space if the last cleanup is older than this. 0 = never.</summary>
+        public int PruneEveryDays { get; set; } = 7;
+
+        /// <summary>After a backup: verify the repository if the last check is older than this. 0 = never (VER-04).</summary>
+        public int CheckEveryDays { get; set; } = 7;
+
+        /// <summary>Share of stored data read and decrypted by scheduled checks (0 = structure only).</summary>
+        public int CheckReadDataPercent { get; set; } = 10;
+
+        public bool NotifyOnFailure { get; set; } = true;
+        public bool NotifyOnWarning { get; set; } = true;
+        public bool NotifyOnSuccess { get; set; }
+
+        /// <summary>Alert when there was no successful backup for this many hours. 0 = off (NOT-02).</summary>
+        public int AlertNoSuccessHours { get; set; }
+
         public DateTime Created { get; set; }
         public DateTime Modified { get; set; }
     }
@@ -166,6 +188,14 @@ namespace Keepsake.Protocol
                 }
             }
             errors.AddRange(ValidateDestination(job.Destination));
+            if (job.Retention != null)
+                errors.AddRange(job.Retention.Validate());
+            if (job.PruneEveryDays < 0 || job.PruneEveryDays > 365 || job.CheckEveryDays < 0 || job.CheckEveryDays > 365)
+                errors.Add("Cleanup and check intervals must be between 0 and 365 days.");
+            if (job.CheckReadDataPercent < 0 || job.CheckReadDataPercent > 100)
+                errors.Add("The share of data read by checks must be between 0 and 100 %.");
+            if (job.AlertNoSuccessHours < 0 || job.AlertNoSuccessHours > 24 * 90)
+                errors.Add("The 'no successful backup' alert must be between 0 hours and 90 days.");
             foreach (var c in job.ShareCredentials ?? new List<ShareCredential>())
             {
                 if (string.IsNullOrWhiteSpace(c.Share) || !c.Share.StartsWith(@"\\", StringComparison.Ordinal) || c.Share.Trim('\\').Split('\\').Length != 2)

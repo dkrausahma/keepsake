@@ -53,6 +53,14 @@ namespace Keepsake.Core.Reporting
             return lines;
         }
 
+        public static List<string> SummaryLines(Maintenance.PruneResult r) => new List<string>
+        {
+            (r.DryRun ? "Dry run – nothing changed. " : "") + "Snapshots: " + r.SnapshotsRemoved.Count + (r.DryRun ? " would be removed, " : " removed, ") + r.SnapshotsKept + " kept",
+            "Packs:     " + Format.Count(r.PacksDeleted) + " deleted, " + Format.Count(r.PacksRepacked) + " repacked into " + Format.Count(r.PacksWritten) + " new",
+            "Space:     " + Format.Bytes(r.BytesFreed) + (r.DryRun ? " would be freed" : " freed") + (r.BytesRepacked > 0 ? ", " + Format.Bytes(r.BytesRepacked) + " copied" : ""),
+            DurationLine(r),
+        };
+
         public static string DurationLine(RunReport r) =>
             "Duration:  " + Format.Duration(r.DurationSeconds) +
             (r.Phases.Count > 0 ? "  (" + string.Join(" · ", r.Phases.Select(p => p.Name + " " + Format.Duration(p.Seconds))) + ")" : "");

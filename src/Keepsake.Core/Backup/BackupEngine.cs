@@ -31,6 +31,16 @@ namespace Keepsake.Core.Backup
 
         /// <summary>Record every excluded item in the run report (can be long).</summary>
         public bool ReportExcluded { get; set; }
+
+        /// <summary>
+        /// Maps a source path to the path that is actually read, e.g. into a VSS snapshot
+        /// (<c>D:\Data</c> → <c>\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy3\Data</c>). Null = read live files.
+        /// Paths stored in the snapshot are always the original ones.
+        /// </summary>
+        public Func<string, string> ReadPath { get; set; }
+
+        /// <summary>Issues found before the backup started (e.g. "VSS failed, live files used").</summary>
+        public List<Issue> InitialIssues { get; set; } = new List<Issue>();
     }
 
     public sealed class BackupProgress
@@ -78,6 +88,15 @@ namespace Keepsake.Core.Backup
             var result = new BackupResult { Start = DateTime.UtcNow, Mode = options.Mode };
             var phases = new PhaseRecorder(result.Phases);
             var issues = new IssueLog(result.Issues);
+            foreach (var i in options.InitialIssues ?? new List<Issue>())
+            {
+                if (i.Kind == IssueKind.Error)
+                    issues.Error(i.Path, i.Message);
+                else if (i.Kind == IssueKind.Warning)
+                    issues.Warning(i.Path, i.Message);
+                else
+                    issues.Skipped(i.Path, i.Message);
+            }
             Walker walker = null;
             try
             {
@@ -302,7 +321,7 @@ namespace Keepsake.Core.Backup
 
             private Node BackupSource(string source, string name, Node previous)
             {
-                string extended = LongPath.ToExtended(source);
+                string extended = LongPath.ToExtended(_options.ReadPath?.Invoke(source) ?? source);
                 try
                 {
                     if (File.Exists(extended))
@@ -446,8 +465,7 @@ namespace Keepsake.Core.Backup
                 long read = 0;
                 try
                 {
-                    using (var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read,
-                               FileShare.ReadWrite | FileShare.Delete, 4096, FileOptions.SequentialScan))
+                    using (var stream = WindowsFiles.OpenRead(file.FullName))
                     {
                         var chunker = _chunkers.Value;
                         chunker.Reset(stream);
@@ -587,7 +605,7 @@ namespace Keepsake.Core.Backup
             if (ex is UnauthorizedAccessException)
                 return "Access denied.";
             if (ex.HResult == SharingViolation || ex.HResult == LockViolation)
-                return "File is locked by another program (open-file backup via VSS follows in a later version).";
+                return "File is locked by another program. Enable VSS for the job to back up open files.";
             if (ex is PathTooLongException)
                 return "Path is too long.";
             return ex.Message;

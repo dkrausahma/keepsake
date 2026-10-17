@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading;
 using Keepsake.Core;
 using Keepsake.Core.Backup;
+using Keepsake.Core.Check;
+using Keepsake.Core.Maintenance;
 using Keepsake.Core.Repo;
 using Keepsake.Core.Reporting;
 using Keepsake.Core.Restore;
@@ -27,26 +29,31 @@ namespace Keepsake.Service
         private readonly object _lock = new object();
         private readonly List<Pending> _queue = new List<Pending>();
         private readonly Dictionary<string, Active> _active = new Dictionary<string, Active>(StringComparer.Ordinal);
+        private readonly ShadowTracker _shadows;
         private bool _stopping;
 
-        public JobRunner(JobStore jobs, SettingsStore settings, RunHistory history)
+        public JobRunner(JobStore jobs, SettingsStore settings, RunHistory history, ShadowTracker shadows = null)
         {
             _jobs = jobs;
             _settings = settings;
             _history = history;
+            _shadows = shadows;
         }
 
         /// <summary>Raised on the run's thread after a run has ended and its record was saved.</summary>
         public event Action<RunRecord> RunFinished;
 
-        public RunRecord Enqueue(string jobId, RunKind kind, BackupMode mode, RunTrigger trigger, int attempt = 1, RestoreOptions restore = null)
+        /// <param name="followUp">Maintenance queued by the service after a backup: may wait behind the job's current run.</param>
+        public RunRecord Enqueue(string jobId, RunKind kind, BackupMode mode, RunTrigger trigger, int attempt = 1, RestoreOptions restore = null,
+            bool followUp = false, bool fullCheck = false)
         {
             var job = _jobs.Get(jobId) ?? throw new ApiException(ErrorCodes.NotFound, "Job not found.");
             lock (_lock)
             {
                 if (_stopping)
                     throw new ApiException(ErrorCodes.Conflict, "The service is stopping.");
-                if (_active.ContainsKey(jobId) || _queue.Any(q => q.Record.JobId == jobId))
+                if (followUp ? _queue.Any(q => q.Record.JobId == jobId && q.Record.Kind == kind)
+                             : _active.ContainsKey(jobId) || _queue.Any(q => q.Record.JobId == jobId))
                     throw new ApiException(ErrorCodes.Conflict, "'" + job.Name + "' is already running or waiting to run.");
 
                 var record = new RunRecord
@@ -62,7 +69,7 @@ namespace Keepsake.Service
                     Attempt = attempt,
                 };
                 _history.Save(record);
-                _queue.Add(new Pending { Record = record, Restore = restore });
+                _queue.Add(new Pending { Record = record, Restore = restore, FullCheck = fullCheck });
                 ServiceLog.Info("Queued " + kind.ToString().ToLowerInvariant() + " of '" + job.Name + "' (" + trigger.ToString().ToLowerInvariant() + ", " + mode.ToString().ToLowerInvariant() + ").");
                 Pump();
                 return Clone(record);
@@ -154,10 +161,13 @@ namespace Keepsake.Service
         private void Pump()
         {
             int max = Math.Max(1, _settings.Get().MaxConcurrentJobs);
-            while (!_stopping && _active.Count < max && _queue.Count > 0)
+            while (!_stopping && _active.Count < max)
             {
-                var next = _queue[0];
-                _queue.RemoveAt(0);
+                // First waiting run whose job is not already running (a job never runs twice at once).
+                var next = _queue.FirstOrDefault(q => !_active.ContainsKey(q.Record.JobId));
+                if (next == null)
+                    break;
+                _queue.Remove(next);
                 var active = new Active
                 {
                     Record = next.Record,
@@ -191,9 +201,21 @@ namespace Keepsake.Service
             try
             {
                 var job = _jobs.Get(record.JobId) ?? throw new KeepsakeException("The job was deleted.");
-                report = record.Kind == RunKind.Restore
-                    ? RunRestore(job, pending.Restore, active, log)
-                    : RunBackup(job, active, log);
+                switch (record.Kind)
+                {
+                    case RunKind.Restore:
+                        report = RunRestore(job, pending.Restore, active, log);
+                        break;
+                    case RunKind.Check:
+                        report = RunCheck(job, pending.FullCheck, active, log);
+                        break;
+                    case RunKind.Prune:
+                        report = RunPrune(job, active, log);
+                        break;
+                    default:
+                        report = RunBackup(job, active, log);
+                        break;
+                }
             }
             catch (Exception ex) when (ex is KeepsakeException || ex is IOException || ex is UnauthorizedAccessException || ex is InvalidOperationException)
             {
@@ -232,6 +254,7 @@ namespace Keepsake.Service
                     _active.Remove(record.JobId);
                     Pump();
                 }
+                ScheduleMaintenance(record);
                 try
                 {
                     RunFinished?.Invoke(Clone(record));
@@ -268,11 +291,21 @@ namespace Keepsake.Service
                         throw new KeepsakeException("The pre-command failed with exit code " + exit + ". The backup was not started.");
                 }
 
+                VssSession vss = null;
+                var initialIssues = new List<Issue>();
+                if (job.UseVss)
+                {
+                    SetPhase(active, "Creating VSS snapshot");
+                    vss = VssSession.Create(job.Sources, initialIssues, _shadows ?? ShadowTracker.None);
+                }
                 SetPhase(active, "Opening repository");
+                using (vss)
                 using (var opened = OpenRepository(job))
                 {
                     var options = new BackupOptions
                     {
+                        ReadPath = vss == null || vss.Count == 0 ? (Func<string, string>)null : vss.Map,
+                        InitialIssues = initialIssues,
                         Sources = job.Sources.ToList(),
                         Excludes = job.Excludes.ToList(),
                         UseDefaultExcludes = job.UseDefaultExcludes,
@@ -359,6 +392,68 @@ namespace Keepsake.Service
             return result;
         }
 
+        private RunReport RunCheck(JobDefinition job, bool full, Active active, StringBuilder log)
+        {
+            SetPhase(active, "Opening repository");
+            CheckResult result;
+            int percent = full ? 100 : job.CheckReadDataPercent;
+            using (var opened = OpenRepository(job))
+            {
+                SetPhase(active, "Checking");
+                var progress = new TextProgress(text => SetPhase(active, text));
+                result = new Checker(opened.Repository).Run(new CheckOptions { ReadData = percent > 0, ReadDataPercent = Math.Max(1, percent) }, progress, active.Cancel.Token);
+            }
+            var record = active.Record;
+            record.State = Map(result.Status);
+            record.Message = result.Error ?? (percent > 0 ? percent + " % of the data verified." : "Structure verified.");
+            log.Append(TextReport.Full("Keepsake check – " + job.Name, result, TextReport.SummaryLines(result)));
+            return result;
+        }
+
+        private RunReport RunPrune(JobDefinition job, Active active, StringBuilder log)
+        {
+            SetPhase(active, "Opening repository");
+            PruneResult result;
+            using (var opened = OpenRepository(job))
+            {
+                SetPhase(active, "Cleaning up");
+                var progress = new TextProgress(text => SetPhase(active, text));
+                result = new Pruner(opened.Repository).Run(new PruneOptions { Policy = job.Retention, Job = job.Name }, progress, active.Cancel.Token);
+            }
+            var record = active.Record;
+            record.State = Map(result.Status);
+            record.Message = result.Error ?? result.SnapshotsRemoved.Count + " snapshot(s) removed, " + Format.Bytes(result.BytesFreed) + " freed.";
+            log.Append(TextReport.Full("Keepsake cleanup – " + job.Name, result, TextReport.SummaryLines(result)));
+            return result;
+        }
+
+        /// <summary>After a good backup: queue cleanup and check if they are due (RET-03, VER-04).</summary>
+        private void ScheduleMaintenance(RunRecord finished)
+        {
+            if (finished.Kind != RunKind.Backup || (finished.State != RunState.Success && finished.State != RunState.Warning))
+                return;
+            var job = _jobs.Get(finished.JobId);
+            if (job == null)
+                return;
+            try
+            {
+                if (job.PruneEveryDays > 0 && job.Retention != null && !job.Retention.IsEmpty && Due(job.Id, RunKind.Prune, job.PruneEveryDays))
+                    Enqueue(job.Id, RunKind.Prune, BackupMode.Incremental, RunTrigger.Schedule, followUp: true);
+                if (job.CheckEveryDays > 0 && Due(job.Id, RunKind.Check, job.CheckEveryDays))
+                    Enqueue(job.Id, RunKind.Check, BackupMode.Incremental, RunTrigger.Schedule, followUp: true);
+            }
+            catch (ApiException ex)
+            {
+                ServiceLog.Warn("Maintenance for '" + job.Name + "' not queued: " + ex.Message);
+            }
+        }
+
+        private bool Due(string jobId, RunKind kind, int everyDays)
+        {
+            var last = _history.LastOfKind(jobId, kind);
+            return last == null || DateTime.UtcNow - last.Start > TimeSpan.FromDays(everyDays) - TimeSpan.FromHours(1);
+        }
+
         /// <summary>Opens the job's repository, connecting shares and finding the USB disk as needed.</summary>
         internal OpenedRepository OpenRepository(JobDefinition job)
         {
@@ -421,6 +516,7 @@ namespace Keepsake.Service
         {
             public RunRecord Record;
             public RestoreOptions Restore;
+            public bool FullCheck;
         }
 
         private sealed class Active
@@ -436,6 +532,13 @@ namespace Keepsake.Service
             private readonly Action<BackupProgress> _action;
             public Progress(Action<BackupProgress> action) => _action = action;
             public void Report(BackupProgress value) => _action(value);
+        }
+
+        private sealed class TextProgress : IProgress<string>
+        {
+            private readonly Action<string> _action;
+            public TextProgress(Action<string> action) => _action = action;
+            public void Report(string value) => _action(value);
         }
 
         private sealed class RestoreProgressSink : IProgress<RestoreProgress>

@@ -28,6 +28,14 @@ namespace Keepsake.Gui.ViewModels
         private string _preCommand;
         private string _postCommand;
         private int _commandTimeout = 30;
+        private bool _useVss = true;
+        private int _keepLast, _keepDaily = 14, _keepWeekly = 8, _keepMonthly = 12, _keepYearly, _keepWithin;
+        private int _pruneEveryDays = 7;
+        private int _checkEveryDays = 7;
+        private int _checkPercent = 10;
+        private bool _notifyFailure = true, _notifyWarning = true, _notifySuccess;
+        private int _alertHours = 48;
+        private string _previewText;
         private string _error;
 
         public JobEditorViewModel(ServiceConnection connection, JobDetail detail)
@@ -59,6 +67,21 @@ namespace Keepsake.Gui.ViewModels
                 _preCommand = _original.PreCommand;
                 _postCommand = _original.PostCommand;
                 _commandTimeout = _original.CommandTimeoutMinutes;
+                _useVss = _original.UseVss;
+                var r = _original.Retention ?? new Core.Maintenance.RetentionPolicy();
+                _keepLast = r.KeepLast;
+                _keepDaily = r.KeepDaily;
+                _keepWeekly = r.KeepWeekly;
+                _keepMonthly = r.KeepMonthly;
+                _keepYearly = r.KeepYearly;
+                _keepWithin = r.KeepWithinDays;
+                _pruneEveryDays = _original.PruneEveryDays;
+                _checkEveryDays = _original.CheckEveryDays;
+                _checkPercent = _original.CheckReadDataPercent;
+                _notifyFailure = _original.NotifyOnFailure;
+                _notifyWarning = _original.NotifyOnWarning;
+                _notifySuccess = _original.NotifyOnSuccess;
+                _alertHours = _original.AlertNoSuccessHours;
                 var own = Destination.ShareCredential();
                 foreach (var c in _original.ShareCredentials ?? new List<ShareCredential>())
                 {
@@ -87,6 +110,7 @@ namespace Keepsake.Gui.ViewModels
             }, () => SelectedSchedule != null);
             AddShareCommand = new RelayCommand(() => ExtraShares.Add(new ShareCredentialRow(new ShareCredential { Share = @"\\server\share" }, false)));
             RemoveShareCommand = new RelayCommand(p => ExtraShares.Remove((ShareCredentialRow)p));
+            PreviewRetentionCommand = new AsyncCommand(PreviewRetention, () => !IsNew);
         }
 
         public bool IsNew => _original == null;
@@ -114,6 +138,46 @@ namespace Keepsake.Gui.ViewModels
         public string PostCommand { get => _postCommand; set => Set(ref _postCommand, value); }
         public int CommandTimeout { get => _commandTimeout; set => Set(ref _commandTimeout, value); }
         public string Error { get => _error; set => Set(ref _error, value); }
+
+        public bool UseVss { get => _useVss; set => Set(ref _useVss, value); }
+        public int KeepLast { get => _keepLast; set => Set(ref _keepLast, value); }
+        public int KeepDaily { get => _keepDaily; set => Set(ref _keepDaily, value); }
+        public int KeepWeekly { get => _keepWeekly; set => Set(ref _keepWeekly, value); }
+        public int KeepMonthly { get => _keepMonthly; set => Set(ref _keepMonthly, value); }
+        public int KeepYearly { get => _keepYearly; set => Set(ref _keepYearly, value); }
+        public int KeepWithinDays { get => _keepWithin; set => Set(ref _keepWithin, value); }
+        public int PruneEveryDays { get => _pruneEveryDays; set => Set(ref _pruneEveryDays, value); }
+        public int CheckEveryDays { get => _checkEveryDays; set => Set(ref _checkEveryDays, value); }
+        public int CheckPercent { get => _checkPercent; set => Set(ref _checkPercent, value); }
+        public bool NotifyOnFailure { get => _notifyFailure; set => Set(ref _notifyFailure, value); }
+        public bool NotifyOnWarning { get => _notifyWarning; set => Set(ref _notifyWarning, value); }
+        public bool NotifyOnSuccess { get => _notifySuccess; set => Set(ref _notifySuccess, value); }
+        public int AlertNoSuccessHours { get => _alertHours; set => Set(ref _alertHours, value); }
+        public string PreviewText { get => _previewText; private set => Set(ref _previewText, value); }
+        public ICommand PreviewRetentionCommand { get; }
+
+        private Core.Maintenance.RetentionPolicy Policy() => new Core.Maintenance.RetentionPolicy
+        {
+            KeepLast = KeepLast,
+            KeepDaily = KeepDaily,
+            KeepWeekly = KeepWeekly,
+            KeepMonthly = KeepMonthly,
+            KeepYearly = KeepYearly,
+            KeepWithinDays = KeepWithinDays,
+        };
+
+        private async Task PreviewRetention()
+        {
+            PreviewText = "Loading…";
+            var items = await _connection.Call<List<RetentionPreviewItem>>(Methods.RetentionPreview, new RetentionPreviewParams { JobId = _original.Id, Policy = Policy() });
+            if (items.Count == 0)
+            {
+                PreviewText = "No snapshots yet.";
+                return;
+            }
+            var lines = items.Select(i => (i.Keep ? "keep    " : "REMOVE  ") + Core.Reporting.Format.LocalTime(i.Time) + "   " + string.Join(", ", i.Reasons)).ToList();
+            PreviewText = items.Count(i => !i.Keep) + " of " + items.Count + " snapshots would be removed by the next cleanup:" + Environment.NewLine + string.Join(Environment.NewLine, lines);
+        }
 
         public ICommand AddPathCommand { get; }
         public ICommand RemoveSourceCommand { get; }
@@ -206,6 +270,15 @@ namespace Keepsake.Gui.ViewModels
                 PostCommand = string.IsNullOrWhiteSpace(PostCommand) ? null : PostCommand.Trim(),
                 CommandTimeoutMinutes = CommandTimeout,
                 Workers = _original?.Workers ?? 0,
+                UseVss = UseVss,
+                Retention = Policy(),
+                PruneEveryDays = PruneEveryDays,
+                CheckEveryDays = CheckEveryDays,
+                CheckReadDataPercent = CheckPercent,
+                NotifyOnFailure = NotifyOnFailure,
+                NotifyOnWarning = NotifyOnWarning,
+                NotifyOnSuccess = NotifyOnSuccess,
+                AlertNoSuccessHours = AlertNoSuccessHours,
             };
         }
     }

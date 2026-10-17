@@ -32,6 +32,43 @@
                 </StackPanel>
             </Border>
 
+            <Border Style="{StaticResource Card}" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="E-mail notifications" Style="{StaticResource SectionTitle}" />
+                    <TextBlock Style="{StaticResource Muted}" Text="Which events send a mail is set per job (Retention &amp; checks tab). Leave the server empty to turn e-mail off." />
+                    <Grid Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="SMTP server" VerticalAlignment="Center" />
+                        <TextBox Grid.Column="1" Text="{Binding SmtpHost}" Margin="0,3" />
+                        <TextBlock Grid.Row="1" Text="Port / security" VerticalAlignment="Center" />
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,3">
+                            <TextBox Text="{Binding SmtpPort}" Width="70" />
+                            <ComboBox ItemsSource="{Binding SecurityOptions}" SelectedItem="{Binding SmtpSecurity}" Width="120" Margin="8,0,0,0" />
+                        </StackPanel>
+                        <TextBlock Grid.Row="2" Text="User (optional)" VerticalAlignment="Center" />
+                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SmtpUser}" Margin="0,3" />
+                        <TextBlock Grid.Row="3" Text="Password" VerticalAlignment="Center" />
+                        <PasswordBox Grid.Row="3" Grid.Column="1" infra:PasswordBinding.Password="{Binding SmtpPassword, Mode=TwoWay}" Margin="0,3" ToolTip="{Binding SmtpPasswordHint}" />
+                        <TextBlock Grid.Row="4" Text="From" VerticalAlignment="Center" />
+                        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding SmtpFrom}" Margin="0,3" />
+                        <TextBlock Grid.Row="5" Text="To (; separated)" VerticalAlignment="Center" />
+                        <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding SmtpTo}" Margin="0,3" />
+                        <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding SmtpPasswordHint}" Style="{StaticResource Muted}" />
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                        <Button Content="Save" Command="{Binding SaveSmtpCommand}" Style="{StaticResource PrimaryButton}" Margin="0,0,8,0" />
+                        <Button Content="Send test e-mail" Command="{Binding TestSmtpCommand}" />
+                        <TextBlock Text="{Binding SmtpMessage}" Style="{StaticResource Muted}" VerticalAlignment="Center" Margin="12,0,0,0" TextWrapping="Wrap" MaxWidth="320" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <Border Style="{StaticResource Card}">
                 <StackPanel>
                     <TextBlock Text="Application password" Style="{StaticResource SectionTitle}" />

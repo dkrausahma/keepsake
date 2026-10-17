@@ -29,7 +29,11 @@
                     </StackPanel>
                     <StackPanel Grid.Column="2">
                         <TextBlock Text="Backup from" Style="{StaticResource FieldLabel}" Margin="0,0,0,4" />
-                        <ComboBox ItemsSource="{Binding Snapshots}" SelectedItem="{Binding Snapshot}" DisplayMemberPath="Label" />
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="{Binding ProtectLabel}" Command="{Binding ProtectCommand}" Margin="6,0,0,0"
+                                    ToolTip="Protected backups are never removed by the retention rules" />
+                            <ComboBox ItemsSource="{Binding Snapshots}" SelectedItem="{Binding Snapshot}" DisplayMemberPath="Label" />
+                        </DockPanel>
                     </StackPanel>
                 </Grid>
                 <TextBlock DockPanel.Dock="Top" Text="{Binding BrowseLocation}" Style="{StaticResource Muted}" Margin="0,0,0,6" TextTrimming="CharacterEllipsis"

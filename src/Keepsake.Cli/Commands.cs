@@ -5,6 +5,7 @@ using System.Linq;
 using Keepsake.Core;
 using Keepsake.Core.Backup;
 using Keepsake.Core.Check;
+using Keepsake.Core.Maintenance;
 using Keepsake.Core.Repo;
 using Keepsake.Core.Reporting;
 using Keepsake.Core.Restore;
@@ -92,6 +93,26 @@ namespace Keepsake.Cli
                 ValueOptions = new[] { "read-data-percent" },
                 Flags = new[] { "read-data" },
                 Run = Check,
+            },
+            new Command
+            {
+                Name = "prune",
+                Summary = "Remove old snapshots by retention rules and free unused space",
+                Usage = "keepsake prune --repo <path> [--keep-last <n>] [--keep-daily <n>] [--keep-weekly <n>] [--keep-monthly <n>] [--keep-yearly <n>] [--keep-within <days>] [--job <name>] [--dry-run]",
+                Details = "Rules combine: a snapshot is kept if any rule keeps it. Protected snapshots are always kept.\n" +
+                          "Without --keep-* options only unused data is removed (no snapshot is deleted).\n" +
+                          "--job applies the rules only to snapshots of that job. --dry-run shows what would happen.",
+                ValueOptions = new[] { "keep-last", "keep-daily", "keep-weekly", "keep-monthly", "keep-yearly", "keep-within", "job" },
+                Flags = new[] { "dry-run" },
+                Run = Prune,
+            },
+            new Command
+            {
+                Name = "protect",
+                Summary = "Protect a snapshot from retention (or remove the protection)",
+                Usage = "keepsake protect <snapshot> --repo <path> [--remove]",
+                Flags = new[] { "remove" },
+                Run = Protect,
             },
             new Command
             {
@@ -270,12 +291,12 @@ namespace Keepsake.Cli
                 {
                     var snap = s.Snapshot;
                     string paths = snap.Paths.Count == 0 ? "" : snap.Paths[0] + (snap.Paths.Count > 1 ? " (+" + (snap.Paths.Count - 1) + ")" : "");
-                    ctx.Info(s.ShortId + "  " + Format.LocalTime(snap.Time) + "  " + Trim(snap.Job ?? "-", 15).PadRight(15) + "  " +
+                    ctx.Info(s.ShortId + (Repository.IsProtected(snap) ? "* " : "  ") + Format.LocalTime(snap.Time) + "  " + Trim(snap.Job ?? "-", 15).PadRight(15) + "  " +
                              snap.Mode.ToString().ToLowerInvariant().PadRight(11) + "  " +
                              Format.Count(snap.Summary?.Files ?? 0).PadLeft(9) + "  " + Format.Bytes(snap.Summary?.TotalBytes ?? 0).PadLeft(9) + "  " + paths);
                 }
                 ctx.Info();
-                ctx.Info(list.Count + " snapshot(s)");
+                ctx.Info(list.Count + " snapshot(s)" + (list.Any(s => Repository.IsProtected(s.Snapshot)) ? ", * = protected" : ""));
             }
             return ExitCodes.Success;
         }
@@ -448,6 +469,73 @@ namespace Keepsake.Cli
                 PrintStatus(ctx, result);
             }
             return CommandContext.ExitCode(result.Status);
+        }
+
+        // ---- prune / protect --------------------------------------------------------------------
+
+        private static int Prune(CommandContext ctx)
+        {
+            var policy = new RetentionPolicy
+            {
+                KeepLast = ctx.Args.IntValue("keep-last", 0, 0, 100000),
+                KeepDaily = ctx.Args.IntValue("keep-daily", 0, 0, 100000),
+                KeepWeekly = ctx.Args.IntValue("keep-weekly", 0, 0, 100000),
+                KeepMonthly = ctx.Args.IntValue("keep-monthly", 0, 0, 100000),
+                KeepYearly = ctx.Args.IntValue("keep-yearly", 0, 0, 100000),
+                KeepWithinDays = ctx.Args.IntValue("keep-within", 0, 0, 100000),
+            };
+            var options = new PruneOptions { Policy = policy, Job = ctx.Args.Value("job"), DryRun = ctx.Args.Flag("dry-run") };
+            PruneResult result;
+            using (var repo = ctx.OpenRepository())
+            {
+                ctx.Info("Retention: " + policy.Describe() + (options.Job != null ? " (job '" + options.Job + "')" : ""));
+                LatestProgress<string> progress = null;
+                if (!ctx.Quiet && ConsoleUi.CanShowProgress)
+                    progress = new LatestProgress<string>(ConsoleUi.Progress);
+                using (progress)
+                    result = new Pruner(repo).Run(options, progress, ctx.Cancel);
+            }
+            var summary = TextReport.SummaryLines(result);
+            ctx.WriteLog("Keepsake prune", result, summary);
+            ctx.WriteJson(new
+            {
+                status = result.Status,
+                dryRun = result.DryRun,
+                snapshotsRemoved = result.SnapshotsRemoved,
+                snapshotsKept = result.SnapshotsKept,
+                packsDeleted = result.PacksDeleted,
+                packsRepacked = result.PacksRepacked,
+                bytesFreed = result.BytesFreed,
+                error = result.Error,
+                phases = result.Phases,
+            });
+            if (!ctx.Json)
+            {
+                foreach (string line in summary)
+                    ctx.Info(line);
+                foreach (string id in result.SnapshotsRemoved.Take(50))
+                    ctx.Info("  " + (result.DryRun ? "would remove " : "removed ") + id.Substring(0, 8));
+                PrintStatus(ctx, result);
+            }
+            return CommandContext.ExitCode(result.Status);
+        }
+
+        private static int Protect(CommandContext ctx)
+        {
+            if (ctx.Args.Positionals.Count != 1)
+                throw new UsageException("Usage: keepsake protect <snapshot> --repo <path> [--remove]");
+            using (var repo = ctx.OpenRepository())
+            {
+                var snapshot = repo.FindSnapshot(ctx.Args.Positionals[0]);
+                bool protect = !ctx.Args.Flag("remove");
+                using (RepoLock.Acquire(repo, exclusive: false, purpose: "protect"))
+                {
+                    var updated = repo.SetProtected(snapshot, protect);
+                    ctx.WriteJson(new { status = "success", oldId = snapshot.Id, id = updated.Id, @protected = protect });
+                    ctx.Info("Snapshot " + snapshot.ShortId + (protect ? " is now protected" : " is no longer protected") + " (new ID " + updated.ShortId + ").");
+                }
+            }
+            return ExitCodes.Success;
         }
 
         // ---- key / unlock / version / help -----------------------------------------------------

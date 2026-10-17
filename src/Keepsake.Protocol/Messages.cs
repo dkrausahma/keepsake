@@ -37,6 +37,11 @@ namespace Keepsake.Protocol
         public const string SnapshotsList = "snapshots.list";
         public const string TreeList = "tree.list";
         public const string RestoreStart = "restore.start";
+        public const string SnapshotsProtect = "snapshots.protect";
+        public const string RetentionPreview = "retention.preview";
+        public const string SmtpGet = "smtp.get";
+        public const string SmtpSave = "smtp.save";
+        public const string SmtpTest = "smtp.test";
     }
 
     public static class ErrorCodes
@@ -167,7 +172,51 @@ namespace Keepsake.Protocol
     public sealed class RunJobParams
     {
         public string Id { get; set; }
+        public RunKind Kind { get; set; } = RunKind.Backup;
         public BackupMode Mode { get; set; } = BackupMode.Incremental;
+
+        /// <summary>Check runs: read and decrypt all data instead of the job's sample.</summary>
+        public bool FullCheck { get; set; }
+    }
+
+    public sealed class ProtectParams
+    {
+        public string JobId { get; set; }
+        public string SnapshotId { get; set; }
+        public bool Protect { get; set; }
+    }
+
+    public sealed class RetentionPreviewParams
+    {
+        public string JobId { get; set; }
+        public Core.Maintenance.RetentionPolicy Policy { get; set; }
+    }
+
+    public sealed class RetentionPreviewItem
+    {
+        public string SnapshotId { get; set; }
+        public DateTime Time { get; set; }
+        public bool Keep { get; set; }
+        public List<string> Reasons { get; set; }
+    }
+
+    public sealed class SmtpSettings
+    {
+        public string Host { get; set; }
+        public int Port { get; set; } = 587;
+
+        /// <summary><c>none</c>, <c>starttls</c> or <c>ssl</c>.</summary>
+        public string Security { get; set; } = "starttls";
+
+        public string User { get; set; }
+        public string From { get; set; }
+        public List<string> To { get; set; } = new List<string>();
+
+        /// <summary>Only sent to the service; never returned.</summary>
+        public string Password { get; set; }
+
+        public bool HasPassword { get; set; }
+        public bool Enabled => !string.IsNullOrWhiteSpace(Host) && To != null && To.Count > 0;
     }
 
     public sealed class RunStarted
@@ -182,6 +231,9 @@ namespace Keepsake.Protocol
         Backup,
         Restore,
         Check,
+
+        /// <summary>Apply retention and free unused space.</summary>
+        Prune,
     }
 
     public enum RunTrigger
@@ -303,6 +355,7 @@ namespace Keepsake.Protocol
         public BackupMode Mode { get; set; }
         public List<string> Paths { get; set; }
         public SnapshotSummary Summary { get; set; }
+        public bool Protected { get; set; }
     }
 
     public sealed class TreeParams
