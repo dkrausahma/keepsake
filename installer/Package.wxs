@@ -30,9 +30,17 @@
     <Property Id="ARPHELPTELEPHONE" Value="+49 172 1853648" />
     <Property Id="ARPURLINFOABOUT" Value="https://www.kraus-ahma.com" />
 
+    <!-- Default: %ProgramFiles%\dkait\keepsake; the user can choose another folder in the setup dialog. -->
     <StandardDirectory Id="ProgramFiles64Folder">
-      <Directory Id="INSTALLFOLDER" Name="Keepsake" />
+      <Directory Id="VendorFolder" Name="dkait">
+        <Directory Id="INSTALLFOLDER" Name="keepsake" />
+      </Directory>
     </StandardDirectory>
+
+    <!-- Upgrades and repairs stay in the folder chosen at the first install. -->
+    <Property Id="INSTALLFOLDER">
+      <RegistrySearch Id="PreviousInstallFolder" Root="HKLM" Key="Software\Keepsake" Name="InstallFolder" Type="raw" Bitness="always64" />
+    </Property>
 
     <!-- Everything from the stage folder except the service executable (it needs its own component). -->
     <ComponentGroup Id="AppFiles" Directory="INSTALLFOLDER">
@@ -84,7 +92,7 @@
     </Feature>
 
     <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
-    <ui:WixUI Id="WixUI_Minimal" />
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
 
     <!-- Offer to open the GUI at the end so the first-time setup (application password) happens right away. -->
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Open Keepsake now" />

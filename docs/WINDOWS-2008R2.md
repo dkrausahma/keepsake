@@ -25,7 +25,7 @@ Notes:
 ## Installation
 
 1. Install the prerequisites, reboot.
-2. Run `Keepsake-<version>.msi` (as administrator). It installs to `C:\Program Files\Keepsake`,
+2. Run `Keepsake-<version>.msi` (as administrator). It installs to `C:\Program Files\dkait\keepsake` (or a folder you choose in the setup),
    registers and starts the *Keepsake Backup Service* (LocalSystem, automatic, restarts on
    failure), adds `keepsake` to the PATH and creates the Start menu entry *Keepsake Backup*.
 3. Open *Keepsake Backup*, set the application password, create the first job.

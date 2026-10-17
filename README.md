@@ -130,7 +130,7 @@ powershell -ExecutionPolicy Bypass -File toolsuild-release.ps1
 ```
 
 builds, tests and produces `artifacts\Keepsake-<version>.msi` and `artifacts\Keepsake-<version>-portable.zip`.
-The MSI installs to `C:\Program Files\Keepsake`, registers the service (LocalSystem, automatic,
+The MSI installs to `C:\Program Files\dkait\keepsake` (the setup lets you choose another folder), registers the service (LocalSystem, automatic,
 restart on failure), puts `keepsake` on the PATH and adds *Keepsake Backup* to the Start menu.
 It checks for .NET Framework 4.8 and Service Pack 1.
 
