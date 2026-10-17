@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Version>0.1.0</Version>
+    <Product>Keepsake</Product>
+    <Company>Keepsake</Company>
+    <Copyright>Internal use only</Copyright>
+    <Deterministic>true</Deterministic>
+    <!-- BouncyCastle marks some engines obsolete in favour of .NET Core APIs that do not exist on .NET Framework. -->
+    <NoWarn>$(NoWarn);CS0618</NoWarn>
+  </PropertyGroup>
+
+  <!-- Allows building .NET Framework 4.8 targets without the Developer Pack installed. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+</Project>
