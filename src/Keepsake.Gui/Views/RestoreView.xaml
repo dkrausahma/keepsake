@@ -1,0 +1,106 @@
+<UserControl x:Class="Keepsake.Gui.Views.RestoreView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:Keepsake.Gui.ViewModels">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+            <TextBlock Text="Restore" Style="{StaticResource PageTitle}" />
+            <TextBlock Text="Pick a backup job and a point in time, tick what you need, choose where it goes." Style="{StaticResource Muted}" />
+        </StackPanel>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="340" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: job, snapshot, tree -->
+            <DockPanel>
+                <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="Job" Style="{StaticResource FieldLabel}" Margin="0,0,0,4" />
+                        <ComboBox ItemsSource="{Binding Jobs}" SelectedItem="{Binding Job}" DisplayMemberPath="Name" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Backup from" Style="{StaticResource FieldLabel}" Margin="0,0,0,4" />
+                        <ComboBox ItemsSource="{Binding Snapshots}" SelectedItem="{Binding Snapshot}" DisplayMemberPath="Label" />
+                    </StackPanel>
+                </Grid>
+                <TextBlock DockPanel.Dock="Top" Text="{Binding BrowseLocation}" Style="{StaticResource Muted}" Margin="0,0,0,6" TextTrimming="CharacterEllipsis"
+                           Visibility="{Binding BrowseLocation, Converter={StaticResource Visible}}" />
+                <TextBlock DockPanel.Dock="Bottom" Text="{Binding SelectionText}" Style="{StaticResource Muted}" Margin="0,8,0,0" />
+                <TreeView ItemsSource="{Binding Nodes}" BorderBrush="{StaticResource BorderBrush}"
+                          VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="TreeViewItem">
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                            <Setter Property="Padding" Value="1,2" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type vm:SnapshotNode}" ItemsSource="{Binding Children}">
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding IsChecked}" IsEnabled="{Binding IsSelectable}" Margin="0,0,6,0" Focusable="False"
+                                          Visibility="{Binding Name, Converter={StaticResource Visible}}" />
+                                <TextBlock Text="{Binding Name}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsFolder}" Value="True">
+                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock Text="{Binding Details}" Style="{StaticResource Muted}" Margin="10,0,0,0" />
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </DockPanel>
+
+            <!-- Right: target and options -->
+            <Border Grid.Column="2" Style="{StaticResource Card}" VerticalAlignment="Top">
+                <StackPanel>
+                    <TextBlock Text="Restore to" Style="{StaticResource SectionTitle}" />
+                    <RadioButton Content="A different folder" IsChecked="{Binding ToFolder}" GroupName="Target" Margin="0,2" />
+                    <StackPanel Margin="22,4,0,0" IsEnabled="{Binding ToFolder}">
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="…" Command="{Binding BrowseTargetCommand}" MinWidth="32" Margin="6,0,0,0" />
+                            <TextBox x:Name="TargetBox" Text="{Binding TargetFolder, UpdateSourceTrigger=PropertyChanged}" />
+                        </DockPanel>
+                        <CheckBox Content="Keep the full original path (D\Data\…)" IsChecked="{Binding KeepFullPath}" Margin="0,8,0,0" />
+                    </StackPanel>
+                    <RadioButton Content="The original location" IsChecked="{Binding ToOriginal}" GroupName="Target" Margin="0,12,0,2" />
+
+                    <TextBlock Text="If a file already exists" Style="{StaticResource FieldLabel}" Margin="0,16,0,4" />
+                    <ComboBox ItemsSource="{Binding Conflicts}" SelectedItem="{Binding Conflict}" DisplayMemberPath="Label" />
+                    <TextBlock Style="{StaticResource Muted}" Margin="0,6,0,0" Text="Identical files are always left alone." />
+
+                    <CheckBox Content="Dry run – only show what would happen" IsChecked="{Binding DryRun}" Margin="0,14,0,0" />
+                    <TextBlock Style="{StaticResource Muted}" Margin="0,10,0,0"
+                               Text="Restored files get the permissions of the target folder (NTFS permissions are not part of the backup)." />
+
+                    <Button Content="Start restore" Command="{Binding StartCommand}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Stretch" Margin="0,18,0,0" Padding="14,8" />
+
+                    <StackPanel Margin="0,14,0,0" Visibility="{Binding RunStatus, Converter={StaticResource Visible}}">
+                        <ProgressBar IsIndeterminate="True" Visibility="{Binding IsRunning, Converter={StaticResource Visible}}" Margin="0,0,0,8" />
+                        <TextBlock Text="{Binding RunStatus}" TextWrapping="Wrap" />
+                        <Button Content="Show log" Command="{Binding ShowLogCommand}" Style="{StaticResource LinkButton}" HorizontalAlignment="Left" Margin="0,8,0,0" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.ColumnSpan="3" Style="{StaticResource Card}" VerticalAlignment="Top" Visibility="{Binding NoJobs, Converter={StaticResource Visible}}">
+                <TextBlock Text="There are no backup jobs yet. Create one under 'Backup jobs' first." />
+            </Border>
+        </Grid>
+    </DockPanel>
+</UserControl>

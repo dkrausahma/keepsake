@@ -1,0 +1,49 @@
+<UserControl x:Class="Keepsake.Gui.Views.ShellView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:Keepsake.Gui.ViewModels"
+             xmlns:v="clr-namespace:Keepsake.Gui.Views">
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type vm:JobsViewModel}"><v:JobsView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:RestoreViewModel}"><v:RestoreView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:HistoryViewModel}"><v:HistoryView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}"><v:SettingsView /></DataTemplate>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="210" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Sidebar -->
+        <DockPanel Grid.RowSpan="2" Background="{StaticResource SidebarBrush}">
+            <StackPanel DockPanel.Dock="Top" Margin="20,22,20,26">
+                <TextBlock Text="Keepsake" FontSize="22" FontWeight="SemiBold" Foreground="White" />
+                <TextBlock Text="Encrypted backups" Foreground="{StaticResource SidebarTextBrush}" Margin="0,2,0,0" />
+            </StackPanel>
+            <Button DockPanel.Dock="Bottom" Content="Log out" Command="{Binding LogoutCommand}" Style="{StaticResource LinkButton}"
+                    Foreground="{StaticResource SidebarTextBrush}" Margin="20,0,20,18" HorizontalAlignment="Left" />
+            <StackPanel>
+                <RadioButton x:Name="NavJobs" Style="{StaticResource NavButton}" Content="Backup jobs" GroupName="Nav"
+                             IsChecked="{Binding Jobs.IsActive, Mode=TwoWay}" />
+                <RadioButton x:Name="NavRestore" Style="{StaticResource NavButton}" Content="Restore" GroupName="Nav"
+                             IsChecked="{Binding Restore.IsActive, Mode=TwoWay}" />
+                <RadioButton x:Name="NavHistory" Style="{StaticResource NavButton}" Content="History &amp; logs" GroupName="Nav"
+                             IsChecked="{Binding History.IsActive, Mode=TwoWay}" />
+                <RadioButton x:Name="NavSettings" Style="{StaticResource NavButton}" Content="Settings" GroupName="Nav"
+                             IsChecked="{Binding Settings.IsActive, Mode=TwoWay}" />
+            </StackPanel>
+        </DockPanel>
+
+        <ContentControl Grid.Column="1" Content="{Binding Current}" Focusable="False" Margin="28,24,28,12" />
+
+        <Border Grid.Column="1" Grid.Row="1" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="28,6">
+            <TextBlock Text="{Binding Footer}" Style="{StaticResource Muted}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+        </Border>
+    </Grid>
+</UserControl>

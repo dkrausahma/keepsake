@@ -17,6 +17,8 @@ namespace Keepsake.Protocol
         public const string AuthChangePassword = "auth.changePassword";
 
         public const string Status = "service.status";
+        public const string SettingsGet = "settings.get";
+        public const string SettingsSave = "settings.save";
 
         public const string JobsList = "jobs.list";
         public const string JobsGet = "jobs.get";
@@ -106,6 +108,13 @@ namespace Keepsake.Protocol
         public int MaxConcurrentJobs { get; set; }
         public List<RunProgress> Running { get; set; } = new List<RunProgress>();
         public List<string> Queued { get; set; } = new List<string>();
+    }
+
+    public sealed class ServiceSettings
+    {
+        public int MaxConcurrentJobs { get; set; } = 1;
+        public int LogRetentionDays { get; set; } = 90;
+        public int LogRetentionRuns { get; set; } = 200;
     }
 
     // ---- Jobs ----------------------------------------------------------------------------------

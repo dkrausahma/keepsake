@@ -11,7 +11,7 @@ Encrypted, compressed, deduplicated file backup for Windows Server 2008 R2 SP1 a
 |---|---|---|
 | 1 | Core + format: chunking, AES-256-GCM, key slots, file system destination, CLI | **done** |
 | 2 | Windows service, scheduler, job store, run logs, named-pipe API | **done** (console mode tested; not yet installed as a real service) |
-| 3 | WPF GUI | open |
+| 3 | WPF GUI | **done** (tested on Windows 11; disaster-recovery mode without the service still CLI-only) |
 | 4 | Destinations: share credentials, USB by volume ID, SFTP | open |
 | 5 | VSS, retention/prune, scheduled checks, notifications, Event Log | open |
 | 6 | 2008 R2 test pass, installer, DR runbook | open |
@@ -24,6 +24,7 @@ src/Keepsake.Core      .NET Standard 2.0 – engine (backup, restore, check, rep
 src/Keepsake.Protocol  .NET Standard 2.0 – job model, schedules, service API client (shared by CLI and GUI)
 src/Keepsake.Service   .NET Framework 4.8 – keepsake-service.exe (Windows service)
 src/Keepsake.Cli       .NET Framework 4.8 – keepsake.exe
+src/Keepsake.Gui       .NET Framework 4.8 – Keepsake.exe (WPF GUI, runs as administrator)
 tests/                 xUnit tests (net48)
 docs/                  requirements and format specification
 ```
@@ -69,6 +70,22 @@ keepsake run fileserver --wait
 ```bash
 keepsake status
 ```
+
+## GUI
+
+`Keepsake.exe` (elevated) connects to the service. First start asks for the application password; after
+that it offers:
+
+- **Backup jobs** – status, last result, next run, run now / full backup / cancel; job editor with folder
+  tree (tick to include, untick inside a ticked folder to exclude), exclusion patterns, destination
+  (creates the repository and shows the recovery key, which must be confirmed), schedules and options
+- **Restore** – pick job and snapshot, tick folders/files, restore to another folder or the original
+  location with a conflict policy, dry run
+- **History & logs** – every run; details show everything that was not backed up (filter, search,
+  CSV export), phase timings and the full log
+- **Settings** – parallel jobs, log retention, application password
+
+Debug builds run without elevation and accept `--pipe <name>` to talk to a console-mode service.
 
 `keepsake-service console --data <folder> --pipe <name>` runs the service in a console window for testing
 (then pass `--pipe <name>` to the CLI as well). A job file looks like this:

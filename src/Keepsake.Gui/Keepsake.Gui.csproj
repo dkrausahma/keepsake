@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>Keepsake.Gui</RootNamespace>
+    <AssemblyName>Keepsake</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationManifest Condition="'$(Configuration)' == 'Debug'">app.debug.manifest</ApplicationManifest>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Keepsake.Core\Keepsake.Core.csproj" />
+    <ProjectReference Include="..\Keepsake.Protocol\Keepsake.Protocol.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Folder picker; referenced directly (not UseWindowsForms) to avoid WPF/WinForms name clashes. -->
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+
+</Project>

@@ -85,6 +85,27 @@ namespace Keepsake.Service
                 }
                 case Methods.Status:
                     return Status();
+                case Methods.SettingsGet:
+                {
+                    var s = _ctx.Settings.Get();
+                    return new ServiceSettings { MaxConcurrentJobs = s.MaxConcurrentJobs, LogRetentionDays = s.LogRetentionDays, LogRetentionRuns = s.LogRetentionRuns };
+                }
+                case Methods.SettingsSave:
+                {
+                    var p = P<ServiceSettings>(r);
+                    if (p.MaxConcurrentJobs < 1 || p.MaxConcurrentJobs > 8)
+                        throw new ApiException(ErrorCodes.Invalid, "Parallel jobs must be between 1 and 8.");
+                    if (p.LogRetentionDays < 1 || p.LogRetentionDays > 3650 || p.LogRetentionRuns < 1 || p.LogRetentionRuns > 10000)
+                        throw new ApiException(ErrorCodes.Invalid, "Log retention must be 1–3650 days and 1–10000 runs.");
+                    _ctx.Settings.Update(s =>
+                    {
+                        s.MaxConcurrentJobs = p.MaxConcurrentJobs;
+                        s.LogRetentionDays = p.LogRetentionDays;
+                        s.LogRetentionRuns = p.LogRetentionRuns;
+                    });
+                    ServiceLog.Info("Settings changed: " + p.MaxConcurrentJobs + " parallel job(s), logs kept " + p.LogRetentionDays + " days / " + p.LogRetentionRuns + " runs.");
+                    return p;
+                }
                 case Methods.JobsList:
                     return _ctx.Jobs.List().Select(Summary).ToList();
                 case Methods.JobsGet:

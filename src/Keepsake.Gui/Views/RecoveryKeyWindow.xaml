@@ -1,0 +1,30 @@
+<Window x:Class="Keepsake.Gui.Views.RecoveryKeyWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Store your recovery key" Width="640" SizeToContent="Height" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Style="{StaticResource KeepsakeWindow}">
+    <StackPanel Margin="28,24">
+        <TextBlock Text="Recovery key for the new repository" Style="{StaticResource PageTitle}" FontSize="18" />
+        <TextBlock x:Name="Location" Style="{StaticResource Muted}" Margin="0,2,0,14" TextTrimming="CharacterEllipsis" />
+
+        <Border Background="{StaticResource WarningSoftBrush}" CornerRadius="4" Padding="12,10">
+            <TextBlock TextWrapping="Wrap">
+                <Run FontWeight="SemiBold" Text="Store this key now, for example in KeePass." />
+                <Run Text="It is shown only once. If the password and this server are lost, the recovery key is the only way to restore the backups – on any computer." />
+            </TextBlock>
+        </Border>
+
+        <TextBox x:Name="KeyBox" IsReadOnly="True" FontFamily="Consolas" FontSize="16" Margin="0,16,0,0" Padding="10,10" TextWrapping="Wrap" />
+
+        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+            <Button Content="Copy to clipboard" Click="OnCopy" Margin="0,0,8,0" />
+            <Button Content="Save as file…" Click="OnSaveFile" />
+            <TextBlock x:Name="Feedback" Style="{StaticResource Muted}" VerticalAlignment="Center" Margin="12,0,0,0" />
+        </StackPanel>
+
+        <CheckBox x:Name="Confirmed" Margin="0,22,0,0" Checked="OnConfirmChanged" Unchecked="OnConfirmChanged"
+                  Content="I have stored the recovery key in a safe place outside this server." />
+        <Button x:Name="CloseButton" Content="Done" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Right" Margin="0,16,0,0"
+                IsEnabled="False" Click="OnDone" Padding="22,6" />
+    </StackPanel>
+</Window>

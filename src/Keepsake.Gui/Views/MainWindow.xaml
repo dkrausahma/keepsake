@@ -1,0 +1,84 @@
+<Window x:Class="Keepsake.Gui.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:Keepsake.Gui.ViewModels"
+        xmlns:v="clr-namespace:Keepsake.Gui.Views"
+        xmlns:infra="clr-namespace:Keepsake.Gui.Infrastructure"
+        Title="Keepsake Backup" Width="1180" Height="760" MinWidth="900" MinHeight="600"
+        WindowStartupLocation="CenterScreen" Style="{StaticResource KeepsakeWindow}">
+    <Window.Resources>
+        <infra:ArrayConverter x:Key="Array" />
+
+        <!-- Connecting / service unavailable -->
+        <DataTemplate DataType="{x:Type vm:MessageScreen}">
+            <Grid>
+                <Border Style="{StaticResource Card}" Width="480" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="28">
+                    <StackPanel>
+                        <TextBlock Text="Keepsake" FontSize="26" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" />
+                        <TextBlock Text="{Binding Title}" FontSize="15" Margin="0,16,0,0" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Details}" Style="{StaticResource Muted}" Margin="0,8,0,0"
+                                   Visibility="{Binding Details, Converter={StaticResource Visible}}" />
+                        <Button Content="Try again" Command="{Binding Retry}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left"
+                                Margin="0,20,0,0" Visibility="{Binding CanRetry, Converter={StaticResource Visible}}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Login -->
+        <DataTemplate DataType="{x:Type vm:LoginViewModel}">
+            <Grid>
+                <Border Style="{StaticResource Card}" Width="400" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="28">
+                    <StackPanel FocusManager.FocusedElement="{Binding ElementName=Pwd}">
+                        <TextBlock Text="Keepsake" FontSize="26" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}" />
+                        <TextBlock Text="Enter the application password to manage backups." Style="{StaticResource Muted}" Margin="0,6,0,0" />
+                        <TextBlock Text="Application password" Style="{StaticResource FieldLabel}" Margin="0,20,0,4" />
+                        <PasswordBox x:Name="Pwd">
+                            <PasswordBox.InputBindings>
+                                <KeyBinding Key="Return" Command="{Binding LoginCommand}" CommandParameter="{Binding ElementName=Pwd}" />
+                            </PasswordBox.InputBindings>
+                        </PasswordBox>
+                        <TextBlock Text="{Binding Error}" Foreground="{StaticResource DangerBrush}" TextWrapping="Wrap" Margin="0,8,0,0"
+                                   Visibility="{Binding Error, Converter={StaticResource Visible}}" />
+                        <Button Content="Log in" Command="{Binding LoginCommand}" CommandParameter="{Binding ElementName=Pwd}"
+                                Style="{StaticResource PrimaryButton}" HorizontalAlignment="Stretch" Margin="0,18,0,0" Padding="14,8" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </DataTemplate>
+
+        <!-- First start: set the application password -->
+        <DataTemplate DataType="{x:Type vm:SetupViewModel}">
+            <Grid>
+                <Border Style="{StaticResource Card}" Width="460" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="28">
+                    <StackPanel FocusManager.FocusedElement="{Binding ElementName=First}">
+                        <TextBlock Text="Welcome to Keepsake" FontSize="22" FontWeight="SemiBold" />
+                        <TextBlock Style="{StaticResource Muted}" Margin="0,8,0,0"
+                                   Text="Choose an application password. It protects access to Keepsake on this server. It is not the encryption password of your backups – that one is set per backup job." />
+                        <TextBlock Text="Application password (at least 8 characters)" Style="{StaticResource FieldLabel}" Margin="0,18,0,4" />
+                        <PasswordBox x:Name="First" />
+                        <TextBlock Text="Repeat password" Style="{StaticResource FieldLabel}" />
+                        <PasswordBox x:Name="Second" />
+                        <TextBlock Text="{Binding Error}" Foreground="{StaticResource DangerBrush}" TextWrapping="Wrap" Margin="0,8,0,0"
+                                   Visibility="{Binding Error, Converter={StaticResource Visible}}" />
+                        <Button Content="Save and continue" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Stretch" Margin="0,18,0,0" Padding="14,8"
+                                Command="{Binding SaveCommand}">
+                            <Button.CommandParameter>
+                                <MultiBinding Converter="{StaticResource Array}">
+                                    <Binding ElementName="First" />
+                                    <Binding ElementName="Second" />
+                                </MultiBinding>
+                            </Button.CommandParameter>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:ShellViewModel}">
+            <v:ShellView />
+        </DataTemplate>
+    </Window.Resources>
+
+    <ContentControl Content="{Binding Screen}" Focusable="False" />
+</Window>

@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/Keepsake.Cli/Keepsake.Cli.csproj" />
     <Project Path="src/Keepsake.Core/Keepsake.Core.csproj" />
+    <Project Path="src/Keepsake.Gui/Keepsake.Gui.csproj" />
     <Project Path="src/Keepsake.Protocol/Keepsake.Protocol.csproj" />
     <Project Path="src/Keepsake.Service/Keepsake.Service.csproj" />
   </Folder>

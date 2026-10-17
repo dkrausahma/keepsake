@@ -1,0 +1,56 @@
+<Window x:Class="Keepsake.Gui.Views.RunDetailWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding Title}" Width="1000" Height="680" MinWidth="700" MinHeight="420"
+        WindowStartupLocation="CenterOwner" Style="{StaticResource KeepsakeWindow}">
+    <DockPanel Margin="24,20">
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,14">
+            <StackPanel Orientation="Horizontal">
+                <Ellipse Style="{StaticResource StatusDot}" Fill="{Binding State, Converter={StaticResource StateBrush}}" />
+                <TextBlock Text="{Binding Headline}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap"
+                           Foreground="{Binding State, Converter={StaticResource StateBrush}}" />
+            </StackPanel>
+            <ItemsControl ItemsSource="{Binding Summary}" Margin="17,6,0,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" Margin="0,1" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+
+        <TabControl Padding="12" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}">
+            <TabItem Header="  Not backed up / problems  ">
+                <DockPanel>
+                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                        <Button DockPanel.Dock="Right" Content="Export all as CSV…" Command="{Binding ExportCommand}" />
+                        <StackPanel Orientation="Horizontal">
+                            <ComboBox ItemsSource="{Binding Filters}" SelectedItem="{Binding Filter}" Width="120" />
+                            <TextBox Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" Width="240" Margin="8,0,0,0" ToolTip="Search path or message" />
+                            <TextBlock Text="{Binding IssueCounts}" Style="{StaticResource Muted}" VerticalAlignment="Center" Margin="14,0,0,0" />
+                        </StackPanel>
+                    </DockPanel>
+                    <DataGrid ItemsSource="{Binding Issues}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Kind" Binding="{Binding Kind}" Width="80" />
+                            <DataGridTextColumn Header="Path" Binding="{Binding Path}" Width="2*" />
+                            <DataGridTextColumn Header="Reason" Binding="{Binding Message}" Width="3*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="  Phases  ">
+                <DataGrid ItemsSource="{Binding Phases}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Phase" Binding="{Binding Name}" Width="220" />
+                        <DataGridTextColumn Header="Started (UTC)" Binding="{Binding Start, StringFormat='yyyy-MM-dd HH:mm:ss'}" Width="180" />
+                        <DataGridTextColumn Header="Seconds" Binding="{Binding Seconds, StringFormat='0.0'}" Width="100" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem Header="  Full log  ">
+                <TextBox Text="{Binding Log, Mode=OneWay}" Style="{StaticResource Mono}" />
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>
