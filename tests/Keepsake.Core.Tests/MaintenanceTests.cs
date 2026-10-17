@@ -164,6 +164,50 @@ namespace Keepsake.Core.Tests
         }
 
         [Fact]
+        public void Repair_rebuilds_a_lost_index()
+        {
+            using (var t = new TestRepo())
+            {
+                Snapshots(t, 3);
+                foreach (var f in Directory.GetFiles(Path.Combine(t.RepoPath, "index")))
+                    File.Delete(f);
+
+                t.Reopen();
+                var repair = new IndexRebuilder(t.Repo).Run(null, CancellationToken.None);
+                Assert.Equal(RunStatus.Success, repair.Status);
+                Assert.True(repair.BlobsIndexed > 0);
+
+                t.Reopen();
+                Assert.Equal(RunStatus.Success, new Checker(t.Repo).Run(new CheckOptions { ReadData = true }, null, CancellationToken.None).Status);
+                string target = Path.Combine(t.Root, "after-repair");
+                Assert.Equal(RunStatus.Success, t.RestoreTo(target).Status);
+            }
+        }
+
+        [Fact]
+        public void Restore_tool_is_copied_once_per_version()
+        {
+            using (var t = new TestRepo())
+            {
+                string install = Path.Combine(t.Root, "install");
+                Directory.CreateDirectory(install);
+                File.WriteAllText(Path.Combine(install, "keepsake.exe"), "exe");
+                File.WriteAllText(Path.Combine(install, "keepsake.exe.config"), "config");
+                File.WriteAllText(Path.Combine(install, "Keepsake.Core.dll"), "dll");
+
+                Assert.True(ToolCopy.Ensure(t.Repo.Storage, install, "9.9.9"));
+                Assert.False(ToolCopy.Ensure(t.Repo.Storage, install, "9.9.9"));
+                Assert.Equal("exe", File.ReadAllText(Path.Combine(t.RepoPath, "tools", "keepsake-9.9.9", "keepsake.exe")));
+                Assert.True(File.Exists(Path.Combine(t.RepoPath, "tools", "keepsake-9.9.9", "Keepsake.Core.dll")));
+                Assert.False(ToolCopy.Ensure(t.Repo.Storage, Path.Combine(t.Root, "no-cli-here"), "1.0.0"));
+
+                // The tools folder does not disturb checks.
+                t.Reopen();
+                Assert.Equal(RunStatus.Success, new Checker(t.Repo).Run(new CheckOptions(), null, CancellationToken.None).Status);
+            }
+        }
+
+        [Fact]
         public void Prune_needs_exclusive_access()
         {
             using (var t = new TestRepo())

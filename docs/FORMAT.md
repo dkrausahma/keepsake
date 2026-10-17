@@ -16,6 +16,7 @@ data/<xx>/<pack-id>    encrypted    pack files with the actual file contents and
 index/<id>             encrypted    which blob is stored in which pack, at which offset
 snapshots/<id>         encrypted    one file per backup run
 locks/<id>             encrypted    in-use markers
+tools/keepsake-<ver>/  plain        portable keepsake.exe with its libraries (for restores without installation)
 ```
 
 `<xx>` is the first two hex characters of the pack ID. All IDs are 64 lowercase hex characters

@@ -327,6 +327,18 @@ namespace Keepsake.Service
                         };
                     });
                     result = new BackupEngine(opened.Repository).Run(options, progress, active.Cancel.Token);
+                    if (result.Status == RunStatus.Success || result.Status == RunStatus.Warning)
+                    {
+                        try
+                        {
+                            if (ToolCopy.Ensure(opened.Repository.Storage, AppDomain.CurrentDomain.BaseDirectory, ProgramInfo.Version))
+                                log.AppendLine("Portable restore tool " + ProgramInfo.Version + " copied into the repository (tools folder).");
+                        }
+                        catch (Exception ex) when (ex is KeepsakeException || ex is IOException || ex is UnauthorizedAccessException)
+                        {
+                            ServiceLog.Warn("Could not copy the restore tool into the repository: " + ex.Message);
+                        }
+                    }
                 }
 
                 record.SnapshotId = result.SnapshotId;

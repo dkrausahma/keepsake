@@ -5,7 +5,7 @@
     <TargetFramework>net48</TargetFramework>
     <UseWPF>true</UseWPF>
     <RootNamespace>Keepsake.Gui</RootNamespace>
-    <AssemblyName>Keepsake</AssemblyName>
+    <AssemblyName>KeepsakeGui</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationManifest Condition="'$(Configuration)' == 'Debug'">app.debug.manifest</ApplicationManifest>
     <PlatformTarget>AnyCPU</PlatformTarget>

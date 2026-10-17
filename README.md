@@ -14,7 +14,7 @@ Encrypted, compressed, deduplicated file backup for Windows Server 2008 R2 SP1 a
 | 3 | WPF GUI | **done** (tested on Windows 11; disaster-recovery mode without the service still CLI-only) |
 | 4 | Destinations: share credentials, USB by volume ID, SFTP | **done** (SFTP tested against OpenSSH in Docker; share credentials not tested against a real domain share) |
 | 5 | VSS, retention/prune, scheduled checks, notifications, Event Log | **done** (VSS fallback tested; real shadow copies need an elevated test on 2008 R2) |
-| 6 | 2008 R2 test pass, installer, DR runbook | open |
+| 6 | 2008 R2 test pass, installer, DR runbook | **done except the 2008 R2 test pass** (MSI, portable ZIP, doctor, repair, runbook; test plan in docs/WINDOWS-2008R2.md) |
 | 7 | PostgreSQL / MariaDB sources | open |
 
 ## Layout
@@ -24,7 +24,7 @@ src/Keepsake.Core      .NET Standard 2.0 – engine (backup, restore, check, rep
 src/Keepsake.Protocol  .NET Standard 2.0 – job model, schedules, service API client (shared by CLI and GUI)
 src/Keepsake.Service   .NET Framework 4.8 – keepsake-service.exe (Windows service)
 src/Keepsake.Cli       .NET Framework 4.8 – keepsake.exe
-src/Keepsake.Gui       .NET Framework 4.8 – Keepsake.exe (WPF GUI, runs as administrator)
+src/Keepsake.Gui       .NET Framework 4.8 – KeepsakeGui.exe (WPF GUI, runs as administrator)
 tests/                 xUnit tests (net48)
 docs/                  requirements and format specification
 ```
@@ -89,7 +89,7 @@ keepsake status
 
 ## GUI
 
-`Keepsake.exe` (elevated) connects to the service. First start asks for the application password; after
+`KeepsakeGui.exe` (elevated, Start menu "Keepsake Backup") connects to the service. First start asks for the application password; after
 that it offers:
 
 - **Backup jobs** – status, last result, next run, run now / full backup / cancel; job editor with folder
@@ -122,6 +122,21 @@ Debug builds run without elevation and accept `--pipe <name>` to talk to a conso
   "postCommand": null
 }
 ```
+
+## Release
+
+```bash
+powershell -ExecutionPolicy Bypass -File toolsuild-release.ps1
+```
+
+builds, tests and produces `artifacts\Keepsake-<version>.msi` and `artifacts\Keepsake-<version>-portable.zip`.
+The MSI installs to `C:\Program Files\Keepsake`, registers the service (LocalSystem, automatic,
+restart on failure), puts `keepsake` on the PATH and adds *Keepsake Backup* to the Start menu.
+It checks for .NET Framework 4.8 and Service Pack 1.
+
+- Disaster recovery: [docs/DISASTER-RECOVERY.md](docs/DISASTER-RECOVERY.md)
+- Windows Server 2008 R2 prerequisites and test plan: [docs/WINDOWS-2008R2.md](docs/WINDOWS-2008R2.md)
+- `keepsake doctor` checks a machine; `tools\Enable-Tls12.ps1` enables TLS 1.2 on 2008 R2 (for e-mail).
 
 ## Build and test
 

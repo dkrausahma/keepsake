@@ -1,7 +1,8 @@
-bin/
-obj/
-.vs/
 *.user
-TestResults/
+.vs/
 /artifacts/
 /scratch/
+TestResults/
+artifacts/
+bin/
+obj/

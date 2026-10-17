@@ -3,7 +3,7 @@
     <LangVersion>12.0</LangVersion>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
-    <Version>0.1.0</Version>
+    <Version>0.9.0</Version>
     <Product>Keepsake</Product>
     <Company>Keepsake</Company>
     <Copyright>Internal use only</Copyright>

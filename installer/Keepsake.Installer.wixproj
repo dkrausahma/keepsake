@@ -1,0 +1,21 @@
+<Project Sdk="WixToolset.Sdk/5.0.2">
+
+  <!-- Built by tools/build-release.ps1, which stages all binaries into $(StageDir) first. -->
+  <PropertyGroup>
+    <StageDir Condition="'$(StageDir)' == ''">$(MSBuildThisFileDirectory)..\artifacts\stage</StageDir>
+    <ProductVersion Condition="'$(ProductVersion)' == ''">0.9.0</ProductVersion>
+    <OutputName>Keepsake-$(ProductVersion)</OutputName>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <DefineConstants>StageDir=$(StageDir);ProductVersion=$(ProductVersion)</DefineConstants>
+    <SuppressValidation>false</SuppressValidation>
+    <!-- ICE43/ICE57 assume a per-user install for the Start menu shortcut; with Scope=perMachine (ALLUSERS=1) it goes to the all-users menu. -->
+    <SuppressIces>ICE43;ICE57</SuppressIces>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.Netfx.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
+  </ItemGroup>
+
+</Project>

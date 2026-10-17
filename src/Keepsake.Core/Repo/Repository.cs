@@ -363,7 +363,8 @@ namespace Keepsake.Core.Repo
             "Created:       " + header.Created.ToString("yyyy-MM-dd HH:mm") + " UTC\r\n\r\n" +
             "Do not change, move or delete files inside this folder by hand.\r\n\r\n" +
             "HOW TO RESTORE ON ANOTHER COMPUTER\r\n" +
-            "1. Copy keepsake.exe (with its DLL files) to the computer, or install Keepsake.\r\n" +
+            "1. Copy the folder tools\\keepsake-<newest version> from this repository to the computer\r\n" +
+            "   (it is added after the first backup), or install Keepsake. .NET Framework 4.8 is required.\r\n" +
             "2. Make this folder reachable from that computer (USB disk, network share, ...).\r\n" +
             "3. Have the repository password or the recovery key (KS1-...) ready.\r\n" +
             "4. List the backups:\r\n" +

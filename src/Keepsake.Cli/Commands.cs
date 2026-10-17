@@ -116,6 +116,23 @@ namespace Keepsake.Cli
             },
             new Command
             {
+                Name = "repair",
+                Summary = "Rebuild the repository index from the pack files",
+                Usage = "keepsake repair --repo <path>",
+                Details = "Use when 'check' reports missing or unreadable index files. Reads only the pack headers,\n" +
+                          "writes a new index and removes the old index files. Snapshots and data are not changed.",
+                Run = Repair,
+            },
+            new Command
+            {
+                Name = "doctor",
+                Summary = "Check this machine for everything Keepsake needs (Server 2008 R2 aware)",
+                Usage = "keepsake doctor [--json]",
+                ValueOptions = new[] { "pipe" },
+                Run = Doctor.Run,
+            },
+            new Command
+            {
                 Name = "key",
                 Summary = "Manage passwords and recovery keys",
                 Usage = "keepsake key (list | add-password | add-recovery | remove <id>) --repo <path> [--label <text>]",
@@ -516,6 +533,37 @@ namespace Keepsake.Cli
                 foreach (string id in result.SnapshotsRemoved.Take(50))
                     ctx.Info("  " + (result.DryRun ? "would remove " : "removed ") + id.Substring(0, 8));
                 PrintStatus(ctx, result);
+            }
+            return CommandContext.ExitCode(result.Status);
+        }
+
+        private static int Repair(CommandContext ctx)
+        {
+            RepairResult result;
+            using (var repo = ctx.OpenRepository())
+            {
+                LatestProgress<string> progress = null;
+                if (!ctx.Quiet && ConsoleUi.CanShowProgress)
+                    progress = new LatestProgress<string>(ConsoleUi.Progress);
+                using (progress)
+                    result = new IndexRebuilder(repo).Run(progress, ctx.Cancel);
+            }
+            var summary = new List<string>
+            {
+                "Packs:     " + Format.Count(result.PacksRead) + " read, " + result.PacksDamaged + " damaged",
+                "Index:     " + Format.Count(result.BlobsIndexed) + " blocks indexed, " + result.OldIndexFiles + " old index file(s) replaced",
+                TextReport.DurationLine(result),
+            };
+            ctx.WriteLog("Keepsake repair", result, summary);
+            ctx.WriteJson(new { status = result.Status, result.PacksRead, result.PacksDamaged, result.BlobsIndexed, error = result.Error, issues = result.Issues });
+            if (!ctx.Json)
+            {
+                foreach (string line in summary)
+                    ctx.Info(line);
+                ctx.PrintIssues(result);
+                PrintStatus(ctx, result);
+                if (result.Status != RunStatus.Failed)
+                    ctx.Info("Run 'keepsake check' to see whether any snapshot still misses data.");
             }
             return CommandContext.ExitCode(result.Status);
         }

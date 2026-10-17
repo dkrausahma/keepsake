@@ -1,0 +1,94 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util"
+     xmlns:netfx="http://wixtoolset.org/schemas/v4/wxs/netfx"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+
+  <Package Name="Keepsake Backup"
+           Manufacturer="Keepsake"
+           Version="$(ProductVersion)"
+           UpgradeCode="{6C0D3B1E-5E41-4B3C-9F2A-7D1E2A9C4B10}"
+           Scope="perMachine"
+           InstallerVersion="500"
+           Compressed="yes">
+
+    <SummaryInformation Description="Keepsake – encrypted, deduplicated backup for Windows" />
+
+    <!-- Upgrades replace the program; configuration and run history in %ProgramData%\Keepsake are kept. -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Keepsake is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <PropertyRef Id="WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED" />
+    <Launch Condition="Installed OR WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED"
+            Message="Keepsake needs the .NET Framework 4.8. Please install it first (on Windows Server 2008 R2: Service Pack 1 and the .NET Framework 4.8 offline installer)." />
+    <Launch Condition="VersionNT64" Message="Keepsake needs a 64-bit Windows." />
+    <Launch Condition="VersionNT &gt; 601 OR (VersionNT = 601 AND ServicePackLevel &gt;= 1)"
+            Message="Keepsake needs Windows Server 2008 R2 / Windows 7 with Service Pack 1 or newer." />
+
+    <Icon Id="KeepsakeIcon" SourceFile="$(StageDir)\KeepsakeGui.exe" />
+    <Property Id="ARPPRODUCTICON" Value="KeepsakeIcon" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="Keepsake" />
+    </StandardDirectory>
+
+    <!-- Everything from the stage folder except the service executable (it needs its own component). -->
+    <ComponentGroup Id="AppFiles" Directory="INSTALLFOLDER">
+      <Files Include="$(StageDir)\**">
+        <Exclude Files="$(StageDir)\keepsake-service.exe" />
+        <Exclude Files="$(StageDir)\KeepsakeGui.exe" />
+      </Files>
+      <!-- The GUI with its Start menu shortcut: the shortcut belongs to the per-machine file component. -->
+      <Component Id="GuiExecutable" Bitness="always64">
+        <File Id="GuiExe" Source="$(StageDir)\KeepsakeGui.exe" KeyPath="yes">
+          <Shortcut Id="GuiShortcut" Directory="ProgramMenuFolder" Name="Keepsake Backup" Description="Manage Keepsake backups"
+                    WorkingDirectory="INSTALLFOLDER" Icon="KeepsakeIcon" Advertise="no" />
+        </File>
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="Service" Directory="INSTALLFOLDER">
+      <Component Id="ServiceExecutable" Bitness="always64">
+        <File Id="ServiceExe" Source="$(StageDir)\keepsake-service.exe" KeyPath="yes" />
+        <ServiceInstall Id="KeepsakeServiceInstall"
+                        Name="KeepsakeService"
+                        DisplayName="Keepsake Backup Service"
+                        Description="Runs scheduled Keepsake backups, checks and cleanups."
+                        Type="ownProcess"
+                        Start="auto"
+                        ErrorControl="normal"
+                        Account="LocalSystem"
+                        Vital="yes">
+          <util:ServiceConfig FirstFailureActionType="restart"
+                              SecondFailureActionType="restart"
+                              ThirdFailureActionType="restart"
+                              RestartServiceDelayInSeconds="60"
+                              ResetPeriodInDays="1" />
+        </ServiceInstall>
+        <ServiceControl Id="KeepsakeServiceControl" Name="KeepsakeService" Start="install" Stop="both" Remove="uninstall" Wait="yes" />
+      </Component>
+
+      <!-- 'keepsake' on the command line of every user (CLI-01). -->
+      <Component Id="PathEntry" Guid="{3B9E6E8F-1B75-4C8B-8F0E-2C5E4C2E9A21}" Bitness="always64">
+        <Environment Id="KeepsakePath" Name="PATH" Value="[INSTALLFOLDER]" Part="last" Action="set" System="yes" Permanent="no" />
+        <RegistryValue Root="HKLM" Key="Software\Keepsake" Name="InstallFolder" Type="string" Value="[INSTALLFOLDER]" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+
+    <Feature Id="Main" Title="Keepsake" Level="1">
+      <ComponentGroupRef Id="AppFiles" />
+      <ComponentGroupRef Id="Service" />
+    </Feature>
+
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+    <ui:WixUI Id="WixUI_Minimal" />
+
+    <!-- Offer to open the GUI at the end so the first-time setup (application password) happens right away. -->
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Open Keepsake now" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <CustomAction Id="LaunchGui" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]KeepsakeGui.exe" Return="asyncNoWait" Impersonate="yes" />
+    <UI>
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchGui" Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 AND NOT Installed" />
+    </UI>
+  </Package>
+</Wix>
