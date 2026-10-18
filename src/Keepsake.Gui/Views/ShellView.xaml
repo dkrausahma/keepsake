@@ -25,8 +25,8 @@
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="18,22,18,26">
                 <Image Source="/Assets/mark.png" Width="34" Height="34" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="Keepsake" FontSize="21" FontWeight="SemiBold" Foreground="White" />
-                    <TextBlock Text="Encrypted backups" Foreground="{StaticResource SidebarTextBrush}" />
+                    <TextBlock Text="Keepsake" FontSize="21" FontWeight="SemiBold" Foreground="White" LineHeight="23" LineStackingStrategy="BlockLineHeight" />
+                    <TextBlock Text="Backup" FontSize="21" FontWeight="SemiBold" Foreground="{StaticResource BrandPinkBrush}" LineHeight="23" LineStackingStrategy="BlockLineHeight" />
                 </StackPanel>
             </StackPanel>
             <StackPanel DockPanel.Dock="Bottom" Margin="20,0,20,16">

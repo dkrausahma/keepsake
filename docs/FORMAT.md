@@ -1,4 +1,4 @@
-# Keepsake Repository Format – Version 1
+# Keepsake Backup Repository Format – Version 1
 
 This document describes how Keepsake stores backups, precisely enough to write an independent
 reader (requirement REP-10). Everything uses standard, published algorithms.

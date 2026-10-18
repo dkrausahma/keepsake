@@ -1,4 +1,4 @@
-# Keepsake – Requirements
+# Keepsake Backup – Requirements
 
 Status: **Draft v0.2** · 2026-10-17
 Product name: **Keepsake** (service: *Keepsake Backup Service*, CLI: `keepsake.exe`, code: `Keepsake.*`)

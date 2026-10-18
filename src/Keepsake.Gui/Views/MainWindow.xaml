@@ -16,7 +16,7 @@
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Image Source="/Assets/mark.png" Width="38" Height="38" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
-                            <TextBlock Text="Keepsake" FontSize="26" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBlock Text="Keepsake Backup" FontSize="26" FontWeight="SemiBold" VerticalAlignment="Center" />
                         </StackPanel>
                         <TextBlock Text="{Binding Title}" FontSize="15" Margin="0,16,0,0" TextWrapping="Wrap" />
                         <TextBlock Text="{Binding Details}" Style="{StaticResource Muted}" Margin="0,8,0,0"
@@ -37,7 +37,7 @@
                     <StackPanel FocusManager.FocusedElement="{Binding ElementName=Pwd}">
                         <StackPanel Orientation="Horizontal">
                             <Image Source="/Assets/mark.png" Width="38" Height="38" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
-                            <TextBlock Text="Keepsake" FontSize="26" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBlock Text="Keepsake Backup" FontSize="26" FontWeight="SemiBold" VerticalAlignment="Center" />
                         </StackPanel>
                         <TextBlock Text="Enter the application password to manage backups." Style="{StaticResource Muted}" Margin="0,6,0,0" />
                         <TextBlock Text="Application password" Style="{StaticResource FieldLabel}" Margin="0,20,0,4" />
@@ -64,7 +64,7 @@
                     <StackPanel FocusManager.FocusedElement="{Binding ElementName=First}">
                         <StackPanel Orientation="Horizontal">
                             <Image Source="/Assets/mark.png" Width="34" Height="34" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
-                            <TextBlock Text="Welcome to Keepsake" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBlock Text="Welcome to Keepsake Backup" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
                         </StackPanel>
                         <TextBlock Style="{StaticResource Muted}" Margin="0,8,0,0"
                                    Text="Choose an application password. It protects access to Keepsake on this server. It is not the encryption password of your backups – that one is set per backup job." />

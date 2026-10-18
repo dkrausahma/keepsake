@@ -1,4 +1,4 @@
-# Keepsake on Windows Server 2008 R2
+# Keepsake Backup on Windows Server 2008 R2
 
 Keepsake targets Windows Server 2008 R2 SP1 and Windows 10/11. Everything it uses exists on
 2008 R2, but a few prerequisites are not there by default. `keepsake doctor` checks all of them.
@@ -10,7 +10,7 @@ Keepsake targets Windows Server 2008 R2 SP1 and Windows 10/11. Everything it use
 | Service Pack 1 (build 7601) | .NET Framework 4.8 requires it | Windows Update / KB976932 |
 | .NET Framework 4.8 | runtime of all Keepsake programs | offline installer `ndp48-x86-x64-allos-enu.exe` (KB4503548) |
 | 64-bit Windows | the MSI is x64 | 2008 R2 is 64-bit only |
-| TLS 1.2 for clients | e-mail notifications (STARTTLS/SSL); not needed for SFTP or file shares | `tools\Enable-Tls12.ps1` (elevated) + reboot |
+| TLS 1.2 for clients | e-mail notifications (STARTTLS/SSL); not needed for SFTP or file shares | `Enable-Tls12.ps1` in the install folder (elevated) + reboot |
 | Volume Shadow Copy service not disabled | backing up open files | `services.msc` → Volume Shadow Copy → Manual |
 | Up-to-date root certificates | SMTP servers with public certificates | root certificate update / Windows Update |
 
@@ -41,7 +41,7 @@ Tick each item; note deviations.
 - [ ] MSI refuses to install without .NET 4.8 (clear message).
 - [ ] MSI installs; service is running and set to automatic; `keepsake` works in a new prompt.
 - [ ] `keepsake doctor` (elevated) shows no FAIL; WARN only for TLS 1.2 before running the script.
-- [ ] `tools\Enable-Tls12.ps1` + reboot → doctor shows TLS 1.2 OK.
+- [ ] `Enable-Tls12.ps1` (install folder) + reboot → doctor shows TLS 1.2 OK.
 
 **GUI**
 - [ ] Start menu entry starts the GUI with a UAC prompt; first-time setup and login work.

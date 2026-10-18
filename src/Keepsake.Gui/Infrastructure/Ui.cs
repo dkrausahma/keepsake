@@ -23,13 +23,13 @@ namespace Keepsake.Gui.Infrastructure
             string message = ex is KeepsakeException || ex is System.IO.IOException || ex is UnauthorizedAccessException
                 ? ex.Message
                 : "Unexpected error: " + ex.Message;
-            MessageBox.Show(Owner, message, "Keepsake", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(Owner, message, "Keepsake Backup", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         public static void Info(string message) =>
-            MessageBox.Show(Owner, message, "Keepsake", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(Owner, message, "Keepsake Backup", MessageBoxButton.OK, MessageBoxImage.Information);
 
-        public static bool Confirm(string message, string title = "Keepsake") =>
+        public static bool Confirm(string message, string title = "Keepsake Backup") =>
             MessageBox.Show(Owner, message, title, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes;
 
         public static string PickFolder(string description, string initial = null)
