@@ -16,6 +16,8 @@ namespace Keepsake.Cli
 
         private static int Main(string[] args)
         {
+            // TEMPORARY: SFTP connection details for the 2008 R2 "MAC error" investigation.
+            Core.Storage.SftpDebugLog.Enable(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "keepsake-sftp-debug.log"));
             try
             {
                 Console.OutputEncoding = Encoding.UTF8;

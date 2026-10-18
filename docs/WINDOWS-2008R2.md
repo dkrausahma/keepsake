@@ -21,6 +21,11 @@ Notes:
 - The GUI needs the "Desktop Experience"-free WPF of .NET 4.8 – nothing else to install.
 - Paths longer than 260 characters work (Keepsake uses `\\?\` paths internally).
 - Internet Explorer is not used.
+- **SFTP and AES-CTR.** On 2008 R2 with .NET Framework 4.8, SSH.NET's AES-CTR (Windows AES provider) failed with
+  "MAC error" – e.g. a Hetzner Storage Box on port 22 (ProFTPD mod_sftp, AES-CTR only), which works from
+  Windows 10/11. AES-GCM (no HMAC) worked. Since 0.9.8 Keepsake computes AES-CTR and all HMACs with BouncyCastle
+  (`ManagedAesCtrCipher`, `ManagedHmac`), like AES-GCM and ChaCha20, and prefers AEAD ciphers anyway. `keepsake sftp-test --repo sftp://…` shows which algorithms work from
+  this computer. (Hetzner Storage Box: port 23 is OpenSSH with AES-GCM, port 22 is mod_sftp.)
 
 ## Installation
 

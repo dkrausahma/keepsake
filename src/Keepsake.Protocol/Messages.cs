@@ -341,6 +341,12 @@ namespace Keepsake.Protocol
         public long? FreeBytes { get; set; }
         public List<string> Problems { get; set; } = new List<string>();
 
+        /// <summary>SFTP: negotiated encryption and its rating (e.g. "aes256-gcm@openssh.com (authenticated encryption), … – strong").</summary>
+        public string Encryption { get; set; }
+
+        /// <summary>SFTP: why the encryption is not the strongest possible, and what would help. Null when strong.</summary>
+        public string EncryptionNote { get; set; }
+
         /// <summary>SFTP host key that is not trusted yet (or changed). The client asks the user and retries with it pinned.</summary>
         public string UntrustedHostKey { get; set; }
         public bool HostKeyChanged { get; set; }

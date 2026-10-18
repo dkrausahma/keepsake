@@ -397,6 +397,11 @@ namespace Keepsake.Service
             using (opened)
             {
                 result.Location = opened.Storage.Location;
+                if (opened.Storage is SftpStorage sftp && sftp.Security != null)
+                {
+                    result.Encryption = sftp.Security.Summary;
+                    result.EncryptionNote = sftp.Security.Note;
+                }
                 var probe = StorageProbe.Test(opened.Storage);
                 result.Reachable = probe.Reachable;
                 result.Exists = probe.RepositoryExists;

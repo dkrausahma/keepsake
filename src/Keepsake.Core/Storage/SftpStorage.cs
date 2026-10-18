@@ -272,6 +272,172 @@ namespace Keepsake.Core.Storage
             }
         }
 
+        /// <summary>
+        /// Cipher preference: the AEAD ciphers first – ChaCha20-Poly1305 and AES-GCM are computed by BouncyCastle
+        /// inside the process, independent of the Windows crypto providers, which differ on Server 2008 R2 (where the
+        /// default AES-CTR + HMAC path failed with "MAC error"). Then AES-CTR with encrypt-then-MAC. Everything SSH.NET
+        /// supports stays available as a fallback, so servers with only older algorithms still work.
+        /// </summary>
+        internal static readonly string[] CipherPreference =
+        {
+            "chacha20-poly1305@openssh.com", "aes256-gcm@openssh.com", "aes128-gcm@openssh.com",
+            "aes256-ctr", "aes192-ctr", "aes128-ctr",
+        };
+
+        internal static readonly string[] MacPreference =
+        {
+            "hmac-sha2-256-etm@openssh.com", "hmac-sha2-512-etm@openssh.com",
+            "hmac-sha2-256", "hmac-sha2-512", "hmac-sha1-etm@openssh.com", "hmac-sha1",
+        };
+
+        internal static void PreferPortableAlgorithms(ConnectionInfo info)
+        {
+            // AES-CTR through BouncyCastle instead of the Windows provider (fails on Server 2008 R2, see ManagedAesCtrCipher).
+            foreach (var ctr in new[] { new { Name = "aes128-ctr", Bits = 128 }, new { Name = "aes192-ctr", Bits = 192 }, new { Name = "aes256-ctr", Bits = 256 } })
+            {
+                if (!info.Encryptions.ContainsKey(ctr.Name))
+                    continue;
+                int bits = ctr.Bits;
+                info.Encryptions[ctr.Name] = new CipherInfo(bits, (key, iv) => ManagedAesCtrCipher.Create(bits, key, iv), false);
+            }
+            // HMACs through BouncyCastle as well: the remaining Windows-dependent part on Server 2008 R2 (see ManagedHmac).
+            foreach (string name in info.HmacAlgorithms.Keys.ToList())
+            {
+                var digest = ManagedHmac.DigestFor(name);
+                if (digest == null)
+                    continue;
+                var old = info.HmacAlgorithms[name];
+                info.HmacAlgorithms[name] = new HashInfo(old.KeySize, key => new ManagedHmac(digest, key), old.IsEncryptThenMAC);
+            }
+            Reorder(info.Encryptions, CipherPreference);
+            Reorder(info.HmacAlgorithms, MacPreference);
+        }
+
+        private static void Reorder<T>(IDictionary<string, T> algorithms, string[] preferred)
+        {
+            var all = algorithms.ToList();
+            var ordered = preferred.Select(name => all.FirstOrDefault(a => a.Key == name)).Where(a => a.Key != null)
+                .Concat(all.Where(a => !preferred.Contains(a.Key)))
+                .ToList();
+            algorithms.Clear();
+            foreach (var a in ordered)
+                algorithms.Add(a.Key, a.Value);
+        }
+
+        /// <summary>
+        /// Algorithm combinations tried in turn when a connection fails with "MAC error" – the two sides derived
+        /// different keys or MACs. Seen with .NET Framework 4.8 on Windows Server 2008 R2 against servers that work
+        /// from Windows 10/11; which algorithm is affected depends on the server. The first combination that works
+        /// is remembered per server for the lifetime of the process. Null = keep the full preference list.
+        /// </summary>
+        internal static readonly AlgorithmProfile[] FallbackProfiles =
+        {
+            new AlgorithmProfile("preferred", null, null, null),
+            new AlgorithmProfile("curve25519", new[] { "curve25519-sha256", "curve25519-sha256@libssh.org" }, null, null),
+            new AlgorithmProfile("dh-group14", new[] { "diffie-hellman-group14-sha256" }, null, null),
+            new AlgorithmProfile("dh-gex", new[] { "diffie-hellman-group-exchange-sha256" }, null, null),
+            new AlgorithmProfile("dh-group16", new[] { "diffie-hellman-group16-sha512" }, null, null),
+            new AlgorithmProfile("ecdh-p256", new[] { "ecdh-sha2-nistp256" }, null, null),
+            new AlgorithmProfile("aes-ctr + hmac", null, new[] { "aes256-ctr", "aes128-ctr" }, new[] { "hmac-sha2-256", "hmac-sha2-512" }),
+            new AlgorithmProfile("curve25519 + aes-ctr + hmac", new[] { "curve25519-sha256", "curve25519-sha256@libssh.org" }, new[] { "aes256-ctr", "aes128-ctr" }, new[] { "hmac-sha2-256", "hmac-sha2-512" }),
+            new AlgorithmProfile("dh-group14 + aes-ctr + hmac", new[] { "diffie-hellman-group14-sha256" }, new[] { "aes256-ctr", "aes128-ctr" }, new[] { "hmac-sha2-256", "hmac-sha2-512" }),
+            new AlgorithmProfile("aes-gcm", null, new[] { "aes256-gcm@openssh.com", "aes128-gcm@openssh.com" }, null),
+            new AlgorithmProfile("aes-ctr + hmac-etm", null, new[] { "aes256-ctr", "aes128-ctr" }, new[] { "hmac-sha2-256-etm@openssh.com", "hmac-sha2-512-etm@openssh.com" }),
+        };
+
+        internal static readonly System.Collections.Concurrent.ConcurrentDictionary<string, AlgorithmProfile> WorkingProfile =
+            new System.Collections.Concurrent.ConcurrentDictionary<string, AlgorithmProfile>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>The algorithms of the current connection (for logs and diagnostics).</summary>
+        public string NegotiatedAlgorithms { get; private set; }
+
+        /// <summary>How strong the encryption of the current connection is, in words (for the destination check and run logs).</summary>
+        public SftpSecurity Security { get; private set; }
+
+        /// <summary>
+        /// Rates what was negotiated. Keepsake offers the same preference list on every Windows version, so the result
+        /// depends on what the server supports: "strong" = authenticated encryption (AES-GCM, ChaCha20-Poly1305) with a
+        /// modern key exchange; "good" = AES-CTR with HMAC-SHA2; "weak" = CBC, 3DES or SHA-1.
+        /// </summary>
+        internal static SftpSecurity Rate(ConnectionInfo info, string host)
+        {
+            string cipher = info.CurrentClientEncryption ?? "";
+            string mac = info.CurrentClientHmacAlgorithm ?? "";
+            string kex = info.CurrentKeyExchangeAlgorithm ?? "";
+            bool aead = cipher.Contains("gcm") || cipher.Contains("chacha20");
+            bool weak = cipher.Contains("cbc") || cipher.Contains("3des") || (!aead && mac.StartsWith("hmac-sha1", StringComparison.Ordinal)) ||
+                        kex.EndsWith("sha1", StringComparison.Ordinal);
+            string level = weak ? "weak" : aead ? "strong" : "good";
+            string text = (aead ? cipher + " (authenticated encryption)" : cipher + " + " + mac) + ", key exchange " + kex + " – " + level;
+            string note = null;
+            if (!aead)
+            {
+                note = "The server offers no authenticated encryption (AES-GCM or ChaCha20-Poly1305); Keepsake uses the strongest it offers.";
+                if ((info.ServerVersion ?? "").IndexOf("mod_sftp", StringComparison.OrdinalIgnoreCase) >= 0 &&
+                    (host ?? "").EndsWith(".your-storagebox.de", StringComparison.OrdinalIgnoreCase))
+                    note += " Hetzner Storage Box: use port 23 (OpenSSH), which offers AES-GCM; port 22 is ProFTPD mod_sftp.";
+            }
+            return new SftpSecurity { Level = level, Summary = text, Note = note, Details = Describe(info) };
+        }
+
+        /// <summary>The server supports none of the algorithms a fallback combination allows.</summary>
+        internal static bool IsNoMatch(Exception ex) =>
+            ex is SshConnectionException && (ex.Message ?? "").StartsWith("No matching", StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>Tests only: makes a connection with the given combination behave as if it failed with "MAC error".</summary>
+        internal static Func<AlgorithmProfile, bool> SimulateMacError;
+
+        internal static bool IsMacError(Exception ex) =>
+            ex is SshConnectionException sce && (sce.DisconnectReason == Renci.SshNet.Messages.Transport.DisconnectReason.MacError ||
+                                                 (sce.Message ?? "").IndexOf("MAC", StringComparison.Ordinal) >= 0);
+
+        internal static List<AuthenticationMethod> AuthMethods(SftpOptions options)
+        {
+            var methods = new List<AuthenticationMethod>();
+            if (!string.IsNullOrEmpty(options.PrivateKey))
+            {
+                try
+                {
+                    var key = new PrivateKeyFile(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(options.PrivateKey)), options.KeyPassphrase);
+                    methods.Add(new PrivateKeyAuthenticationMethod(options.User, key));
+                }
+                catch (SshException ex)
+                {
+                    throw new KeepsakeException("The SFTP private key cannot be read: " + ex.Message +
+                                                (string.IsNullOrEmpty(options.KeyPassphrase) ? " (does it need a passphrase?)" : ""));
+                }
+            }
+            if (!string.IsNullOrEmpty(options.Password))
+                methods.Add(new PasswordAuthenticationMethod(options.User, options.Password));
+            if (methods.Count == 0)
+                throw new KeepsakeException("No SFTP password or private key configured.");
+            return methods;
+        }
+
+        /// <summary>Exception filter helper: writes the failure to the debug log, never catches.</summary>
+        private bool Log(AlgorithmProfile profile, ConnectionInfo info, Exception ex)
+        {
+            SftpDebugLog.Write("FAILED " + _options.Host + ":" + _options.Port + " profile '" + profile.Name + "' (negotiated so far: kex " + info.CurrentKeyExchangeAlgorithm +
+                               ", cipher " + info.CurrentClientEncryption + "/" + info.CurrentServerEncryption + ", mac " + info.CurrentClientHmacAlgorithm + "/" +
+                               info.CurrentServerHmacAlgorithm + ", host key " + info.CurrentHostKeyAlgorithm + ", server " + info.ServerVersion + "): " +
+                               ex.GetType().FullName + (ex is SshConnectionException sce ? " [" + sce.DisconnectReason + "]" : "") + ": " + ex.Message +
+                               Environment.NewLine + ex);
+            return false;
+        }
+
+        internal static ConnectionInfo NewConnectionInfo(SftpOptions options, List<AuthenticationMethod> methods, AlgorithmProfile profile)
+        {
+            var info = new ConnectionInfo(options.Host, options.Port, options.User, methods.ToArray()) { Timeout = TimeSpan.FromSeconds(30) };
+            PreferPortableAlgorithms(info);
+            profile?.Apply(info);
+            return info;
+        }
+
+        internal static string Describe(ConnectionInfo info) =>
+            "kex " + info.CurrentKeyExchangeAlgorithm + ", cipher " + info.CurrentClientEncryption +
+            (string.IsNullOrEmpty(info.CurrentClientHmacAlgorithm) ? "" : ", mac " + info.CurrentClientHmacAlgorithm) +
+            ", host key " + info.CurrentHostKeyAlgorithm + ", server " + info.ServerVersion;
+
         private SftpClient Client()
         {
             lock (_connectLock)
@@ -281,61 +447,135 @@ namespace Keepsake.Core.Storage
                 _client?.Dispose();
                 _client = null;
 
-                var methods = new List<AuthenticationMethod>();
-                if (!string.IsNullOrEmpty(_options.PrivateKey))
+                var methods = AuthMethods(_options);
+                string server = _options.Host + ":" + _options.Port;
+                // The full preference list (strongest first) is always tried first, so a server that gained stronger
+                // algorithms – or a computer where they work – gets them. A combination that worked after a MAC error
+                // is only moved up among the fallbacks.
+                var profiles = new List<AlgorithmProfile> { FallbackProfiles[0] };
+                if (WorkingProfile.TryGetValue(server, out var known) && known != FallbackProfiles[0])
+                    profiles.Add(known);
+                profiles.AddRange(FallbackProfiles.Skip(1).Where(f => !profiles.Contains(f)));
+                var macErrors = new List<string>();
+                var notOffered = new List<string>();
+                foreach (var profile in profiles)
                 {
+                    var info = NewConnectionInfo(_options, methods, profile);
+                    if (!profile.IsPossible(info))
+                        continue;
+                    SftpDebugLog.Write("connect " + server + " profile '" + profile.Name + "': kex [" + string.Join(",", info.KeyExchangeAlgorithms.Keys) +
+                                       "] ciphers [" + string.Join(",", info.Encryptions.Keys) + "] macs [" + string.Join(",", info.HmacAlgorithms.Keys) + "]");
+                    var client = new SftpClient(info) { OperationTimeout = TimeSpan.FromMinutes(5) };
+                    _seenFingerprint = null;
+                    client.HostKeyReceived += (s, e) =>
+                    {
+                        _seenFingerprint = "SHA256:" + e.FingerPrintSHA256;
+                        e.CanTrust = string.Equals(_seenFingerprint, _options.HostKeyFingerprint, StringComparison.Ordinal);
+                    };
                     try
                     {
-                        var key = new PrivateKeyFile(new MemoryStream(System.Text.Encoding.UTF8.GetBytes(_options.PrivateKey)), _options.KeyPassphrase);
-                        methods.Add(new PrivateKeyAuthenticationMethod(_options.User, key));
+                        client.Connect();
+                        if (SimulateMacError != null && SimulateMacError(profile))
+                            throw new SshConnectionException("MAC error", Renci.SshNet.Messages.Transport.DisconnectReason.MacError);
+                        client.KeepAliveInterval = TimeSpan.FromSeconds(30);
                     }
-                    catch (SshException ex)
+                    catch (SshConnectionException) when (_seenFingerprint != null && !string.Equals(_seenFingerprint, _options.HostKeyFingerprint, StringComparison.Ordinal))
                     {
-                        throw new KeepsakeException("The SFTP private key cannot be read: " + ex.Message +
-                                                    (string.IsNullOrEmpty(_options.KeyPassphrase) ? " (does it need a passphrase?)" : ""));
+                        client.Dispose();
+                        bool mismatch = !string.IsNullOrEmpty(_options.HostKeyFingerprint);
+                        throw new HostKeyException(mismatch
+                                ? "WARNING: the host key of " + _options.Host + " has CHANGED (now " + _seenFingerprint + ", trusted " + _options.HostKeyFingerprint +
+                                  "). This can mean the server was reinstalled – or that someone intercepts the connection. Verify with the server administrator."
+                                : "The host key of " + _options.Host + " is not trusted yet: " + _seenFingerprint + ". Verify it and confirm to continue.",
+                            _seenFingerprint, mismatch);
                     }
+                    catch (Exception ex) when (Log(profile, info, ex))
+                    {
+                        throw; // never reached: Log() records every failure and returns false, so the handlers below run
+                    }
+                    catch (Exception ex) when (IsMacError(ex))
+                    {
+                        // Keys or MACs computed differently on both sides: try the next algorithm combination.
+                        client.Dispose();
+                        macErrors.Add(profile.Name);
+                        continue;
+                    }
+                    catch (Exception ex) when (macErrors.Count > 0 && IsNoMatch(ex))
+                    {
+                        // A fallback combination the server does not offer: try the next one.
+                        client.Dispose();
+                        notOffered.Add(profile.Name);
+                        continue;
+                    }
+                    catch (SshAuthenticationException ex)
+                    {
+                        client.Dispose();
+                        throw new KeepsakeException("SFTP login to " + _options.Host + " as '" + _options.User + "' failed: " + ex.Message);
+                    }
+                    catch (Exception ex) when (ex is SshException || ex is SocketException || ex is TimeoutException)
+                    {
+                        client.Dispose();
+                        throw new StorageException("Cannot connect to SFTP server " + _options.Host + ":" + _options.Port + ": " + ex.Message, ex);
+                    }
+                    WorkingProfile[server] = profile;
+                    SftpDebugLog.Write("connected " + server + " profile '" + profile.Name + "': " + Describe(info));
+                    NegotiatedAlgorithms = Describe(info) + (macErrors.Count == 0 ? "" : " (after MAC errors with: " + string.Join(", ", macErrors) + ")");
+                    Security = Rate(info, _options.Host);
+                    _client = client;
+                    return client;
                 }
-                if (!string.IsNullOrEmpty(_options.Password))
-                    methods.Add(new PasswordAuthenticationMethod(_options.User, _options.Password));
-                if (methods.Count == 0)
-                    throw new KeepsakeException("No SFTP password or private key configured.");
-
-                var info = new ConnectionInfo(_options.Host, _options.Port, _options.User, methods.ToArray()) { Timeout = TimeSpan.FromSeconds(30) };
-                var client = new SftpClient(info) { OperationTimeout = TimeSpan.FromMinutes(5) };
-                _seenFingerprint = null;
-                client.HostKeyReceived += (s, e) =>
-                {
-                    _seenFingerprint = "SHA256:" + e.FingerPrintSHA256;
-                    e.CanTrust = string.Equals(_seenFingerprint, _options.HostKeyFingerprint, StringComparison.Ordinal);
-                };
-                try
-                {
-                    client.Connect();
-                    client.KeepAliveInterval = TimeSpan.FromSeconds(30);
-                }
-                catch (SshConnectionException) when (_seenFingerprint != null && !string.Equals(_seenFingerprint, _options.HostKeyFingerprint, StringComparison.Ordinal))
-                {
-                    client.Dispose();
-                    bool mismatch = !string.IsNullOrEmpty(_options.HostKeyFingerprint);
-                    throw new HostKeyException(mismatch
-                            ? "WARNING: the host key of " + _options.Host + " has CHANGED (now " + _seenFingerprint + ", trusted " + _options.HostKeyFingerprint +
-                              "). This can mean the server was reinstalled – or that someone intercepts the connection. Verify with the server administrator."
-                            : "The host key of " + _options.Host + " is not trusted yet: " + _seenFingerprint + ". Verify it and confirm to continue.",
-                        _seenFingerprint, mismatch);
-                }
-                catch (SshAuthenticationException ex)
-                {
-                    client.Dispose();
-                    throw new KeepsakeException("SFTP login to " + _options.Host + " as '" + _options.User + "' failed: " + ex.Message);
-                }
-                catch (Exception ex) when (ex is SshException || ex is SocketException || ex is TimeoutException)
-                {
-                    client.Dispose();
-                    throw new StorageException("Cannot connect to SFTP server " + _options.Host + ":" + _options.Port + ": " + ex.Message, ex);
-                }
-                _client = client;
-                return client;
+                throw new StorageException("Cannot connect to SFTP server " + _options.Host + ":" + _options.Port + ": MAC error with every algorithm combination the server supports (" +
+                                           string.Join(", ", macErrors) + (notOffered.Count == 0 ? "" : "; not offered by the server: " + string.Join(", ", notOffered)) +
+                                           "). Run 'keepsake sftp-test --repo sftp://...' on this computer and send the output.", null);
             }
         }
+    }
+
+    /// <summary>A restriction of the key exchange, cipher and MAC lists; null keeps the full list.</summary>
+    internal sealed class AlgorithmProfile
+    {
+        public AlgorithmProfile(string name, string[] kex, string[] ciphers, string[] macs)
+        {
+            Name = name;
+            Kex = kex;
+            Ciphers = ciphers;
+            Macs = macs;
+        }
+
+        public string Name { get; }
+        public string[] Kex { get; }
+        public string[] Ciphers { get; }
+        public string[] Macs { get; }
+
+        public void Apply(ConnectionInfo info)
+        {
+            Keep(info.KeyExchangeAlgorithms, Kex);
+            Keep(info.Encryptions, Ciphers);
+            Keep(info.HmacAlgorithms, Macs);
+        }
+
+        /// <summary>False when the client does not support any algorithm of a restricted list.</summary>
+        public bool IsPossible(ConnectionInfo info) =>
+            info.KeyExchangeAlgorithms.Count > 0 && info.Encryptions.Count > 0 && info.HmacAlgorithms.Count > 0;
+
+        private static void Keep<T>(IDictionary<string, T> algorithms, string[] names)
+        {
+            if (names == null)
+                return;
+            var keep = names.Where(algorithms.ContainsKey).Select(n => new KeyValuePair<string, T>(n, algorithms[n])).ToList();
+            algorithms.Clear();
+            foreach (var a in keep)
+                algorithms.Add(a.Key, a.Value);
+        }
+    }
+
+    public sealed class SftpSecurity
+    {
+        /// <summary>"strong", "good" or "weak".</summary>
+        public string Level { get; set; }
+        public string Summary { get; set; }
+        /// <summary>Why it is not "strong", and what would help; null when strong.</summary>
+        public string Note { get; set; }
+        public string Details { get; set; }
     }
 }

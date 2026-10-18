@@ -61,26 +61,7 @@ namespace Keepsake.Cli
             if (!StorageFactory.IsSftp(location))
                 return StorageFactory.Open(location);
 
-            var options = StorageFactory.ParseSftp(location);
-            string keyFile = Args.Value("sftp-key-file");
-            if (keyFile != null)
-            {
-                options.PrivateKey = ReadFile(keyFile, "SFTP key");
-                string passFile = Args.Value("sftp-key-passphrase-file");
-                options.KeyPassphrase = passFile != null ? FirstLine(passFile, "SFTP key passphrase") : Environment.GetEnvironmentVariable("KEEPSAKE_SFTP_KEY_PASSPHRASE");
-            }
-            else
-            {
-                string pwFile = Args.Value("sftp-password-file");
-                options.Password = pwFile != null ? FirstLine(pwFile, "SFTP password") : Environment.GetEnvironmentVariable("KEEPSAKE_SFTP_PASSWORD");
-                if (string.IsNullOrEmpty(options.Password))
-                {
-                    if (NonInteractive)
-                        throw new UsageException("No SFTP password given. Use --sftp-password-file, KEEPSAKE_SFTP_PASSWORD or --sftp-key-file.");
-                    options.Password = ConsoleUi.ReadSecret("SFTP password for " + options.User + "@" + options.Host + ": ");
-                }
-            }
-            options.HostKeyFingerprint = Args.Value("sftp-host-key") ?? Environment.GetEnvironmentVariable("KEEPSAKE_SFTP_HOST_KEY");
+            var options = SftpOptionsFromArgs(location);
 
             for (int attempt = 0; ; attempt++)
             {
@@ -113,6 +94,33 @@ namespace Keepsake.Cli
                     throw;
                 }
             }
+        }
+
+        /// <summary>SFTP location, credentials and trusted host key from the command line or environment.</summary>
+        public SftpOptions SftpOptionsFromArgs(string location)
+        {
+            var options = StorageFactory.ParseSftp(location);
+            string keyFile = Args.Value("sftp-key-file");
+            if (keyFile != null)
+            {
+                options.PrivateKey = ReadFile(keyFile, "SFTP key");
+                string passFile = Args.Value("sftp-key-passphrase-file");
+                options.KeyPassphrase = passFile != null ? FirstLine(passFile, "SFTP key passphrase") : Environment.GetEnvironmentVariable("KEEPSAKE_SFTP_KEY_PASSPHRASE");
+            }
+            else
+            {
+                string pwFile = Args.Value("sftp-password-file");
+                options.Password = pwFile != null ? FirstLine(pwFile, "SFTP password") : Environment.GetEnvironmentVariable("KEEPSAKE_SFTP_PASSWORD");
+                if (string.IsNullOrEmpty(options.Password))
+                {
+                    if (NonInteractive)
+                        throw new UsageException("No SFTP password given. Use --sftp-password-file, KEEPSAKE_SFTP_PASSWORD or --sftp-key-file.");
+                    options.Password = ConsoleUi.ReadSecret("SFTP password for " + options.User + "@" + options.Host + ": ");
+                }
+            }
+            options.HostKeyFingerprint = Args.Value("sftp-host-key") ?? Environment.GetEnvironmentVariable("KEEPSAKE_SFTP_HOST_KEY");
+
+            return options;
         }
 
         private static string FirstLine(string path, string what) => ReadFile(path, what).Split('\n')[0].TrimEnd('\r');

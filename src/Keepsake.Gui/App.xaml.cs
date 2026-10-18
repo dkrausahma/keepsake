@@ -14,6 +14,8 @@ namespace Keepsake.Gui
         {
             base.OnStartup(e);
             DispatcherUnhandledException += OnUnhandled;
+            // TEMPORARY: SFTP connection details (recovery mode connects itself) for the 2008 R2 "MAC error" investigation.
+            Core.Storage.SftpDebugLog.Enable(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "keepsake-sftp-debug.log"));
 
             string pipe = null;
             string autoLoginFile = null;

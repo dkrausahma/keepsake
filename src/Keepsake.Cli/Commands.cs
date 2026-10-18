@@ -133,6 +133,15 @@ namespace Keepsake.Cli
             },
             new Command
             {
+                Name = "sftp-test",
+                Summary = "Test which SSH algorithms work with an SFTP server from this computer",
+                Usage = "keepsake sftp-test --repo sftp://user@host[:port]/path [--sftp-password-file <file> | --sftp-key-file <file>] [--sftp-host-key SHA256:...]",
+                Details = "Connects once per key exchange, cipher, MAC and host-key algorithm and reports which ones work.\n" +
+                              "Use it when a connection fails with 'MAC error' on one computer but works on others; nothing is read or written.",
+                Run = SftpTest,
+            },
+            new Command
+            {
                 Name = "key",
                 Summary = "Manage passwords and recovery keys",
                 Usage = "keepsake key (list | add-password | add-recovery | remove <id>) --repo <path> [--label <text>]",
@@ -287,6 +296,43 @@ namespace Keepsake.Cli
         }
 
         // ---- snapshots / ls --------------------------------------------------------------------
+
+        private static int SftpTest(CommandContext ctx)
+        {
+            string location = ctx.RepositoryLocation;
+            if (!StorageFactory.IsSftp(location))
+                throw new UsageException("sftp-test needs an SFTP location: --repo sftp://user@host[:port]/path");
+            var options = ctx.SftpOptionsFromArgs(location);
+            if (string.IsNullOrEmpty(options.HostKeyFingerprint))
+            {
+                string fingerprint = SftpDiagnostics.ProbeHostKey(options);
+                Console.Error.WriteLine("Host key of " + options.Host + ": " + fingerprint);
+                Console.Error.WriteLine("Compare it with the fingerprint shown by your provider (e.g. Hetzner Robot) or ssh-keygen -lf.");
+                if (ctx.NonInteractive || !ConsoleUi.ReadLine("Trust this key for the test? [y/N] ").Trim().StartsWith("y", StringComparison.OrdinalIgnoreCase))
+                    throw new KeepsakeException("Host key not trusted. Pass --sftp-host-key " + fingerprint + " after verifying it.");
+                options.HostKeyFingerprint = fingerprint;
+            }
+            Console.WriteLine(".NET Framework release: " + NetFrameworkRelease() + ", Windows: " + WindowsName() + ", FIPS-only policy: " + SftpDebugLog.FipsOnly());
+            foreach (string line in SftpDiagnostics.Run(options))
+                Console.WriteLine(line);
+            Console.WriteLine();
+            Console.WriteLine("Detailed log (send it together with this output): " + SftpDebugLog.FilePath);
+            return ExitCodes.Success;
+        }
+
+        private static string NetFrameworkRelease()
+        {
+            using (var key = Microsoft.Win32.RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry64)
+                       .OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full"))
+                return key?.GetValue("Release")?.ToString() ?? "unknown";
+        }
+
+        private static string WindowsName()
+        {
+            using (var key = Microsoft.Win32.RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry64)
+                       .OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion"))
+                return (key?.GetValue("ProductName") + " build " + key?.GetValue("CurrentBuild")).Trim();
+        }
 
         private static int Snapshots(CommandContext ctx)
         {

@@ -300,7 +300,7 @@ namespace Keepsake.Service
                 }
                 SetPhase(active, "Opening repository");
                 using (vss)
-                using (var opened = OpenRepository(job))
+                using (var opened = OpenRepository(job, log))
                 {
                     var options = new BackupOptions
                     {
@@ -381,7 +381,7 @@ namespace Keepsake.Service
                 throw new KeepsakeException("No restore options given.");
             SetPhase(active, "Opening repository");
             RestoreResult result;
-            using (var opened = OpenRepository(job))
+            using (var opened = OpenRepository(job, log))
             {
                 SetPhase(active, "Restoring");
                 var progress = new RestoreProgressSink(p =>
@@ -409,7 +409,7 @@ namespace Keepsake.Service
             SetPhase(active, "Opening repository");
             CheckResult result;
             int percent = full ? 100 : job.CheckReadDataPercent;
-            using (var opened = OpenRepository(job))
+            using (var opened = OpenRepository(job, log))
             {
                 SetPhase(active, "Checking");
                 var progress = new TextProgress(text => SetPhase(active, text));
@@ -426,7 +426,7 @@ namespace Keepsake.Service
         {
             SetPhase(active, "Opening repository");
             PruneResult result;
-            using (var opened = OpenRepository(job))
+            using (var opened = OpenRepository(job, log))
             {
                 SetPhase(active, "Cleaning up");
                 var progress = new TextProgress(text => SetPhase(active, text));
@@ -467,12 +467,18 @@ namespace Keepsake.Service
         }
 
         /// <summary>Opens the job's repository, connecting shares and finding the USB disk as needed.</summary>
-        internal OpenedRepository OpenRepository(JobDefinition job)
+        internal OpenedRepository OpenRepository(JobDefinition job, StringBuilder log = null)
         {
             var secrets = _jobs.GetSecrets(job.Id);
             if (string.IsNullOrEmpty(secrets.RepositoryPassword))
                 throw new KeepsakeException("No repository password is stored for this job.");
             var destination = DestinationResolver.Open(job.Destination, job.ShareCredentials, secrets);
+            if (log != null && destination.Storage is SftpStorage sftp && sftp.Security != null)
+            {
+                log.AppendLine("SFTP encryption: " + sftp.Security.Summary);
+                if (sftp.Security.Note != null)
+                    log.AppendLine("  " + sftp.Security.Note);
+            }
             try
             {
                 if (!Repository.Exists(destination.Storage))

@@ -291,6 +291,8 @@ namespace Keepsake.Gui.ViewModels
                 parts.Add("No repository yet – a new encrypted repository is created when you save.");
             parts.Add((r.CanWrite ? "Writable" : "NOT writable") + (r.CanWrite ? (r.CanDelete ? ", deletable" : ", but files cannot be deleted") : "") +
                       (r.FreeBytes.HasValue ? " · " + Format.Bytes(r.FreeBytes.Value) + " free" : ""));
+            if (r.Encryption != null)
+                parts.Add("Encryption: " + r.Encryption + (r.EncryptionNote == null ? "" : Environment.NewLine + r.EncryptionNote));
             parts.AddRange(r.Problems);
             Ok = r.CanWrite && r.Problems.Count == 0;
             Status = string.Join(Environment.NewLine, parts.Where(s => !string.IsNullOrEmpty(s)));

@@ -67,6 +67,20 @@ namespace Keepsake.Service.Tests
             UseVss = false, // VSS needs elevation; covered by its own test
         };
 
+        /// <summary>Waits until no run of the job is queued or running (e.g. the automatic check after a backup).</summary>
+        public void WaitIdle(KeepsakeClient client, JobDefinition job, int timeoutSeconds = 30)
+        {
+            var deadline = DateTime.UtcNow.AddSeconds(timeoutSeconds);
+            while (DateTime.UtcNow < deadline)
+            {
+                var status = client.Call<ServiceStatus>(Methods.Status);
+                if (!status.Running.Any(r => r.JobId == job.Id) && !(status.Queued ?? new List<string>()).Contains(job.Name))
+                    return;
+                Thread.Sleep(100);
+            }
+            throw new TimeoutException("Job " + job.Name + " did not become idle.");
+        }
+
         public RunRecord WaitForRun(KeepsakeClient client, string runId, int timeoutSeconds = 30)
         {
             var deadline = DateTime.UtcNow.AddSeconds(timeoutSeconds);
@@ -291,6 +305,7 @@ namespace Keepsake.Service.Tests
             {
                 var saved = client.Call<JobDetail>(Methods.JobsSave, new JobSaveParams { Job = t.NewJob(), RepositoryPassword = TestService.RepoPassword });
                 var backup = t.WaitForRun(client, client.Call<RunStarted>(Methods.JobsRun, new RunJobParams { Id = saved.Job.Id }).RunId);
+                t.WaitIdle(client, saved.Job); // the automatic check queued after the first backup
 
                 var root = client.Call<List<TreeEntry>>(Methods.TreeList, new TreeParams { JobId = saved.Job.Id, SnapshotId = backup.SnapshotId });
                 Assert.Single(root);
