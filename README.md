@@ -213,6 +213,9 @@ Exit codes: 0 success, 1 warnings, 2 failed, 3 usage error, 4 wrong password/key
   read and execute), because it holds the service and is on the system PATH.
 - **Links.** Restores never follow a junction or symbolic link below the target (or below the backed-up folder when
   restoring to the original location); folder destinations never list, write or delete through one.
+- **Recovery mode.** `KeepsakeGui.exe --recovery` (in the portable ZIP: `Keepsake Recovery.cmd`) opens a repository
+  directly – location plus password or recovery key – and restores without the service or any configuration
+  (RST-07). It runs with the rights of the logged-on administrator and only reads the backup.
 - **Restored permissions.** NTFS permissions are not backed up: restored files inherit the target folder's
   permissions. Restore confidential data only into folders with suitable permissions.
 - **Keys.** Removing a password or recovery key does not revoke it for someone who kept the old key file; after a

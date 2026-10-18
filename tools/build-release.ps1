@@ -79,12 +79,21 @@ Keepsake $version
   keepsake.exe         command line; 'keepsake help' lists all commands
   keepsake-service.exe Windows service (installed by the MSI)
 
-Restore on any computer (no installation needed, .NET Framework 4.8 required):
-  keepsake snapshots --repo <backup folder or sftp://user@host/path>
-  keepsake restore latest --repo <...> --target D:\Restore
+Restore on any computer – no installation, no service, no configuration
+(.NET Framework 4.8 required; run as administrator):
+
+  With the GUI:   double-click "Keepsake Recovery.cmd" (or KeepsakeGui.exe --recovery),
+                  enter the backup location and the password or recovery key,
+                  tick what you need and restore.
+
+  On the command line:
+    keepsake snapshots --repo <backup folder or sftp://user@host/path>
+    keepsake restore latest --repo <...> --target D:\Restore
 
 See DISASTER-RECOVERY.md for the full procedure.
 "@ | Set-Content (Join-Path $stage 'README.txt') -Encoding UTF8
+# Starts the GUI in recovery mode: restore straight from a repository, without the service (RST-07).
+"@echo off`r`nstart `"`" `"%~dp0KeepsakeGui.exe`" --recovery`r`n" | Set-Content (Join-Path $stage 'Keepsake Recovery.cmd') -Encoding ASCII -NoNewline
 
 if ($certificate) {
     Write-Host '== Sign programs'

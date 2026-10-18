@@ -21,8 +21,12 @@
                         <TextBlock Text="{Binding Title}" FontSize="15" Margin="0,16,0,0" TextWrapping="Wrap" />
                         <TextBlock Text="{Binding Details}" Style="{StaticResource Muted}" Margin="0,8,0,0"
                                    Visibility="{Binding Details, Converter={StaticResource Visible}}" />
-                        <Button Content="Try again" Command="{Binding Retry}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left"
-                                Margin="0,20,0,0" Visibility="{Binding CanRetry, Converter={StaticResource Visible}}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                            <Button Content="Try again" Command="{Binding Retry}" Style="{StaticResource PrimaryButton}"
+                                    Visibility="{Binding CanRetry, Converter={StaticResource Visible}}" />
+                            <Button Content="Restore without the service…" Command="{Binding Recovery}" Margin="10,0,0,0" Padding="14,6"
+                                    Visibility="{Binding CanRecover, Converter={StaticResource Visible}}" />
+                        </StackPanel>
                     </StackPanel>
                 </Border>
                 <Image Source="/Assets/logo-color.png" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,28"
@@ -88,6 +92,10 @@
                 <Image Source="/Assets/logo-color.png" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,28"
                        RenderOptions.BitmapScalingMode="HighQuality" ToolTip="Kraus-Ahma IT Consulting" Opacity="0.9" />
             </Grid>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:RecoveryViewModel}">
+            <v:RecoveryView />
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:ShellViewModel}">

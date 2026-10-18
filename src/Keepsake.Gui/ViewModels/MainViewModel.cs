@@ -50,12 +50,22 @@ namespace Keepsake.Gui.ViewModels
             {
                 Screen = new MessageScreen(
                     "The Keepsake service is not reachable.",
-                    ex.Message + "\n\nMake sure the 'Keepsake Backup Service' is installed and running (services.msc), then try again.",
-                    new RelayCommand(Start));
+                    ex.Message + "\n\nMake sure the 'Keepsake Backup Service' is installed and running (services.msc), then try again." +
+                    "\n\nOn a computer without Keepsake installed – for example after losing the server – restore without the service instead.",
+                    new RelayCommand(Start),
+                    new RelayCommand(StartRecovery));
             }
         }
 
         public void ShowShell() => Screen = new ShellViewModel(this);
+
+        /// <summary>Recovery mode: open a repository directly, no service needed (RST-07).</summary>
+        public void StartRecovery()
+        {
+            if (Screen is ShellViewModel shell)
+                shell.Stop();
+            Screen = new RecoveryViewModel(Start);
+        }
 
         public void Logout()
         {
@@ -68,12 +78,16 @@ namespace Keepsake.Gui.ViewModels
 
     public sealed class MessageScreen
     {
-        public MessageScreen(string title, string details, ICommand retry = null)
+        public MessageScreen(string title, string details, ICommand retry = null, ICommand recovery = null)
         {
             Title = title;
             Details = details;
             Retry = retry;
+            Recovery = recovery;
         }
+
+        public ICommand Recovery { get; }
+        public bool CanRecover => Recovery != null;
 
         public string Title { get; }
         public string Details { get; }

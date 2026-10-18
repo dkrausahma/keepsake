@@ -13,9 +13,13 @@ using Keepsake.Protocol;
 
 namespace Keepsake.Gui.ViewModels
 {
-    /// <summary>Browse a job's snapshots, tick files and folders, restore them (RST-01..06).</summary>
+    /// <summary>
+    /// Browse a job's snapshots, tick files and folders, restore them (RST-01..06). Works through the service, or –
+    /// in recovery mode – directly on a repository the GUI opened (RST-07); see <see cref="IRestoreBackend"/>.
+    /// </summary>
     public sealed class RestoreViewModel : PageViewModel
     {
+        private readonly IRestoreBackend _backend;
         private readonly HashSet<string> _checked = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private JobChoice _job;
         private SnapshotRow _snapshot;
@@ -30,8 +34,24 @@ namespace Keepsake.Gui.ViewModels
         private bool _loadingSnapshots;
         private string _browseLocation;
 
-        public RestoreViewModel(ShellViewModel shell) : base(shell)
+        public RestoreViewModel(ShellViewModel shell) : this(shell, new ServiceRestoreBackend(shell.Connection), null)
         {
+        }
+
+        /// <summary>Recovery mode: no shell, no service.</summary>
+        public RestoreViewModel(IRestoreBackend backend, string location) : this(null, backend, location)
+        {
+        }
+
+        private RestoreViewModel(ShellViewModel shell, IRestoreBackend backend, string location) : base(shell)
+        {
+            _backend = backend;
+            Hint = location == null
+                ? "Pick a backup job and a point in time, tick what you need, choose where it goes."
+                : "Backups in " + location + ". Pick a point in time, tick what you need, choose where it goes.";
+            NoJobsText = location == null
+                ? "There are no backup jobs yet. Create one under 'Backup jobs' first."
+                : "This repository contains no backups yet.";
             _conflict = Conflicts[0];
             BrowseTargetCommand = new RelayCommand(() =>
             {
@@ -41,7 +61,7 @@ namespace Keepsake.Gui.ViewModels
             });
             StartCommand = new AsyncCommand(Start, () => _snapshot != null && _checked.Count > 0 && (ToOriginal || !string.IsNullOrWhiteSpace(TargetFolder)) && !IsRunning);
             ShowLogCommand = new AsyncCommand(ShowLog, () => _runId != null && !IsRunning);
-            ProtectCommand = new AsyncCommand(ToggleProtect, () => _snapshot != null && !IsRunning);
+            ProtectCommand = new AsyncCommand(ToggleProtect, () => _backend.CanProtect && _snapshot != null && !IsRunning);
         }
 
         public ObservableCollection<JobChoice> Jobs { get; } = new ObservableCollection<JobChoice>();
@@ -61,6 +81,9 @@ namespace Keepsake.Gui.ViewModels
         public ICommand ShowLogCommand { get; }
         public ICommand ProtectCommand { get; }
         public string ProtectLabel => _snapshot?.Info.Protected == true ? "Remove protection" : "Protect this backup";
+        public bool CanProtect => _backend.CanProtect;
+        public string Hint { get; }
+        public string NoJobsText { get; }
         public override bool AutoRefresh => IsRunning;
 
         public JobChoice Job
@@ -110,10 +133,10 @@ namespace Keepsake.Gui.ViewModels
         {
             if (Jobs.Count == 0 || _pendingJobId != null)
             {
-                var jobs = await Connection.Call<List<JobSummary>>(Methods.JobsList);
+                var jobs = await _backend.ListJobs();
                 Jobs.Clear();
                 foreach (var j in jobs)
-                    Jobs.Add(new JobChoice(j.Id, j.Name));
+                    Jobs.Add(j);
                 OnPropertyChanged(nameof(NoJobs));
                 var wanted = Jobs.FirstOrDefault(j => j.Id == _pendingJobId) ?? (Job != null ? Jobs.FirstOrDefault(j => j.Id == Job.Id) : null) ?? Jobs.FirstOrDefault();
                 _pendingJobId = null;
@@ -123,12 +146,11 @@ namespace Keepsake.Gui.ViewModels
 
             if (IsRunning && _runId != null)
             {
-                var detail = await Connection.Call<RunDetail>(Methods.RunsGet, new IdParams { Id = _runId });
-                var r = detail.Record;
-                if (r.State == RunState.Running || r.State == RunState.Queued)
+                var poll = await _backend.Poll(_runId);
+                var r = poll.Record;
+                if (poll.Running)
                 {
-                    var p = (await Connection.Call<ServiceStatus>(Methods.Status)).Running.FirstOrDefault(x => x.RunId == _runId);
-                    RunStatus = p == null ? "Waiting…" : "Restoring: " + Format.Count(p.Files) + " files, " + Format.Bytes(p.BytesRead) + " written · " + p.CurrentPath;
+                    RunStatus = poll.Progress;
                 }
                 else
                 {
@@ -167,7 +189,7 @@ namespace Keepsake.Gui.ViewModels
         }
 
         internal Task<List<TreeEntry>> List(string path) =>
-            Connection.Call<List<TreeEntry>>(Methods.TreeList, new TreeParams { JobId = Job.Id, SnapshotId = Snapshot.Id, Path = path });
+            _backend.ListTree(Job.Id, Snapshot.Id, path);
 
         private async Task LoadSnapshots()
         {
@@ -180,7 +202,7 @@ namespace Keepsake.Gui.ViewModels
             _loadingSnapshots = true;
             try
             {
-                foreach (var s in await Connection.Call<List<SnapshotInfo>>(Methods.SnapshotsList, new IdParams { Id = Job.Id }))
+                foreach (var s in await _backend.ListSnapshots(Job.Id))
                     Snapshots.Add(new SnapshotRow(s));
                 Snapshot = Snapshots.FirstOrDefault();
             }
@@ -257,8 +279,7 @@ namespace Keepsake.Gui.ViewModels
                 Conflict = Conflict.Policy,
                 DryRun = DryRun,
             };
-            var started = await Connection.Call<RunStarted>(Methods.RestoreStart, new RestoreParams { JobId = Job.Id, Options = options });
-            _runId = started.RunId;
+            _runId = await _backend.StartRestore(Job.Id, options);
             IsRunning = true;
             OnPropertyChanged(nameof(IsRunning));
             RunStatus = "Starting restore…";
@@ -267,7 +288,7 @@ namespace Keepsake.Gui.ViewModels
         private async Task ToggleProtect()
         {
             bool protect = !_snapshot.Info.Protected;
-            await Connection.Call<IdParams>(Methods.SnapshotsProtect, new ProtectParams { JobId = Job.Id, SnapshotId = _snapshot.Id, Protect = protect });
+            await _backend.Protect(Job.Id, _snapshot.Id, protect);
             string keepTime = _snapshot.Info.Time.ToString("o");
             await LoadSnapshots();
             Snapshot = Snapshots.FirstOrDefault(s => s.Info.Time.ToString("o") == keepTime) ?? Snapshots.FirstOrDefault();
@@ -275,7 +296,7 @@ namespace Keepsake.Gui.ViewModels
 
         private async Task ShowLog()
         {
-            var detail = await Connection.Call<RunDetail>(Methods.RunsGet, new IdParams { Id = _runId });
+            var detail = await _backend.Detail(_runId);
             RunDetailWindow.Open(new RunDetailViewModel(detail));
         }
     }

@@ -28,7 +28,14 @@ the original server, its configuration and its Windows domain are not needed.
    > `Get-AuthenticodeSignature .\keepsake.exe` must show a valid signature of Kraus-Ahma IT Consulting
    > (signed releases), or `Get-FileHash` of the files must match the release you recorded. The service
    > re-checks this copy after every backup and repairs it, but on disaster day that service is gone.
-3. List the backups:
+3. **With the GUI** (easiest): double-click `Keepsake Recovery.cmd` (or run `KeepsakeGui.exe --recovery`,
+   confirm the administrator prompt). Enter the repository folder (e.g. `E:\Keepsake\Fileserver`) and the
+   password or the recovery key, click *Open backup*, pick the point in time, tick what you need, choose a target
+   folder and *Start restore*. *Show log* lists anything that could not be restored. No service, no configuration
+   and no installation are needed. On a computer with Keepsake installed whose service is not running, the GUI
+   offers the same as *Restore without the service…*.
+
+   **With the command line** – list the backups:
 
    ```bash
    keepsake snapshots --repo E:\Keepsake\Fileserver
@@ -147,7 +154,8 @@ If both the password and the recovery key are lost, **the backups cannot be decr
 
 - [ ] On a computer that is **not** the backup server, with only the KeePass entry at hand:
 - [ ] Unpack the portable ZIP from the KeePass attachment / release (not the copy in the repository), check its SHA-256.
-- [ ] `keepsake snapshots` with the **recovery key** (not the password) – lists the backups.
+- [ ] `Keepsake Recovery.cmd` → open the backup with the **recovery key** (not the password) – the backups are listed.
+- [ ] `keepsake snapshots` with the recovery key – same list on the command line.
 - [ ] Restore one folder with `--include … --flat` into a temp folder; open some files.
 - [ ] `keepsake check --read-data-percent 10` – no errors.
 - [ ] Note the date and result in the IT documentation.

@@ -5,7 +5,7 @@
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Margin="0,0,0,16">
             <TextBlock Text="Restore" Style="{StaticResource PageTitle}" />
-            <TextBlock Text="Pick a backup job and a point in time, tick what you need, choose where it goes." Style="{StaticResource Muted}" />
+            <TextBlock Text="{Binding Hint}" Style="{StaticResource Muted}" TextTrimming="CharacterEllipsis" />
         </StackPanel>
 
         <Grid>
@@ -31,6 +31,7 @@
                         <TextBlock Text="Backup from" Style="{StaticResource FieldLabel}" Margin="0,0,0,4" />
                         <DockPanel>
                             <Button DockPanel.Dock="Right" Content="{Binding ProtectLabel}" Command="{Binding ProtectCommand}" Margin="6,0,0,0"
+                                    Visibility="{Binding CanProtect, Converter={StaticResource Visible}}"
                                     ToolTip="Protected backups are never removed by the retention rules" />
                             <ComboBox ItemsSource="{Binding Snapshots}" SelectedItem="{Binding Snapshot}" DisplayMemberPath="Label" />
                         </DockPanel>
@@ -103,7 +104,7 @@
             </Border>
 
             <Border Grid.ColumnSpan="3" Style="{StaticResource Card}" VerticalAlignment="Top" Visibility="{Binding NoJobs, Converter={StaticResource Visible}}">
-                <TextBlock Text="There are no backup jobs yet. Create one under 'Backup jobs' first." />
+                <TextBlock Text="{Binding NoJobsText}" />
             </Border>
         </Grid>
     </DockPanel>

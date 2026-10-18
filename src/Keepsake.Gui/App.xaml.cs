@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
 using Keepsake.Gui.Infrastructure;
@@ -29,11 +30,17 @@ namespace Keepsake.Gui
 #endif
             }
 
+            // --recovery: restore without the service (portable version on a replacement computer, RST-07).
+            bool recovery = e.Args.Any(a => string.Equals(a, "--recovery", StringComparison.OrdinalIgnoreCase));
+
             var main = new MainViewModel(new ServiceConnection(pipe));
             var window = new MainWindow { DataContext = main };
             MainWindow = window;
             window.Show();
-            main.Start(autoLoginFile == null ? null : System.IO.File.ReadAllText(autoLoginFile).Trim());
+            if (recovery)
+                main.StartRecovery();
+            else
+                main.Start(autoLoginFile == null ? null : System.IO.File.ReadAllText(autoLoginFile).Trim());
         }
 
         private static void OnUnhandled(object sender, DispatcherUnhandledExceptionEventArgs e)

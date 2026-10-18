@@ -1,0 +1,86 @@
+<UserControl x:Class="Keepsake.Gui.Views.RecoveryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:v="clr-namespace:Keepsake.Gui.Views">
+    <DockPanel>
+        <!-- Header: recovery mode is always visible as such -->
+        <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBrush}" Padding="20,12">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="CloseRepoButton" Content="Open another backup" Command="{Binding CloseCommand}" Style="{StaticResource LinkButton}"
+                            Foreground="{StaticResource SidebarTextBrush}" Visibility="{Binding IsOpen, Converter={StaticResource Visible}}" />
+                    <Button Content="Back to the service" Command="{Binding BackToServiceCommand}" Style="{StaticResource LinkButton}"
+                            Foreground="{StaticResource SidebarTextBrush}" Margin="20,0,0,0" Visibility="{Binding CanGoBackToService, Converter={StaticResource Visible}}" />
+                    <Button Content="About" Click="OnAbout" Style="{StaticResource LinkButton}" Foreground="{StaticResource SidebarTextBrush}" Margin="20,0,0,0" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Assets/mark.png" Width="30" Height="30" Margin="0,0,10,0" RenderOptions.BitmapScalingMode="HighQuality" />
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Foreground="White" FontSize="16" FontWeight="SemiBold">
+                            <Run Text="Keepsake" /><Run Text=" Backup" Foreground="{StaticResource BrandPinkBrush}" /><Run Text="  ·  Recovery" />
+                        </TextBlock>
+                        <TextBlock Text="Restore without the Keepsake service – nothing is installed or configured on this computer."
+                                   Foreground="{StaticResource SidebarTextBrush}" />
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Grid Margin="28,24">
+            <!-- Step 1: open the repository -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsOpen, Converter={StaticResource Hidden}}">
+                <Border Style="{StaticResource Card}" Width="600" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="28">
+                    <StackPanel>
+                        <TextBlock Text="Open a backup" Style="{StaticResource PageTitle}" FontSize="20" />
+                        <TextBlock Style="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,4,0,0"
+                                   Text="All you need is the backup location and its password or recovery key – for example from KeePass." />
+
+                        <TextBlock Text="Where is the backup?" Style="{StaticResource FieldLabel}" Margin="0,20,0,4" />
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="Browse…" Command="{Binding BrowseFolderCommand}" Margin="6,0,0,0" />
+                            <TextBox x:Name="LocationBox" Text="{Binding Location, UpdateSourceTrigger=PropertyChanged}" />
+                        </DockPanel>
+                        <TextBlock Style="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,6,0,0"
+                                   Text="The folder that contains keepsake.json: a USB disk (E:\Keepsake\Fileserver), a network share (\\server\backup\fileserver) or sftp://user@host[:port]/path. Connect a share that needs a login in Explorer first." />
+
+                        <StackPanel Visibility="{Binding IsSftp, Converter={StaticResource Visible}}" Margin="0,8,0,0">
+                            <TextBlock Text="SFTP password" Style="{StaticResource FieldLabel}" Margin="0,8,0,4" />
+                            <PasswordBox x:Name="SftpPasswordBox" />
+                            <TextBlock Text="or private key file" Style="{StaticResource FieldLabel}" Margin="0,8,0,4" />
+                            <DockPanel>
+                                <Button DockPanel.Dock="Right" Content="Browse…" Command="{Binding BrowseSftpKeyCommand}" Margin="6,0,0,0" />
+                                <TextBox Text="{Binding SftpKeyFile, UpdateSourceTrigger=PropertyChanged}" />
+                            </DockPanel>
+                            <TextBlock Text="Key passphrase (if the key has one)" Style="{StaticResource FieldLabel}" Margin="0,8,0,4" />
+                            <PasswordBox x:Name="SftpPassphraseBox" />
+                        </StackPanel>
+
+                        <TextBlock Text="Unlock with" Style="{StaticResource FieldLabel}" Margin="0,18,0,4" />
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton Content="Repository password" IsChecked="{Binding UsePassword}" GroupName="Unlock" Margin="0,0,24,0" />
+                            <RadioButton Content="Recovery key (KS1-…)" IsChecked="{Binding UseRecoveryKey}" GroupName="Unlock" />
+                        </StackPanel>
+                        <PasswordBox x:Name="PasswordBox" Margin="0,8,0,0" Visibility="{Binding UsePassword, Converter={StaticResource Visible}}" />
+                        <StackPanel Margin="0,8,0,0" Visibility="{Binding UseRecoveryKey, Converter={StaticResource Visible}}">
+                            <TextBox Text="{Binding RecoveryKey, UpdateSourceTrigger=PropertyChanged}" FontFamily="Consolas" TextWrapping="Wrap" />
+                            <Button Content="Load from file…" Command="{Binding LoadKeyFileCommand}" Style="{StaticResource LinkButton}" HorizontalAlignment="Left" Margin="0,6,0,0" />
+                        </StackPanel>
+
+                        <TextBlock Text="{Binding Error}" Foreground="{StaticResource DangerBrush}" TextWrapping="Wrap" Margin="0,12,0,0"
+                                   Visibility="{Binding Error, Converter={StaticResource Visible}}" />
+                        <ProgressBar IsIndeterminate="True" Margin="0,12,0,0" Visibility="{Binding Busy, Converter={StaticResource Visible}}" />
+                        <Button x:Name="OpenButton" Content="Open backup" Click="OnOpen" IsDefault="True" Style="{StaticResource PrimaryButton}"
+                                HorizontalAlignment="Stretch" Margin="0,18,0,0" Padding="14,8" />
+                        <TextBlock Style="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,14,0,0"
+                                   Text="The backup is only read. Restored files get the permissions of the target folder." />
+                    </StackPanel>
+                </Border>
+            </ScrollViewer>
+
+            <!-- Step 2: the normal restore page, working on the opened repository -->
+            <Grid Visibility="{Binding IsOpen, Converter={StaticResource Visible}}">
+                <v:RestoreView DataContext="{Binding Restore}" />
+            </Grid>
+        </Grid>
+    </DockPanel>
+</UserControl>

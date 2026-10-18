@@ -47,6 +47,12 @@ namespace Keepsake.Gui.Infrastructure
             var dialog = new Microsoft.Win32.SaveFileDialog { Title = title, FileName = fileName, Filter = filter };
             return dialog.ShowDialog(Owner) == true ? dialog.FileName : null;
         }
+
+        public static string OpenFile(string title, string filter)
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog { Title = title, Filter = filter, CheckFileExists = true };
+            return dialog.ShowDialog(Owner) == true ? dialog.FileName : null;
+        }
     }
 
     // ---- Converters --------------------------------------------------------------------------
