@@ -9,9 +9,14 @@ namespace Keepsake.Service
     /// <summary>Runs a job's pre/post command through <c>cmd.exe /c</c> with a timeout and captures its output.</summary>
     internal static class CommandRunner
     {
+        /// <summary>
+        /// Full path in System32: a bare name would also be searched in the program folder first (SEC-002).
+        /// </summary>
+        internal static string SystemTool(string exe) => System.IO.Path.Combine(Environment.SystemDirectory, exe);
+
         public static int Run(string command, TimeSpan timeout, IDictionary<string, string> environment, StringBuilder log, CancellationToken cancel)
         {
-            var psi = new ProcessStartInfo("cmd.exe", "/c " + command)
+            var psi = new ProcessStartInfo(SystemTool("cmd.exe"), "/c " + command)
             {
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
@@ -65,7 +70,7 @@ namespace Keepsake.Service
         {
             try
             {
-                using (var kill = Process.Start(new ProcessStartInfo("taskkill.exe", "/T /F /PID " + pid) { CreateNoWindow = true, UseShellExecute = false }))
+                using (var kill = Process.Start(new ProcessStartInfo(SystemTool("taskkill.exe"), "/T /F /PID " + pid) { CreateNoWindow = true, UseShellExecute = false }))
                     kill?.WaitForExit(10000);
             }
             catch (Exception ex) when (ex is System.ComponentModel.Win32Exception || ex is InvalidOperationException)

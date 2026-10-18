@@ -139,7 +139,10 @@ namespace Keepsake.Cli
                 Details = "  list                      Show all keys\n" +
                           "  add-password              Add another password (--new-password-file <file>, or prompt)\n" +
                           "  add-recovery              Create an additional recovery key (--recovery-key-out <file>)\n" +
-                          "  remove <id>               Remove a key (the last one cannot be removed)",
+                          "  remove <id>               Remove a key (the last one cannot be removed).\n" +
+                          "                            Removing does not revoke it: anyone who kept a copy of the old key file\n" +
+                          "                            and knows that password can still open the repository. After a leak,\n" +
+                          "                            start a new repository and let the old one expire.",
                 ValueOptions = new[] { "label", "new-password-file", "recovery-key-out" },
                 Run = Key,
             },
@@ -207,7 +210,7 @@ namespace Keepsake.Cli
                           "Repository ID: " + repo.Header.Id + "\r\n" +
                           "Created: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm") + "\r\n\r\n" +
                           key + "\r\n";
-            File.WriteAllText(path, text);
+            PrivateFile.WriteAllText(path, text);
         }
 
         // ---- backup ----------------------------------------------------------------------------

@@ -332,7 +332,7 @@ namespace Keepsake.Service
                         try
                         {
                             if (ToolCopy.Ensure(opened.Repository.Storage, AppDomain.CurrentDomain.BaseDirectory, ProgramInfo.Version))
-                                log.AppendLine("Portable restore tool " + ProgramInfo.Version + " copied into the repository (tools folder).");
+                                log.AppendLine("Portable restore tool " + ProgramInfo.Version + " copied into the repository (tools folder), or repaired where it differed from the installed version.");
                         }
                         catch (Exception ex) when (ex is KeepsakeException || ex is IOException || ex is UnauthorizedAccessException)
                         {

@@ -26,6 +26,7 @@ namespace Keepsake.Service
         private readonly DataPaths _paths;
         private readonly string _pipeName;
         private readonly bool _consoleMode;
+        private readonly bool _restrict;
         private PipeServer _pipe;
         private bool _started;
 
@@ -34,14 +35,16 @@ namespace Keepsake.Service
             _paths = new DataPaths(dataFolder ?? DataPaths.DefaultRoot);
             _pipeName = pipeName ?? Wire.DefaultPipeName;
             _consoleMode = consoleMode;
+            // The default folder is always restricted (it holds the real configuration); a console run with a
+            // custom folder is for development and tests and keeps that folder's permissions.
+            _restrict = !consoleMode || dataFolder == null;
         }
 
         public ServiceContext Context { get; private set; }
 
         public void Start()
         {
-            // Restricting the data folder needs elevation; a console run with a custom folder is for development.
-            _paths.Ensure(restrict: !_consoleMode);
+            _paths.Ensure(restrict: _restrict);
             ServiceLog.Init(_paths.Logs, _consoleMode);
             ServiceLog.Info(ProgramInfo.Name + " service starting on " + ProgramInfo.Host + " (data: " + _paths.Root + ", account: " + ProgramInfo.User + ").");
 

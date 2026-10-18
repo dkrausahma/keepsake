@@ -42,7 +42,7 @@ namespace Keepsake.Core.Maintenance
                     var packs = new List<IndexPack>();
                     using (phases.Begin("Read pack headers"))
                     {
-                        var stored = _repo.Storage.List(Layout.Data).ToList();
+                        var stored = Layout.ListObjects(_repo.Storage, Layout.Data).ToList();
                         foreach (var entry in stored)
                         {
                             cancel.ThrowIfCancellationRequested();
@@ -68,7 +68,7 @@ namespace Keepsake.Core.Maintenance
 
                     using (phases.Begin("Write index"))
                     {
-                        var old = _repo.Storage.List(Layout.Index).Select(e => e.Path).ToList();
+                        var old = Layout.ListObjects(_repo.Storage, Layout.Index).Select(e => e.Path).ToList();
                         result.OldIndexFiles = old.Count;
                         var written = new HashSet<string>(StringComparer.Ordinal);
                         for (int i = 0; i < packs.Count; i += 2000)
@@ -102,23 +102,39 @@ namespace Keepsake.Core.Maintenance
     {
         public const string Folder = "tools";
 
-        /// <summary>Uploads keepsake.exe and its libraries once per version. Returns true when something was copied.</summary>
+        /// <summary>
+        /// Uploads keepsake.exe and its libraries for this version, and repairs the copy when it differs from the
+        /// installed files. The destination is untrusted and the copy is not encrypted, so an existing copy is never
+        /// trusted as it is: every file is compared with the installed one and rewritten if it differs (SEC-006).
+        /// Returns true when something was copied.
+        /// </summary>
         public static bool Ensure(IStorage storage, string installFolder, string version)
         {
             string exe = Path.Combine(installFolder, "keepsake.exe");
             if (!File.Exists(exe))
                 return false; // development build without the CLI next to the service
             string target = Folder + "/keepsake-" + version;
-            if (storage.Exists(target + "/keepsake.exe"))
-                return false;
             var files = Directory.GetFiles(installFolder, "*.dll")
                 .Concat(new[] { exe + ".config", exe })
                 .Where(File.Exists)
                 .ToList();
-            foreach (string f in files)
-                storage.Write(target + "/" + Path.GetFileName(f), File.ReadAllBytes(f));
-            // The executable is written last: its presence marks a complete copy.
-            return true;
+            bool changed = false;
+            using (var sha = System.Security.Cryptography.SHA256.Create())
+            {
+                foreach (string f in files)
+                {
+                    // The executable is written last: its presence marks a complete copy.
+                    string remote = target + "/" + Path.GetFileName(f);
+                    byte[] local = File.ReadAllBytes(f);
+                    bool same = storage.Exists(remote) && storage.GetSize(remote) == local.Length &&
+                                sha.ComputeHash(storage.Read(remote)).SequenceEqual(sha.ComputeHash(local));
+                    if (same)
+                        continue;
+                    storage.Write(remote, local);
+                    changed = true;
+                }
+            }
+            return changed;
         }
     }
 }

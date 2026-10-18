@@ -55,7 +55,7 @@ namespace Keepsake.Core.Check
                     using (phases.Begin("Index"))
                     {
                         progress?.Report("Loading index");
-                        foreach (var entry in _repo.Storage.List(Layout.Index))
+                        foreach (var entry in Layout.ListObjects(_repo.Storage, Layout.Index))
                         {
                             cancel.ThrowIfCancellationRequested();
                             try
@@ -74,7 +74,7 @@ namespace Keepsake.Core.Check
                     using (phases.Begin("Packs"))
                     {
                         progress?.Report("Listing packs");
-                        stored = _repo.Storage.List(Layout.Data).ToDictionary(e => e.Name, StringComparer.Ordinal);
+                        stored = Layout.ListObjects(_repo.Storage, Layout.Data).ToDictionary(e => e.Name, StringComparer.Ordinal);
                         result.Packs = stored.Count;
                         foreach (string packId in index.PackIds())
                         {
@@ -92,7 +92,7 @@ namespace Keepsake.Core.Check
                     {
                         var checkedTrees = new HashSet<string>(StringComparer.Ordinal);
                         var checkedFiles = new HashSet<string>(StringComparer.Ordinal);
-                        foreach (var entry in _repo.Storage.List(Layout.Snapshots))
+                        foreach (var entry in Layout.ListObjects(_repo.Storage, Layout.Snapshots))
                         {
                             cancel.ThrowIfCancellationRequested();
                             Snapshot snapshot;

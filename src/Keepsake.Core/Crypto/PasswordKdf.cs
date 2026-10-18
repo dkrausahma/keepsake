@@ -24,6 +24,10 @@ namespace Keepsake.Core.Crypto
         internal static int DefaultIterations = 3;
         internal static int DefaultParallelism = 2;
 
+        public const int MaxMemoryKiB = 1024 * 1024;
+        public const int MaxIterations = 20;
+        public const int MaxParallelism = 16;
+
         public static KdfParams NewParams() => new KdfParams
         {
             MemoryKiB = DefaultMemoryKiB,
@@ -36,13 +40,28 @@ namespace Keepsake.Core.Crypto
         {
             if (!string.Equals(p.Algorithm, "argon2id", StringComparison.Ordinal) || p.Version != 0x13)
                 throw new RepositoryFormatException("Unsupported key derivation '" + p.Algorithm + "' (version " + p.Version + ").");
+            // The parameters are read from the repository, which may be tampered with: refuse values that would
+            // exhaust memory or run for hours (SEC-007). Keepsake itself writes 64 MiB / 3 / 2.
+            if (p.Parallelism < 1 || p.Parallelism > MaxParallelism || p.Iterations < 1 || p.Iterations > MaxIterations ||
+                p.MemoryKiB < 8 * p.Parallelism || p.MemoryKiB > MaxMemoryKiB || string.IsNullOrEmpty(p.Salt) || p.Salt.Length > 128)
+                throw new RepositoryFormatException("Key derivation parameters out of range (memory " + p.MemoryKiB + " KiB, " +
+                                                    p.Iterations + " iterations, parallelism " + p.Parallelism + ").");
+            byte[] salt;
+            try
+            {
+                salt = Convert.FromBase64String(p.Salt);
+            }
+            catch (FormatException)
+            {
+                throw new RepositoryFormatException("Invalid key derivation salt.");
+            }
 
             var parameters = new Argon2Parameters.Builder(Argon2Parameters.Argon2id)
                 .WithVersion(Argon2Parameters.Version13)
                 .WithMemoryAsKB(p.MemoryKiB)
                 .WithIterations(p.Iterations)
                 .WithParallelism(p.Parallelism)
-                .WithSalt(Convert.FromBase64String(p.Salt))
+                .WithSalt(salt)
                 .Build();
 
             var generator = new Argon2BytesGenerator();

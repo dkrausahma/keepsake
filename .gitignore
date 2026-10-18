@@ -9,3 +9,12 @@ obj/
 
 # Raw brand material (licensed fonts, PSD/PDF); only the generated Assets are committed.
 claudeinput/
+
+# Local secrets never belong in the repository (keys, certificates, password files).
+*.pfx
+*.snk
+*.pem
+*.ppk
+*.key
+*.env
+*password*.txt

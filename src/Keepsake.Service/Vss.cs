@@ -155,6 +155,13 @@ namespace Keepsake.Service
 
         public static bool Delete(string id)
         {
+            // IDs also come from state\vss.json: only a well-formed GUID may reach the WQL query (SEC-012).
+            if (!Guid.TryParse(id, out Guid parsed))
+            {
+                ServiceLog.Warn("Ignoring invalid shadow copy ID '" + id + "'.");
+                return false; // nothing that could be deleted; the caller drops it from the list
+            }
+            id = parsed.ToString("B").ToUpperInvariant();
             try
             {
                 using (var searcher = new ManagementObjectSearcher(@"\\.\root\cimv2", "SELECT * FROM Win32_ShadowCopy WHERE ID='" + id + "'"))

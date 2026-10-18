@@ -19,7 +19,9 @@ locks/<id>             encrypted    in-use markers
 tools/keepsake-<ver>/  plain        portable keepsake.exe with its libraries (for restores without installation)
 ```
 
-`<xx>` is the first two hex characters of the pack ID. All IDs are 64 lowercase hex characters
+`<xx>` is the first two hex characters of the pack ID. Content-addressed IDs (packs, blobs, index files, snapshots) are
+64 lowercase hex characters; random IDs (repository, key slots, locks) are 32. Readers ignore files whose name does
+not match (they are never parsed or deleted). All IDs are lowercase hex
 (256 bits). Files whose name contains `.tmp-` are incomplete uploads and must be ignored.
 
 The repository is **self-describing**: storage location + password (or recovery key) are enough to

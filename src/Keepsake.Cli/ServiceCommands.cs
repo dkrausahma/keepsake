@@ -93,6 +93,7 @@ namespace Keepsake.Cli
                 if (!auth.PasswordSet)
                     throw new KeepsakeException("The service has no application password yet. Run 'keepsake setup' first.");
                 client.Login(AppPassword(ctx));
+                client.LogoutOnDispose = true;
                 return client;
             }
             catch

@@ -185,6 +185,8 @@ namespace Keepsake.Core.Restore
             private readonly SemaphoreSlim _workers;
             private DateTime _lastReport = DateTime.MinValue;
             private long _restored, _unchanged, _skipped, _failed, _bytes;
+            private readonly System.Collections.Concurrent.ConcurrentDictionary<string, string> _finalAnchors =
+                new System.Collections.Concurrent.ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             public RestoreRun(Repository repo, RestoreOptions options, List<List<string>> includes, List<string> sources, RestoreStats stats,
                 IssueLog issues, IProgress<RestoreProgress> progress, CancellationToken cancel)
@@ -312,11 +314,47 @@ namespace Keepsake.Core.Restore
 
             private string TargetPath(List<string> path, int baseLength)
             {
+                // Names come from authenticated trees, but a repository written by another holder of the key must
+                // still not be able to point outside the target (SEC-017).
+                foreach (string name in path)
+                    CheckName(name);
                 if (_options.Target == RestoreTargetMode.Original)
                     return RepoPaths.ToWindows(path);
                 var parts = _options.KeepFullPath ? path : path.Skip(baseLength).ToList();
-                return RepoPaths.Combine(LongPath.Normalize(_options.TargetFolder), parts);
+                string folder = LongPath.Normalize(_options.TargetFolder);
+                string target = RepoPaths.Combine(folder, parts);
+                if (!LongPath.IsSameOrBelow(LongPath.Normalize(target), folder))
+                    throw new KeepsakeException("'" + RepoPaths.Join(path) + "' would be restored outside the target folder.");
+                return target;
             }
+
+            private static readonly char[] BadNameChars = { '\\', '/', ':', '*', '?', '"', '<', '>', '|' };
+
+            private static void CheckName(string name)
+            {
+                if (string.IsNullOrEmpty(name) || name == "." || name == ".." || name.IndexOfAny(BadNameChars) >= 0 || name.Any(char.IsControl))
+                    throw new KeepsakeException("The backup contains an invalid file name ('" + name + "'); it is skipped.");
+            }
+
+            /// <summary>
+            /// The folder below which no junction or link is followed: the chosen target folder, or for a restore to
+            /// the original location the backed-up source folder the file belongs to (SEC-003).
+            /// </summary>
+            private string AnchorFor(string target)
+            {
+                if (_options.Target != RestoreTargetMode.Original)
+                    return LongPath.Normalize(_options.TargetFolder);
+                string best = null;
+                foreach (string s in _sources)
+                {
+                    if (LongPath.IsSameOrBelow(target, s) && (best == null || s.Length > best.Length))
+                        best = s;
+                }
+                return best ?? Path.GetPathRoot(target);
+            }
+
+            private string FinalAnchor(string anchor) =>
+                _finalAnchors.GetOrAdd(anchor, a => Directory.Exists(LongPath.ToExtended(a)) ? LinkSafety.FinalDirectoryPath(a) : null);
 
             private void RestoreFile(Node node, List<string> path, int baseLength)
             {
@@ -335,6 +373,8 @@ namespace Keepsake.Core.Restore
                 string temp = null;
                 try
                 {
+                    string anchor = AnchorFor(target);
+                    LinkSafety.EnsureNoLinksBelow(anchor, Path.GetDirectoryName(target));
                     var existing = new FileInfo(extended);
                     if (existing.Exists)
                     {
@@ -378,6 +418,12 @@ namespace Keepsake.Core.Restore
                     long written = 0;
                     using (var output = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None, 65536))
                     {
+                        // A folder swapped for a junction after the check above would redirect the write: compare
+                        // where the new file really is with where the anchor really is.
+                        string finalAnchor = FinalAnchor(anchor);
+                        string finalTemp = finalAnchor == null ? null : LinkSafety.FinalPath(output.SafeFileHandle);
+                        if (finalTemp != null && !LongPath.IsSameOrBelow(finalTemp, finalAnchor))
+                            throw new IOException(target + " resolves to a location outside " + anchor + " (junction or link); not restored.");
                         foreach (string id in node.Content ?? new List<string>())
                         {
                             _cancel.ThrowIfCancellationRequested();
@@ -404,7 +450,7 @@ namespace Keepsake.Core.Restore
                         File.SetAttributes(extended, (FileAttributes)node.Attributes);
                     Interlocked.Increment(ref _restored);
                 }
-                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is RepositoryFormatException)
+                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is RepositoryFormatException || ex is ArgumentException)
                 {
                     _issues.Error(target, ex is UnauthorizedAccessException ? "Access denied." : ex.Message);
                     Interlocked.Increment(ref _failed);
@@ -431,7 +477,9 @@ namespace Keepsake.Core.Restore
                 }
                 try
                 {
-                    string extended = LongPath.ToExtended(TargetPath(path, baseLength));
+                    string targetDir = TargetPath(path, baseLength);
+                    LinkSafety.EnsureNoLinksBelow(AnchorFor(targetDir), targetDir);
+                    string extended = LongPath.ToExtended(targetDir);
                     if (!Directory.Exists(extended))
                     {
                         // Restore empty folders too.
@@ -446,7 +494,7 @@ namespace Keepsake.Core.Restore
                             File.SetAttributes(extended, File.GetAttributes(extended) | wanted);
                     }
                 }
-                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is KeepsakeException)
+                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is KeepsakeException || ex is ArgumentException)
                 {
                     _issues.Warning(RepoPaths.Join(path), "Folder times/attributes could not be set: " + ex.Message);
                 }

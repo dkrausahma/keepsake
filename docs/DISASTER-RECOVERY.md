@@ -11,7 +11,7 @@ the original server, its configuration and its Windows domain are not needed.
 | The backup repository | the folder / network share / USB disk / SFTP server of the job |
 | The repository password **or** the recovery key (`KS1-…`) | KeePass |
 | For SFTP: user, password or private key, host key fingerprint | KeePass |
-| `keepsake.exe` | inside every repository in `tools\keepsake-<version>\` (copied automatically after backups), or the portable ZIP, or any Keepsake installation |
+| `keepsake.exe` | **preferred:** the portable ZIP or the MSI from the official release (keep a copy and its SHA-256 from `SHA256SUMS.txt` with the KeePass entry). Fallback: `tools\keepsake-<version>\` inside every repository – see the warning below |
 
 > Test this runbook once on a second computer before you rely on Keepsake (see the end of this document).
 
@@ -20,8 +20,14 @@ the original server, its configuration and its Windows domain are not needed.
 ## Scenario 1 – The server is gone, the backups are on a share, USB disk or folder
 
 1. On any Windows computer, make the repository reachable (plug in the USB disk, open the share).
-2. Copy the folder `tools\keepsake-<newest version>` from the repository to the local disk,
-   e.g. `C:\Keepsake`. Open a command prompt there.
+2. Unpack the portable ZIP (or install the MSI) on the local disk, e.g. `C:\Keepsake`, and open a command
+   prompt there.
+
+   > **Copy in the repository:** `tools\keepsake-<version>` works too, but it is **not encrypted** – whoever
+   > controls the backup storage could have replaced it. Before you type a password into it, check it:
+   > `Get-AuthenticodeSignature .\keepsake.exe` must show a valid signature of Kraus-Ahma IT Consulting
+   > (signed releases), or `Get-FileHash` of the files must match the release you recorded. The service
+   > re-checks this copy after every backup and repairs it, but on disaster day that service is gone.
 3. List the backups:
 
    ```bash
@@ -140,7 +146,7 @@ If both the password and the recovery key are lost, **the backups cannot be decr
 ## Recovery test (do this before going live, then once a year)
 
 - [ ] On a computer that is **not** the backup server, with only the KeePass entry at hand:
-- [ ] Copy `tools\keepsake-<version>` from the repository.
+- [ ] Unpack the portable ZIP from the KeePass attachment / release (not the copy in the repository), check its SHA-256.
 - [ ] `keepsake snapshots` with the **recovery key** (not the password) – lists the backups.
 - [ ] Restore one folder with `--include … --flat` into a temp folder; open some files.
 - [ ] `keepsake check --read-data-percent 10` – no errors.

@@ -80,7 +80,7 @@ namespace Keepsake.Service
                 case Methods.AuthChangePassword:
                 {
                     var p = P<ChangePasswordParams>(r);
-                    _ctx.Auth.ChangePassword(p.OldPassword, p.NewPassword);
+                    _ctx.Auth.ChangePassword(p.OldPassword, p.NewPassword, r.Token);
                     return null;
                 }
                 case Methods.Status:
@@ -195,7 +195,7 @@ namespace Keepsake.Service
                 {
                     var p = P<RunsListParams>(r);
                     string jobId = string.IsNullOrEmpty(p.JobId) ? null : Job(p.JobId).Id;
-                    return _ctx.History.List(jobId, p.Limit <= 0 ? 50 : p.Limit);
+                    return _ctx.History.List(jobId, p.Limit <= 0 ? 50 : Math.Min(p.Limit, 10000)); // bounded response (SEC-015)
                 }
                 case Methods.RunsGet:
                     return _ctx.History.Get(P<IdParams>(r).Id) ?? throw new ApiException(ErrorCodes.NotFound, "Run not found.");
@@ -335,9 +335,27 @@ namespace Keepsake.Service
             var errors = JobValidation.ValidateDestination(p.Destination);
             if (errors.Count > 0)
                 throw new ApiException(ErrorCodes.Invalid, string.Join(" ", errors));
-            secrets = _ctx.Jobs.GetSecrets(string.IsNullOrEmpty(p.JobId) ? null : p.JobId).Merge(p.Secrets);
+            string jobId = string.IsNullOrEmpty(p.JobId) ? null : p.JobId;
+            var stored = _ctx.Jobs.GetSecrets(jobId);
+            // Stored SFTP credentials only go to the server they were saved for: a caller must not be able to send
+            // them to another host by testing an existing job against a different destination (SEC-010).
+            var job = jobId == null ? null : _ctx.Jobs.Get(jobId);
+            if (job != null && !SameSftpServer(job.Destination, p.Destination))
+            {
+                stored.SftpPassword = null;
+                stored.SftpKey = null;
+                stored.SftpPassphrase = null;
+            }
+            secrets = stored.Merge(p.Secrets);
             return DestinationResolver.Open(p.Destination, p.ShareCredentials, secrets, p.VolumeId);
         }
+
+        private static bool SameSftpServer(Destination saved, Destination requested) =>
+            saved != null && requested != null &&
+            saved.Type == DestinationTypes.Sftp && requested.Type == DestinationTypes.Sftp &&
+            string.Equals(saved.Host, requested.Host, StringComparison.OrdinalIgnoreCase) &&
+            saved.Port == requested.Port &&
+            string.Equals(saved.User, requested.User, StringComparison.Ordinal);
 
         private RepoInitResult InitRepository(RepoParams p)
         {

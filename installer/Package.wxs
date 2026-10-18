@@ -37,6 +37,15 @@
       </Directory>
     </StandardDirectory>
 
+    <!--
+      Data folder (configuration, DPAPI-protected secrets, run history). Created here with owner Administrators and
+      access for SYSTEM and Administrators only, so a folder a user created beforehand is taken back (SEC-001).
+      The service enforces the same at every start. Permanent: uninstalling keeps configuration and history.
+    -->
+    <StandardDirectory Id="CommonAppDataFolder">
+      <Directory Id="DATAFOLDER" Name="Keepsake" />
+    </StandardDirectory>
+
     <!-- Upgrades and repairs stay in the folder chosen at the first install. -->
     <Property Id="INSTALLFOLDER">
       <RegistrySearch Id="PreviousInstallFolder" Root="HKLM" Key="Software\Keepsake" Name="InstallFolder" Type="raw" Bitness="always64" />
@@ -54,6 +63,23 @@
           <Shortcut Id="GuiShortcut" Directory="ProgramMenuFolder" Name="Keepsake Backup" Description="Manage Keepsake backups"
                     WorkingDirectory="INSTALLFOLDER" Icon="KeepsakeIcon" Advertise="no" />
         </File>
+      </Component>
+    </ComponentGroup>
+
+    <!--
+      The install folder holds the LocalSystem service and is on the system PATH: whatever folder the admin picks,
+      only SYSTEM and Administrators may change it; users can read and run (SEC-002).
+    -->
+    <ComponentGroup Id="Folders">
+      <Component Id="InstallFolderAcl" Directory="INSTALLFOLDER" Guid="{8E2B7A4C-3F61-4D0E-9B5A-1C7D2E9F4A63}" Bitness="always64">
+        <CreateFolder>
+          <PermissionEx Sddl="O:BAG:SYD:PAI(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;0x1200a9;;;BU)" />
+        </CreateFolder>
+      </Component>
+      <Component Id="DataFolderAcl" Directory="DATAFOLDER" Guid="{2D9C5E7B-8A14-4F3B-A6E2-5B0C9D1F7E84}" Bitness="always64" Permanent="yes">
+        <CreateFolder>
+          <PermissionEx Sddl="O:BAG:SYD:PAI(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)" />
+        </CreateFolder>
       </Component>
     </ComponentGroup>
 
@@ -89,6 +115,7 @@
     <Feature Id="Main" Title="Keepsake" Level="1">
       <ComponentGroupRef Id="AppFiles" />
       <ComponentGroupRef Id="Service" />
+      <ComponentGroupRef Id="Folders" />
     </Feature>
 
     <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />

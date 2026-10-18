@@ -221,6 +221,13 @@ namespace Keepsake.Gui.ViewModels
             File.WriteAllText(file, sb.ToString(), new UTF8Encoding(true));
         }
 
-        private static string Csv(string s) => "\"" + (s ?? "").Replace("\"", "\"\"") + "\"";
+        /// <summary>Quoted CSV cell; a leading = + - @ is neutralised so a spreadsheet never runs it as a formula.</summary>
+        private static string Csv(string s)
+        {
+            s = s ?? "";
+            if (s.Length > 0 && "=+-@\t\r".IndexOf(s[0]) >= 0)
+                s = "'" + s;
+            return "\"" + s.Replace("\"", "\"\"") + "\"";
+        }
     }
 }

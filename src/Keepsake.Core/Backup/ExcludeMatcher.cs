@@ -43,8 +43,16 @@ namespace Keepsake.Core.Backup
             {
                 if (r.DirectoriesOnly && !isDirectory)
                     continue;
-                if (r.Regex.IsMatch(r.FullPath ? fullPath : name))
-                    return r.Pattern;
+                try
+                {
+                    if (r.Regex.IsMatch(r.FullPath ? fullPath : name))
+                        return r.Pattern;
+                }
+                catch (RegexMatchTimeoutException)
+                {
+                    // A crafted file name must not stall the backup (SEC-023): treat as not excluded, so the file
+                    // is backed up rather than lost.
+                }
             }
             return null;
         }
@@ -70,7 +78,7 @@ namespace Keepsake.Core.Backup
                 Pattern = pattern.Trim(),
                 DirectoriesOnly = dirOnly,
                 FullPath = fullPath,
-                Regex = new Regex("^" + regex + "$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled),
+                Regex = new Regex("^" + regex + "$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled, TimeSpan.FromSeconds(1)),
             };
         }
 

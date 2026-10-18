@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using Keepsake.Core.Util;
 
 namespace Keepsake.Service
 {
@@ -30,17 +31,44 @@ namespace Keepsake.Service
         public string SchedulerFile => Path.Combine(State, "scheduler.json");
 
         /// <summary>
-        /// Creates the folders. With <paramref name="restrict"/>, only SYSTEM and Administrators can access them:
-        /// stored secrets are DPAPI-protected for the machine, so the file permissions are what keeps other
-        /// local users out.
+        /// Creates the folders. Junctions and symbolic links anywhere in the data folder are refused, because they
+        /// would redirect what the service reads and writes as SYSTEM.
+        /// With <paramref name="restrict"/>, only SYSTEM and Administrators can access the folder (SEC-001): the owner
+        /// of the folder and of everything below it becomes Administrators, the root gets a protected ACL, and every
+        /// child loses its explicit entries and only inherits. This also takes the folder back from a user who
+        /// created it before Keepsake was installed.
         /// </summary>
         public void Ensure(bool restrict)
         {
-            foreach (string dir in new[] { Root, Config, State, Runs, Logs })
-                Directory.CreateDirectory(dir);
-            if (!restrict)
-                return;
+            if (IsLink(Root))
+                throw new InvalidOperationException("The data folder " + Root + " is a junction or symbolic link. Replace it with a normal folder.");
+            CheckNoLinks(Root);
 
+            if (!restrict)
+            {
+                foreach (string dir in new[] { Root, Config, State, Runs, Logs })
+                    Directory.CreateDirectory(dir);
+                return;
+            }
+
+            // Ownership can only be taken back with these privileges (LocalSystem and elevated admins hold them).
+            WindowsFiles.EnablePrivilege("SeTakeOwnershipPrivilege");
+            WindowsFiles.EnablePrivilege("SeRestorePrivilege");
+            var admins = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
+
+            if (!Directory.Exists(Root))
+                Directory.CreateDirectory(Root, RootSecurity());
+            // Owner first: a pre-created folder may deny SYSTEM the right to change its ACL until it owns it.
+            SetOwner(new DirectoryInfo(Root), admins);
+            Directory.SetAccessControl(Root, RootSecurity());
+
+            foreach (string dir in new[] { Config, State, Runs, Logs })
+                Directory.CreateDirectory(dir);
+            ResetChildren(new DirectoryInfo(Root), admins);
+        }
+
+        private static DirectorySecurity RootSecurity()
+        {
             var security = new DirectorySecurity();
             security.SetAccessRuleProtection(isProtected: true, preserveInheritance: false);
             foreach (var sid in new[] { WellKnownSidType.LocalSystemSid, WellKnownSidType.BuiltinAdministratorsSid })
@@ -52,7 +80,63 @@ namespace Keepsake.Service
                     PropagationFlags.None,
                     AccessControlType.Allow));
             }
-            Directory.SetAccessControl(Root, security);
+            return security;
+        }
+
+        /// <summary>Owner Administrators, no explicit entries, permissions inherited from the root – for every child.</summary>
+        private static void ResetChildren(DirectoryInfo dir, SecurityIdentifier owner)
+        {
+            foreach (var entry in dir.EnumerateFileSystemInfos())
+            {
+                if ((entry.Attributes & FileAttributes.ReparsePoint) != 0)
+                    throw new InvalidOperationException("The data folder contains a junction or symbolic link: " + entry.FullName + ". Remove it and start the service again.");
+                SetOwner(entry, owner);
+                if (entry is DirectoryInfo sub)
+                {
+                    var inherit = new DirectorySecurity();
+                    inherit.SetAccessRuleProtection(isProtected: false, preserveInheritance: false);
+                    sub.SetAccessControl(inherit);
+                    ResetChildren(sub, owner);
+                }
+                else
+                {
+                    var inherit = new FileSecurity();
+                    inherit.SetAccessRuleProtection(isProtected: false, preserveInheritance: false);
+                    ((FileInfo)entry).SetAccessControl(inherit);
+                }
+            }
+        }
+
+        private static void SetOwner(FileSystemInfo entry, SecurityIdentifier owner)
+        {
+            if (entry is DirectoryInfo dir)
+            {
+                var s = new DirectorySecurity();
+                s.SetOwner(owner);
+                dir.SetAccessControl(s);
+            }
+            else
+            {
+                var s = new FileSecurity();
+                s.SetOwner(owner);
+                ((FileInfo)entry).SetAccessControl(s);
+            }
+        }
+
+        private static bool IsLink(string path) =>
+            (File.Exists(path) || Directory.Exists(path)) && (File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0;
+
+        private static void CheckNoLinks(string dir)
+        {
+            if (!Directory.Exists(dir))
+                return;
+            foreach (var entry in new DirectoryInfo(dir).EnumerateFileSystemInfos())
+            {
+                if ((entry.Attributes & FileAttributes.ReparsePoint) != 0)
+                    throw new InvalidOperationException("The data folder contains a junction or symbolic link: " + entry.FullName + ". Remove it and start the service again.");
+                if (entry is DirectoryInfo)
+                    CheckNoLinks(entry.FullName);
+            }
         }
     }
 

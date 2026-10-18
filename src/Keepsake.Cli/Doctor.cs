@@ -157,12 +157,23 @@ namespace Keepsake.Cli
             {
                 try
                 {
-                    var rules = Directory.GetAccessControl(data).GetAccessRules(true, true, typeof(SecurityIdentifier)).OfType<FileSystemAccessRule>();
-                    var open = new[] { WellKnownSidType.BuiltinUsersSid, WellKnownSidType.WorldSid, WellKnownSidType.AuthenticatedUserSid }
+                    var trusted = new[] { WellKnownSidType.LocalSystemSid, WellKnownSidType.BuiltinAdministratorsSid }
                         .Select(t => new SecurityIdentifier(t, null)).ToList();
-                    bool exposed = rules.Any(r => r.AccessControlType == AccessControlType.Allow && open.Contains((SecurityIdentifier)r.IdentityReference));
-                    Add(exposed ? Level.Fail : Level.Ok, "Data folder", data + (exposed ? " is readable by all users" : " restricted to SYSTEM and Administrators"),
-                        exposed ? "Restart the service; it restricts the folder at start-up." : null);
+                    var problems = new List<string>();
+                    foreach (string dir in new[] { data, Path.Combine(data, "config") }.Where(Directory.Exists))
+                    {
+                        var acl = Directory.GetAccessControl(dir);
+                        if ((File.GetAttributes(dir) & FileAttributes.ReparsePoint) != 0)
+                            problems.Add(dir + " is a junction or link");
+                        if (!trusted.Contains((SecurityIdentifier)acl.GetOwner(typeof(SecurityIdentifier))))
+                            problems.Add(dir + " is owned by " + acl.GetOwner(typeof(NTAccount)));
+                        if (acl.GetAccessRules(true, true, typeof(SecurityIdentifier)).OfType<FileSystemAccessRule>()
+                            .Any(r => r.AccessControlType == AccessControlType.Allow && !trusted.Contains((SecurityIdentifier)r.IdentityReference)))
+                            problems.Add(dir + " grants access to other accounts");
+                    }
+                    bool exposed = problems.Count > 0;
+                    Add(exposed ? Level.Fail : Level.Ok, "Data folder", exposed ? string.Join("; ", problems) : data + " restricted to SYSTEM and Administrators",
+                        exposed ? "Restart the service; it takes ownership of the folder and resets its permissions at start-up." : null);
                 }
                 catch (UnauthorizedAccessException)
                 {

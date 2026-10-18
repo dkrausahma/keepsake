@@ -71,6 +71,9 @@ namespace Keepsake.Core.Repo
 
     public static class PackReader
     {
+        /// <summary>A header entry is 41 bytes; 64 MiB covers far more blobs than a pack can hold.</summary>
+        private const uint MaxHeaderBytes = 64u * 1024 * 1024;
+
         /// <summary>Reads only the header of a stored pack (two range reads).</summary>
         public static List<PackBlobEntry> ReadHeader(IStorage storage, string packId, byte[] encryptionKey)
         {
@@ -80,7 +83,8 @@ namespace Keepsake.Core.Repo
                 throw new RepositoryCorruptException("Pack " + packId + " is truncated.");
             uint headerLength = Bytes.ReadUInt32(storage.ReadRange(path, size - 4, 4), 0);
             long headerStart = size - 4 - headerLength;
-            if (headerStart < 0)
+            // The trailer is not authenticated: bound it before allocating (SEC-009).
+            if (headerStart < 0 || headerLength > MaxHeaderBytes)
                 throw new RepositoryCorruptException("Pack " + packId + " has an invalid header length.");
             byte[] sealedHeader = storage.ReadRange(path, headerStart, (int)headerLength);
             return Parse(Aead.Open(encryptionKey, sealedHeader, Aead.Context("pack-header")), headerStart, packId);

@@ -55,8 +55,7 @@ namespace Keepsake.Core.Repo
 
         public static InitResult Init(IStorage storage, string password, RepoConfig config = null)
         {
-            if (string.IsNullOrEmpty(password))
-                throw new KeepsakeException("A password is required to create a repository.");
+            CheckPasswordPolicy(password);
             if (Exists(storage))
                 throw new KeepsakeException("A Keepsake repository already exists at " + storage.Location + ".");
 
@@ -94,18 +93,23 @@ namespace Keepsake.Core.Repo
                 throw new RepositoryFormatException("The repository uses format version " + header.Version +
                     ", which is newer than this program supports (" + FormatVersion + "). Please update Keepsake.");
 
+            // Key slots come from untrusted storage (SEC-007): only plausible files are tried, at most MaxKeySlots,
+            // and a malformed slot is skipped instead of aborting the open.
+            int tried = 0;
             foreach (var entry in storage.List(Layout.Keys))
             {
-                KeySlot slot;
+                if (entry.Size > MaxKeySlotBytes || !IsHexName(entry.Name) || ++tried > MaxKeySlots)
+                    continue;
+                byte[] master;
                 try
                 {
-                    slot = Json.FromBytes<KeySlot>(storage.Read(entry.Path));
+                    var slot = Json.FromBytes<KeySlot>(storage.Read(entry.Path));
+                    master = Unlock(slot, credential, header.Id);
                 }
-                catch (RepositoryFormatException)
+                catch (Exception ex) when (ex is RepositoryFormatException || ex is FormatException)
                 {
                     continue;
                 }
-                byte[] master = Unlock(slot, credential, header.Id);
                 if (master == null)
                     continue;
 
@@ -117,6 +121,21 @@ namespace Keepsake.Core.Repo
                 ? "The password is not valid for this repository."
                 : "The recovery key is not valid for this repository.");
         }
+
+        /// <summary>Same minimum as the GUI and the service API, for every way a password key is created (SEC-022).</summary>
+        public const int MinPasswordLength = 8;
+
+        private static void CheckPasswordPolicy(string password)
+        {
+            if (string.IsNullOrEmpty(password) || password.Length < MinPasswordLength)
+                throw new KeepsakeException("The repository password must have at least " + MinPasswordLength + " characters.");
+        }
+
+        private const int MaxKeySlots = 64;
+        private const long MaxKeySlotBytes = 64 * 1024;
+
+        private static bool IsHexName(string name) =>
+            name.Length >= 16 && name.Length <= 64 && name.All(c => (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'));
 
         private static byte[] Unlock(KeySlot slot, RepoCredential credential, string repoId)
         {
@@ -162,8 +181,7 @@ namespace Keepsake.Core.Repo
 
         public string AddPasswordKey(string password, string label)
         {
-            if (string.IsNullOrEmpty(password))
-                throw new KeepsakeException("The password must not be empty.");
+            CheckPasswordPolicy(password);
             var kdf = PasswordKdf.NewParams();
             return WriteSlot(new KeySlot { Type = PasswordSlot, Kdf = kdf }, PasswordKdf.Derive(password, kdf), label);
         }
@@ -255,7 +273,7 @@ namespace Keepsake.Core.Repo
         {
             if (Index.Loaded)
                 return;
-            foreach (var entry in Storage.List(Layout.Index))
+            foreach (var entry in Layout.ListObjects(Storage, Layout.Index))
                 Index.Add(LoadObject<IndexFile>(entry.Path, "index"));
             Index.Loaded = true;
         }
@@ -324,7 +342,7 @@ namespace Keepsake.Core.Repo
         public List<SnapshotRef> ListSnapshots()
         {
             var result = new List<SnapshotRef>();
-            foreach (var entry in Storage.List(Layout.Snapshots))
+            foreach (var entry in Layout.ListObjects(Storage, Layout.Snapshots))
                 result.Add(new SnapshotRef(entry.Name, LoadObject<Snapshot>(entry.Path, "snapshot")));
             return result.OrderBy(s => s.Snapshot.Time).ToList();
         }
@@ -363,8 +381,10 @@ namespace Keepsake.Core.Repo
             "Created:       " + header.Created.ToString("yyyy-MM-dd HH:mm") + " UTC\r\n\r\n" +
             "Do not change, move or delete files inside this folder by hand.\r\n\r\n" +
             "HOW TO RESTORE ON ANOTHER COMPUTER\r\n" +
-            "1. Copy the folder tools\\keepsake-<newest version> from this repository to the computer\r\n" +
-            "   (it is added after the first backup), or install Keepsake. .NET Framework 4.8 is required.\r\n" +
+            "1. Install Keepsake or unpack its portable ZIP from the official download (preferred), or copy\r\n" +
+            "   the folder tools\\keepsake-<version> from this repository. That copy is not encrypted: whoever\r\n" +
+            "   controls this storage could have replaced it. Check its digital signature (or its SHA-256 against\r\n" +
+            "   the published release) before you enter a password. .NET Framework 4.8 is required.\r\n" +
             "2. Make this folder reachable from that computer (USB disk, network share, ...).\r\n" +
             "3. Have the repository password or the recovery key (KS1-...) ready.\r\n" +
             "4. List the backups:\r\n" +

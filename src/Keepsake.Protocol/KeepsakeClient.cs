@@ -22,13 +22,18 @@ namespace Keepsake.Protocol
         }
 
         /// <summary>Returns null when the other side closed the connection.</summary>
-        public static byte[] Read(Stream stream)
+        /// <summary>Largest request the service accepts (responses, e.g. full run logs, may be larger).</summary>
+        public const int MaxRequest = 8 * 1024 * 1024;
+
+        public static byte[] Read(Stream stream) => Read(stream, MaxMessage);
+
+        public static byte[] Read(Stream stream, int maxLength)
         {
             var header = new byte[4];
             if (!ReadExactly(stream, header, 4))
                 return null;
             uint length = BitConverter.ToUInt32(header, 0);
-            if (length > MaxMessage)
+            if (length > maxLength)
                 throw new IOException("Message too large (" + length + " bytes).");
             var payload = new byte[length];
             if (!ReadExactly(stream, payload, (int)length))
@@ -80,7 +85,9 @@ namespace Keepsake.Protocol
 
         public static KeepsakeClient Connect(string pipeName = null, int timeoutMs = 3000)
         {
-            var pipe = new NamedPipeClientStream(".", pipeName ?? Wire.DefaultPipeName, PipeDirection.InOut, PipeOptions.None);
+            // Identification only: the server may learn who the client is, but can never act as the client (SEC-005).
+            var pipe = new NamedPipeClientStream(".", pipeName ?? Wire.DefaultPipeName, PipeDirection.InOut, PipeOptions.None,
+                System.Security.Principal.TokenImpersonationLevel.Identification);
             try
             {
                 pipe.Connect(timeoutMs);
@@ -94,6 +101,15 @@ namespace Keepsake.Protocol
             {
                 pipe.Dispose();
                 throw new KeepsakeException("Access to the Keepsake service was denied. Run as administrator.");
+            }
+            try
+            {
+                PipeServerIdentity.Verify(pipe);
+            }
+            catch
+            {
+                pipe.Dispose();
+                throw;
             }
             return new KeepsakeClient(pipe);
         }
@@ -142,6 +158,23 @@ namespace Keepsake.Protocol
             }
         }
 
-        public void Dispose() => _pipe.Dispose();
+        /// <summary>End the session when the client is disposed (one-shot clients such as the CLI, SEC-014).</summary>
+        public bool LogoutOnDispose { get; set; }
+
+        public void Dispose()
+        {
+            if (LogoutOnDispose && Token != null)
+            {
+                try
+                {
+                    Call(Methods.AuthLogout);
+                }
+                catch (Exception ex) when (ex is KeepsakeException || ex is IOException || ex is ObjectDisposedException)
+                {
+                    // Best effort: the session expires anyway.
+                }
+            }
+            _pipe.Dispose();
+        }
     }
 }

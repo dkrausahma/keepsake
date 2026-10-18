@@ -82,6 +82,33 @@ namespace Keepsake.Service
                 j.Job.ShareCredentials = j.Job.ShareCredentials ?? new List<ShareCredential>();
                 j.Job.Destination.Volumes = j.Job.Destination.Volumes ?? new List<UsbVolume>();
             }
+            if (UpgradeSecrets())
+                Persist();
+        }
+
+        /// <summary>Converts secrets stored in the old machine-scope format (SEC-001). True if anything changed.</summary>
+        private bool UpgradeSecrets()
+        {
+            bool changed = false;
+            foreach (var j in _data.Jobs)
+            {
+                string pw = Secrets.Upgrade(j.RepositoryPassword);
+                if (pw != j.RepositoryPassword)
+                {
+                    j.RepositoryPassword = pw;
+                    changed = true;
+                }
+                foreach (string key in j.Secrets.Keys.ToList())
+                {
+                    string v = Secrets.Upgrade(j.Secrets[key]);
+                    if (v != j.Secrets[key])
+                    {
+                        j.Secrets[key] = v;
+                        changed = true;
+                    }
+                }
+            }
+            return changed;
         }
 
         public bool HasSecret(string id, string key)
@@ -183,7 +210,8 @@ namespace Keepsake.Service
                 {
                     if (string.IsNullOrEmpty(repositoryPassword))
                         throw new ApiException(ErrorCodes.Invalid, "A new job needs the repository password.");
-                    copy.Id = string.IsNullOrEmpty(copy.Id) ? Guid.NewGuid().ToString("N") : copy.Id;
+                    // The ID becomes a folder name under runs\: accept only the GUI's own format (SEC-011).
+                    copy.Id = IsJobId(copy.Id) ? copy.Id : Guid.NewGuid().ToString("N");
                     copy.Created = now;
                     stored = new StoredJob();
                     _data.Jobs.Add(stored);
@@ -228,6 +256,9 @@ namespace Keepsake.Service
             }
         }
 
+        internal static bool IsJobId(string id) =>
+            id != null && id.Length == 32 && id.All(c => (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'));
+
         private StoredJob Find(string id) => _data.Jobs.FirstOrDefault(j => j.Job.Id == id);
 
         private void Persist() => AtomicFile.Write(_file, Json.ToBytes(_data, indented: true));
@@ -266,6 +297,9 @@ namespace Keepsake.Service
         {
             _file = file;
             _settings = File.Exists(file) ? Json.FromBytes<Settings>(File.ReadAllBytes(file)) : new Settings();
+            string smtp = Secrets.Upgrade(_settings.SmtpPassword);
+            if (smtp != _settings.SmtpPassword)
+                Update(s => s.SmtpPassword = smtp); // old machine-scope format (SEC-001)
         }
 
         public Settings Get()

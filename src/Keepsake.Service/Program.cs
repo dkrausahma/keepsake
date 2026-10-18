@@ -123,7 +123,7 @@ namespace Keepsake.Service
 
         private static int Sc(string arguments, bool ignoreErrors = false)
         {
-            var psi = new ProcessStartInfo("sc.exe", arguments) { UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true };
+            var psi = new ProcessStartInfo(CommandRunner.SystemTool("sc.exe"), arguments) { UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true };
             using (var p = Process.Start(psi))
             {
                 string output = p.StandardOutput.ReadToEnd() + p.StandardError.ReadToEnd();

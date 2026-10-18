@@ -49,6 +49,7 @@ namespace Keepsake.Core.Storage
             string temp = target + TempMarker + Rand.HexId(6);
             try
             {
+                CheckNoLinks(target);
                 Directory.CreateDirectory(Path.GetDirectoryName(target));
                 using (var fs = new FileStream(temp, FileMode.CreateNew, FileAccess.Write, FileShare.None, 81920))
                 {
@@ -69,6 +70,7 @@ namespace Keepsake.Core.Storage
         public void Delete(string path) => Guard(path, () =>
         {
             string local = Local(path);
+            CheckNoLinks(local);
             if (File.Exists(local))
                 File.Delete(local);
             return true;
@@ -79,10 +81,12 @@ namespace Keepsake.Core.Storage
             string local = Local(directory);
             if (!Directory.Exists(local))
                 yield break;
+            if (LinkSafety.IsLink(local))
+                throw new StorageException("'" + directory + "' in " + Location + " is a junction or symbolic link; it is not followed.", null);
             IEnumerable<FileInfo> files;
             try
             {
-                files = new DirectoryInfo(local).EnumerateFiles("*", SearchOption.AllDirectories);
+                files = Walk(new DirectoryInfo(local), 0);
             }
             catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
             {
@@ -111,7 +115,55 @@ namespace Keepsake.Core.Storage
         {
         }
 
-        private string Local(string path) => _root + "\\" + path.Replace('/', '\\');
+        private string Local(string path)
+        {
+            foreach (string part in path.Split('/', '\\'))
+            {
+                if (part.Length == 0 || part == "." || part == ".." || part.IndexOf(':') >= 0)
+                    throw new StorageException("Invalid repository path '" + path + "'.", null);
+            }
+            return _root + "\\" + path.Replace('/', '\\');
+        }
+
+        /// <summary>
+        /// The repository layout is at most two folders deep (data/xx/id). Junctions and symbolic links are never
+        /// followed: they could make prune, repair or unlock delete files outside the repository (SEC-004).
+        /// </summary>
+        private const int MaxDepth = 2;
+
+        private static IEnumerable<FileInfo> Walk(DirectoryInfo dir, int depth)
+        {
+            foreach (var entry in dir.EnumerateFileSystemInfos())
+            {
+                if ((entry.Attributes & FileAttributes.ReparsePoint) != 0)
+                    continue;
+                if (entry is DirectoryInfo sub)
+                {
+                    if (depth < MaxDepth)
+                    {
+                        foreach (var f in Walk(sub, depth + 1))
+                            yield return f;
+                    }
+                }
+                else
+                {
+                    yield return (FileInfo)entry;
+                }
+            }
+        }
+
+        /// <summary>Refuses a write or delete whose folder inside the repository is a junction or link (SEC-004).</summary>
+        private void CheckNoLinks(string localFile)
+        {
+            try
+            {
+                LinkSafety.EnsureNoLinksBelow(Location, LongPath.ToNormal(Path.GetDirectoryName(localFile)));
+            }
+            catch (IOException ex)
+            {
+                throw new StorageException(ex.Message, ex);
+            }
+        }
 
         private T Guard<T>(string path, Func<T> action)
         {

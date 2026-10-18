@@ -63,7 +63,7 @@ namespace Keepsake.Core.Repo
         public static List<KeyValuePair<string, LockInfo>> List(Repository repo)
         {
             var result = new List<KeyValuePair<string, LockInfo>>();
-            foreach (var entry in repo.Storage.List(Layout.Locks))
+            foreach (var entry in Layout.ListObjects(repo.Storage, Layout.Locks))
             {
                 LockInfo info = null;
                 try

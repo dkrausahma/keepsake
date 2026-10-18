@@ -141,7 +141,7 @@ namespace Keepsake.Service.Tests
                 Assert.True(saved.HasRepositoryPassword);
                 string stored = File.ReadAllText(Path.Combine(t.Root, "data", "config", "jobs.json"));
                 Assert.DoesNotContain(TestService.RepoPassword, stored);
-                Assert.Contains("dpapi:", stored);
+                Assert.Contains("dpapi-u:", stored);
 
                 var run = client.Call<RunStarted>(Methods.JobsRun, new RunJobParams { Id = saved.Job.Id });
                 var record = t.WaitForRun(client, run.RunId);

@@ -3,11 +3,13 @@
     <LangVersion>12.0</LangVersion>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
-    <Version>0.9.1</Version>
+    <Version>0.9.2</Version>
     <Product>Keepsake</Product>
     <Company>Kraus-Ahma IT Consulting</Company>
     <Copyright>© 2026 Kraus-Ahma IT Consulting &amp; Anwendungsentwicklung</Copyright>
     <Deterministic>true</Deterministic>
+    <!-- packages.lock.json pins the full dependency tree; CI restores with -locked-mode (SEC-028). -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <!-- BouncyCastle marks some engines obsolete in favour of .NET Core APIs that do not exist on .NET Framework. -->
     <NoWarn>$(NoWarn);CS0618</NoWarn>
   </PropertyGroup>

@@ -55,14 +55,20 @@ namespace Keepsake.Service
                         : SecureSocketOptions.StartTls;
                     client.Connect(smtp.Host, smtp.Port, security);
                     if (!string.IsNullOrEmpty(smtp.User))
+                    {
+                        // Kept for internal relays without TLS, but never silently (SEC-020).
+                        if (security == SecureSocketOptions.None)
+                            ServiceLog.Warn("SMTP login to " + smtp.Host + " without encryption: the password and the report travel in clear text. Use STARTTLS or SSL.");
                         client.Authenticate(smtp.User, Secrets.Unprotect(s.SmtpPassword) ?? "");
+                    }
                     client.Send(message);
                     client.Disconnect(true);
                 }
             }
             catch (Exception ex) when (ex is SocketException || ex is System.Security.Authentication.AuthenticationException || ex is MailKit.Security.AuthenticationException ||
                                        ex is SmtpCommandException || ex is SmtpProtocolException || ex is SslHandshakeException ||
-                                       ex is ServiceNotConnectedException || ex is TimeoutException || ex is System.IO.IOException || ex is ParseException)
+                                       ex is ServiceNotConnectedException || ex is TimeoutException || ex is System.IO.IOException || ex is ParseException ||
+                                       ex is NotSupportedException)
             {
                 throw new KeepsakeException("E-mail could not be sent via " + smtp.Host + ":" + smtp.Port + ": " + ex.Message);
             }

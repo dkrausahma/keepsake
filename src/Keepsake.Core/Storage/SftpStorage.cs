@@ -139,23 +139,33 @@ namespace Keepsake.Core.Storage
             string start = Remote(directory);
             if (!c.Exists(start))
                 return result;
-            var pending = new Stack<string>();
-            pending.Push(start);
+            // A malicious server could report endless or looping folders: the layout is at most two levels deep,
+            // and names with path separators are ignored (SEC-009).
+            var pending = new Stack<KeyValuePair<string, int>>();
+            pending.Push(new KeyValuePair<string, int>(start, 0));
             while (pending.Count > 0)
             {
-                string dir = pending.Pop();
+                var current = pending.Pop();
+                string dir = current.Key;
                 foreach (ISftpFile f in c.ListDirectory(dir))
                 {
-                    if (f.Name == "." || f.Name == "..")
+                    if (f.Name == "." || f.Name == ".." || f.Name.IndexOf('/') >= 0 || f.Name.IndexOf('\\') >= 0)
                         continue;
+                    if (result.Count >= MaxListEntries)
+                        throw new StorageException("Listing " + directory + " on " + Location + " returned more than " + MaxListEntries + " entries.", null);
                     if (f.IsDirectory)
-                        pending.Push(f.FullName);
+                    {
+                        if (current.Value < 2)
+                            pending.Push(new KeyValuePair<string, int>(f.FullName, current.Value + 1));
+                    }
                     else if (f.IsRegularFile && f.Name.IndexOf(TempMarker, StringComparison.Ordinal) < 0)
                         result.Add(new StorageEntry(f.FullName.Substring(_root.Length + 1), f.Length));
                 }
             }
             return result;
         }, directory);
+
+        private const int MaxListEntries = 10000000;
 
         public long? FreeBytes()
         {

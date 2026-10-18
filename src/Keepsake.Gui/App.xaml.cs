@@ -14,15 +14,16 @@ namespace Keepsake.Gui
             base.OnStartup(e);
             DispatcherUnhandledException += OnUnhandled;
 
-            // --pipe <name> connects to a service started with 'keepsake-service console --pipe <name>' (testing).
             string pipe = null;
             string autoLoginFile = null;
             for (int i = 0; i < e.Args.Length - 1; i++)
             {
+#if DEBUG
+                // Development and automated UI tests only; not available in release builds, where the GUI always
+                // talks to the installed service (SEC-016).
+                // --pipe <name> connects to a service started with 'keepsake-service console --pipe <name>'.
                 if (string.Equals(e.Args[i], "--pipe", StringComparison.OrdinalIgnoreCase))
                     pipe = e.Args[i + 1];
-#if DEBUG
-                // Automated UI tests only; not available in release builds.
                 if (string.Equals(e.Args[i], "--app-password-file", StringComparison.OrdinalIgnoreCase))
                     autoLoginFile = e.Args[i + 1];
 #endif

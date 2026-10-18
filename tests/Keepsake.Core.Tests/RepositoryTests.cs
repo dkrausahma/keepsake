@@ -92,7 +92,7 @@ namespace Keepsake.Core.Tests
 
                 // A stale exclusive lock does not block.
                 var stale = new LockInfo { Host = "old", Exclusive = true, Purpose = "crashed", Time = System.DateTime.UtcNow.AddHours(-2) };
-                t.Repo.Storage.Write(Layout.LockPath("stale"), t.Repo.EncryptObject(stale, "lock"));
+                t.Repo.Storage.Write(Layout.LockPath(Keepsake.Core.Util.Rand.HexId(16)), t.Repo.EncryptObject(stale, "lock"));
                 using (RepoLock.Acquire(t.Repo, exclusive: false, purpose: "backup"))
                 {
                 }

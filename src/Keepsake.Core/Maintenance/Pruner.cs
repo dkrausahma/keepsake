@@ -85,7 +85,7 @@ namespace Keepsake.Core.Maintenance
                     using (phases.Begin("Find used data"))
                     {
                         progress?.Report("Reading index");
-                        foreach (var entry in _repo.Storage.List(Layout.Index))
+                        foreach (var entry in Layout.ListObjects(_repo.Storage, Layout.Index))
                         {
                             index.Add(_repo.LoadObject<IndexFile>(entry.Path, "index"));
                             indexFiles.Add(entry.Path);
@@ -101,7 +101,7 @@ namespace Keepsake.Core.Maintenance
                     }
 
                     // 3. Classify packs.
-                    var stored = _repo.Storage.List(Layout.Data).ToDictionary(e => e.Name, e => e.Size, StringComparer.Ordinal);
+                    var stored = Layout.ListObjects(_repo.Storage, Layout.Data).ToDictionary(e => e.Name, e => e.Size, StringComparer.Ordinal);
                     var byPack = index.GroupByPack();
                     var keep = new Dictionary<string, List<KeyValuePair<string, BlobLocation>>>(StringComparer.Ordinal);
                     var repack = new List<string>();

@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
+using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading;
 using Keepsake.Core;
 using Keepsake.Core.Util;
 using Keepsake.Protocol;
+using Microsoft.Win32.SafeHandles;
 
 namespace Keepsake.Service
 {
@@ -69,10 +71,16 @@ namespace Keepsake.Service
             while (!_stopping)
             {
                 NamedPipeServerStream server;
+                int count = ConnectionCount();
+                if (count >= MaxConnections)
+                {
+                    Thread.Sleep(200); // bounded number of clients (SEC-015): wait for a free slot
+                    continue;
+                }
+                bool first = count == 0; // no instance of ours exists: claim the name exclusively
                 try
                 {
-                    server = new NamedPipeServerStream(_name, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances,
-                        PipeTransmissionMode.Byte, PipeOptions.None, 65536, 65536, _security);
+                    server = CreateInstance(first);
                 }
                 catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
                 {
@@ -113,7 +121,7 @@ namespace Keepsake.Service
             {
                 while (!_stopping && pipe.IsConnected)
                 {
-                    byte[] raw = Wire.Read(pipe);
+                    byte[] raw = Wire.Read(pipe, Wire.MaxRequest);
                     if (raw == null)
                         break;
                     Response response;
@@ -140,6 +148,61 @@ namespace Keepsake.Service
                 pipe.Dispose();
             }
         }
+
+        private const int MaxConnections = 16;
+
+        private int ConnectionCount()
+        {
+            lock (_lock)
+                return _connections.Count;
+        }
+
+        /// <summary>
+        /// Creates one server instance. When no instance of ours exists, the name is claimed with
+        /// FILE_FLAG_FIRST_PIPE_INSTANCE: if another process already owns a pipe with this name, creation fails
+        /// instead of silently joining it, so a squatter cannot share the name with the service (SEC-005).
+        /// Remote clients are rejected by the pipe itself, in addition to the NETWORK deny entry.
+        /// </summary>
+        private NamedPipeServerStream CreateInstance(bool first)
+        {
+            byte[] sd = _security.GetSecurityDescriptorBinaryForm();
+            var pinned = GCHandle.Alloc(sd, GCHandleType.Pinned);
+            try
+            {
+                var sa = new SecurityAttributes { Length = Marshal.SizeOf(typeof(SecurityAttributes)), Descriptor = pinned.AddrOfPinnedObject() };
+                uint openMode = PipeAccessDuplex | (first ? FileFlagFirstPipeInstance : 0);
+                var handle = CreateNamedPipe(@"\\.\pipe\" + _name, openMode, PipeRejectRemoteClients, 255, 65536, 65536, 0, ref sa);
+                if (handle.IsInvalid)
+                {
+                    int error = Marshal.GetLastWin32Error();
+                    handle.Dispose();
+                    if (first && (error == 5 || error == 231)) // access denied / pipe busy: the name belongs to someone else
+                        throw new IOException("The pipe name is already in use by another process – possibly a program impersonating the Keepsake service.");
+                    throw new IOException(new System.ComponentModel.Win32Exception(error).Message);
+                }
+                return new NamedPipeServerStream(PipeDirection.InOut, false, false, handle);
+            }
+            finally
+            {
+                pinned.Free();
+            }
+        }
+
+        private const uint PipeAccessDuplex = 0x00000003;
+        private const uint FileFlagFirstPipeInstance = 0x00080000;
+        private const uint PipeRejectRemoteClients = 0x00000008; // byte mode, blocking
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct SecurityAttributes
+        {
+            public int Length;
+            public IntPtr Descriptor;
+            public int InheritHandle;
+        }
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern SafePipeHandle CreateNamedPipe(string name, uint openMode, uint pipeMode, uint maxInstances,
+            uint outBufferSize, uint inBufferSize, uint defaultTimeout, ref SecurityAttributes security);
 
         private static PipeSecurity CreateSecurity(SecurityIdentifier extraUser)
         {

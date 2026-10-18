@@ -126,7 +126,7 @@ Debug builds run without elevation and accept `--pipe <name>` to talk to a conso
 ## Release
 
 ```bash
-powershell -ExecutionPolicy Bypass -File toolsuild-release.ps1
+powershell -ExecutionPolicy Bypass -File tools\build-release.ps1
 ```
 
 builds, tests and produces `artifacts\Keepsake-<version>.msi` and `artifacts\Keepsake-<version>-portable.zip`.
@@ -199,6 +199,26 @@ The first connection shows the server's host key fingerprint and asks to trust i
 
 For automation use `--password-file` (or `KEEPSAKE_PASSWORD`), `--non-interactive` and `--json`.
 Exit codes: 0 success, 1 warnings, 2 failed, 3 usage error, 4 wrong password/key, 5 locked, 6 cancelled.
+
+## Security notes
+
+- **Who can do what.** The service runs as LocalSystem. The GUI and CLI can only reach it as an elevated
+  administrator; the application password guards against casual use, not against local administrators (they can
+  edit the configuration directly). Pre/post commands run as SYSTEM through `cmd.exe` – quote the variables
+  Keepsake passes (`"%KEEPSAKE_JOB%"`).
+- **Data folder.** `%ProgramData%\Keepsake` is created by the installer and taken over by the service at every
+  start: owner Administrators, access for SYSTEM and Administrators only. Junctions inside it are refused. Stored
+  passwords are DPAPI-protected for the service account (`dpapi-u:`; older `dpapi:` values are converted).
+- **Install folder.** Whatever folder is chosen, the installer restricts it to SYSTEM and Administrators (users
+  read and execute), because it holds the service and is on the system PATH.
+- **Links.** Restores never follow a junction or symbolic link below the target (or below the backed-up folder when
+  restoring to the original location); folder destinations never list, write or delete through one.
+- **Restored permissions.** NTFS permissions are not backed up: restored files inherit the target folder's
+  permissions. Restore confidential data only into folders with suitable permissions.
+- **Keys.** Removing a password or recovery key does not revoke it for someone who kept the old key file; after a
+  leak, start a new repository.
+- **Releases.** `tools\build-release.ps1 -CertificateThumbprint <thumbprint>` signs programs and MSI;
+  `SHA256SUMS.txt` lists the checksums to publish. The full audit is in `audits/SECURITY_AUDIT_REPORT.md`.
 
 ## Dependencies
 
