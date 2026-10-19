@@ -121,6 +121,12 @@ namespace Keepsake.Protocol
         public int MaxConcurrentJobs { get; set; } = 1;
         public int LogRetentionDays { get; set; } = 90;
         public int LogRetentionRuns { get; set; } = 200;
+
+        /// <summary>Debug log with SFTP connection details (for support).</summary>
+        public bool DebugLog { get; set; }
+
+        /// <summary>Where the service writes the debug log (read-only).</summary>
+        public string DebugLogPath { get; set; }
     }
 
     // ---- Jobs ----------------------------------------------------------------------------------

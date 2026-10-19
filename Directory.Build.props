@@ -3,7 +3,7 @@
     <LangVersion>12.0</LangVersion>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
-    <Version>0.9.9</Version>
+    <Version>0.9.10</Version>
     <Product>Keepsake</Product>
     <Company>Kraus-Ahma IT Consulting</Company>
     <Copyright>© 2026 Kraus-Ahma IT Consulting &amp; Anwendungsentwicklung</Copyright>

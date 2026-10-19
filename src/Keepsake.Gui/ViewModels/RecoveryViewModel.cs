@@ -87,6 +87,23 @@ namespace Keepsake.Gui.ViewModels
         public bool Busy { get => _busy; private set => Set(ref _busy, value); }
         public bool CanGoBackToService => _backToService != null;
 
+        /// <summary>Recovery mode connects itself: its own debug log in %TEMP% (SFTP connection details for support).</summary>
+        public bool DebugLog
+        {
+            get => Keepsake.Core.Storage.SftpDebugLog.IsEnabled;
+            set
+            {
+                if (value)
+                    Keepsake.Core.Storage.SftpDebugLog.Enable(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "keepsake-debug.log"));
+                else
+                    Keepsake.Core.Storage.SftpDebugLog.Disable();
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(DebugLogText));
+            }
+        }
+
+        public string DebugLogText => Keepsake.Core.Storage.SftpDebugLog.IsEnabled ? "Writing to " + Keepsake.Core.Storage.SftpDebugLog.FilePath : null;
+
         public RestoreViewModel Restore
         {
             get => _restore;

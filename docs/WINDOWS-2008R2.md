@@ -25,7 +25,10 @@ Notes:
   "MAC error" – e.g. a Hetzner Storage Box on port 22 (ProFTPD mod_sftp, AES-CTR only), which works from
   Windows 10/11. AES-GCM (no HMAC) worked. Since 0.9.8 Keepsake computes AES-CTR and all HMACs with BouncyCastle
   (`ManagedAesCtrCipher`, `ManagedHmac`), like AES-GCM and ChaCha20, and prefers AEAD ciphers anyway. `keepsake sftp-test --repo sftp://…` shows which algorithms work from
-  this computer. (Hetzner Storage Box: port 23 is OpenSSH with AES-GCM, port 22 is mod_sftp.)
+  this computer. (Hetzner Storage Box: port 23 is OpenSSH with AES-GCM, port 22 is mod_sftp; the job editor
+  offers "Use port 23", which confirms port 23's own host key and checks that the repository is found there.)
+  For support, switch on *Settings → Write a debug log* (`%ProgramData%\Keepsake\logs\debug.log`), or in the
+  portable recovery mode the checkbox under *Open backup* (`%TEMP%\keepsake-debug.log`).
 
 ## Installation
 

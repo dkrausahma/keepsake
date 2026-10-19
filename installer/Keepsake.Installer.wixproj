@@ -3,7 +3,7 @@
   <!-- Built by tools/build-release.ps1, which stages all binaries into $(StageDir) first. -->
   <PropertyGroup>
     <StageDir Condition="'$(StageDir)' == ''">$(MSBuildThisFileDirectory)..\artifacts\stage</StageDir>
-    <ProductVersion Condition="'$(ProductVersion)' == ''">0.9.9</ProductVersion>
+    <ProductVersion Condition="'$(ProductVersion)' == ''">0.9.10</ProductVersion>
     <OutputName>Keepsake-$(ProductVersion)</OutputName>
     <InstallerPlatform>x64</InstallerPlatform>
     <DefineConstants>StageDir=$(StageDir);ProductVersion=$(ProductVersion)</DefineConstants>

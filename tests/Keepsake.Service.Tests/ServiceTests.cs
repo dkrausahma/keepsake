@@ -113,6 +113,33 @@ namespace Keepsake.Service.Tests
     public class ServiceTests
     {
         [Fact]
+        public void Debug_log_is_off_by_default_and_switchable()
+        {
+            using (var t = new TestService())
+            using (var client = t.Client())
+            {
+                var s = client.Call<ServiceSettings>(Methods.SettingsGet);
+                Assert.False(s.DebugLog);
+                Assert.EndsWith(@"logs\debug.log", s.DebugLogPath);
+                try
+                {
+                    s.DebugLog = true;
+                    client.Call<ServiceSettings>(Methods.SettingsSave, s);
+                    Assert.True(client.Call<ServiceSettings>(Methods.SettingsGet).DebugLog);
+                    Assert.True(File.Exists(s.DebugLogPath));
+                    Assert.Contains("debug log started", File.ReadAllText(s.DebugLogPath));
+                }
+                finally
+                {
+                    s.DebugLog = false;
+                    client.Call<ServiceSettings>(Methods.SettingsSave, s);
+                }
+                Assert.Contains("debug log stopped", File.ReadAllText(s.DebugLogPath));
+                Assert.False(Keepsake.Core.Storage.SftpDebugLog.IsEnabled);
+            }
+        }
+
+        [Fact]
         public void Api_requires_setup_then_login()
         {
             using (var t = new TestService())

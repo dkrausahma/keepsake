@@ -40,6 +40,7 @@ config\settings.json   application password (Argon2id hash), parallel jobs, log 
 state\scheduler.json   last run time of each schedule (for missed-run detection)
 runs\<job>\<run>.*     run record, issue list and readable log of every run
 logs\service.log       diagnostic log (10 MB × 5)
+logs\debug.log         optional debug log: SFTP connection details for support (Settings, off by default; 5 MB × 2)
 ```
 
 GUI and CLI talk to it through the local named pipe `keepsake-service` (Administrators only, no
@@ -198,6 +199,8 @@ The first connection shows the server's host key fingerprint and asks to trust i
 `--sftp-host-key SHA256:...` to pin it for unattended use.
 
 For automation use `--password-file` (or `KEEPSAKE_PASSWORD`), `--non-interactive` and `--json`.
+`--debug-log <file>` writes SFTP connection details (algorithms, errors, no passwords) for support;
+`keepsake sftp-test` always writes one to `%TEMP%\keepsake-debug.log`.
 Exit codes: 0 success, 1 warnings, 2 failed, 3 usage error, 4 wrong password/key, 5 locked, 6 cancelled.
 
 ## Security notes

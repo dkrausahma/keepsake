@@ -27,6 +27,7 @@ namespace Keepsake.Service
         public string Logs => Path.Combine(Root, "logs");
 
         public string JobsFile => Path.Combine(Config, "jobs.json");
+        public string DebugLogFile => Path.Combine(Logs, "debug.log");
         public string SettingsFile => Path.Combine(Config, "settings.json");
         public string SchedulerFile => Path.Combine(State, "scheduler.json");
 

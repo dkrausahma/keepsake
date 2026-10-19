@@ -280,6 +280,9 @@ namespace Keepsake.Service
         public int LogRetentionDays { get; set; } = 90;
         public int LogRetentionRuns { get; set; } = 200;
 
+        /// <summary>Write logs\debug.log with SFTP connection details (support; off by default).</summary>
+        public bool DebugLog { get; set; }
+
         /// <summary>SMTP for notifications; the password is DPAPI-protected in <see cref="SmtpPassword"/>.</summary>
         public SmtpSettings Smtp { get; set; } = new SmtpSettings();
 

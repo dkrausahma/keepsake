@@ -77,6 +77,8 @@ namespace Keepsake.Gui.ViewModels
         public int MaxConcurrentJobs { get => _settings.MaxConcurrentJobs; set { _settings.MaxConcurrentJobs = value; OnPropertyChanged(); } }
         public int LogRetentionDays { get => _settings.LogRetentionDays; set { _settings.LogRetentionDays = value; OnPropertyChanged(); } }
         public int LogRetentionRuns { get => _settings.LogRetentionRuns; set { _settings.LogRetentionRuns = value; OnPropertyChanged(); } }
+        public bool DebugLog { get => _settings?.DebugLog ?? false; set { _settings.DebugLog = value; OnPropertyChanged(); } }
+        public string DebugLogText => _settings?.DebugLogPath == null ? null : "File: " + _settings.DebugLogPath + " (only readable by administrators; at most 5 MB, then the older part moves to .1)";
 
         public string ServiceInfo => _status == null ? "" :
             "Keepsake " + _status.Version + " on " + _status.Host + "\nRunning since " + Format.LocalTime(_status.StartedAt) + "\nData folder: " + _status.DataFolder;
@@ -105,6 +107,8 @@ namespace Keepsake.Gui.ViewModels
                 SettingsMessage = ex.Message;
             }
             OnPropertyChanged(nameof(MaxConcurrentJobs));
+            OnPropertyChanged(nameof(DebugLog));
+            OnPropertyChanged(nameof(DebugLogText));
         }
 
         private async Task ChangePassword(object parameter)

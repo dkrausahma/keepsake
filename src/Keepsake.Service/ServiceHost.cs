@@ -46,11 +46,11 @@ namespace Keepsake.Service
         {
             _paths.Ensure(restrict: _restrict);
             ServiceLog.Init(_paths.Logs, _consoleMode);
-            // TEMPORARY: SFTP connection details for the 2008 R2 "MAC error" investigation.
-            Core.Storage.SftpDebugLog.Enable(System.IO.Path.Combine(_paths.Logs, "sftp-debug.log"));
             ServiceLog.Info(ProgramInfo.Name + " service starting on " + ProgramInfo.Host + " (data: " + _paths.Root + ", account: " + ProgramInfo.User + ").");
 
             var settings = new SettingsStore(_paths.SettingsFile);
+            if (settings.Get().DebugLog)
+                Core.Storage.SftpDebugLog.Enable(_paths.DebugLogFile);
             var jobs = new JobStore(_paths.JobsFile);
             var history = new RunHistory(_paths.Runs);
             history.MarkInterrupted();

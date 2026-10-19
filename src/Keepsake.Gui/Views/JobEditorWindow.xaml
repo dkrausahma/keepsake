@@ -265,6 +265,14 @@
                         <TextBlock Text="Repeat password (only needed for a new repository)" Style="{StaticResource FieldLabel}" />
                         <PasswordBox x:Name="RepoConfirm" infra:PasswordBinding.Password="{Binding RepoConfirm, Mode=TwoWay}" Width="320" HorizontalAlignment="Left" />
 
+                        <Border Margin="0,14,0,0" Padding="12,8" CornerRadius="4" Background="{StaticResource WarningSoftBrush}"
+                                Visibility="{Binding CanUsePort23, Converter={StaticResource Visible}}">
+                            <DockPanel>
+                                <Button DockPanel.Dock="Right" Content="Use port 23" Command="{Binding UsePort23Command}" Margin="12,0,0,0" VerticalAlignment="Center" />
+                                <TextBlock TextWrapping="Wrap" VerticalAlignment="Center"
+                                           Text="Hetzner Storage Box: port 22 (ProFTPD) only offers AES-CTR. Port 23 (OpenSSH) offers authenticated encryption (AES-GCM) on the same storage." />
+                            </DockPanel>
+                        </Border>
                         <Button Content="Check destination" Command="{Binding CheckCommand}" HorizontalAlignment="Left" Margin="0,14,0,0" />
                         <Border Margin="0,12,0,0" Padding="12,8" CornerRadius="4" Background="{StaticResource AccentSoftBrush}">
                             <TextBlock Text="{Binding Status}" TextWrapping="Wrap" />

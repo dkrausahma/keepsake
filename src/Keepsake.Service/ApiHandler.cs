@@ -88,7 +88,11 @@ namespace Keepsake.Service
                 case Methods.SettingsGet:
                 {
                     var s = _ctx.Settings.Get();
-                    return new ServiceSettings { MaxConcurrentJobs = s.MaxConcurrentJobs, LogRetentionDays = s.LogRetentionDays, LogRetentionRuns = s.LogRetentionRuns };
+                    return new ServiceSettings
+                    {
+                        MaxConcurrentJobs = s.MaxConcurrentJobs, LogRetentionDays = s.LogRetentionDays, LogRetentionRuns = s.LogRetentionRuns,
+                        DebugLog = s.DebugLog, DebugLogPath = _ctx.Paths.DebugLogFile,
+                    };
                 }
                 case Methods.SettingsSave:
                 {
@@ -102,8 +106,15 @@ namespace Keepsake.Service
                         s.MaxConcurrentJobs = p.MaxConcurrentJobs;
                         s.LogRetentionDays = p.LogRetentionDays;
                         s.LogRetentionRuns = p.LogRetentionRuns;
+                        s.DebugLog = p.DebugLog;
                     });
-                    ServiceLog.Info("Settings changed: " + p.MaxConcurrentJobs + " parallel job(s), logs kept " + p.LogRetentionDays + " days / " + p.LogRetentionRuns + " runs.");
+                    if (p.DebugLog)
+                        SftpDebugLog.Enable(_ctx.Paths.DebugLogFile);
+                    else
+                        SftpDebugLog.Disable();
+                    ServiceLog.Info("Settings changed: " + p.MaxConcurrentJobs + " parallel job(s), logs kept " + p.LogRetentionDays + " days / " + p.LogRetentionRuns +
+                                    " runs, debug log " + (p.DebugLog ? "on (" + _ctx.Paths.DebugLogFile + ")" : "off") + ".");
+                    p.DebugLogPath = _ctx.Paths.DebugLogFile;
                     return p;
                 }
                 case Methods.JobsList:

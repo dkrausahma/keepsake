@@ -312,6 +312,8 @@ namespace Keepsake.Cli
                     throw new KeepsakeException("Host key not trusted. Pass --sftp-host-key " + fingerprint + " after verifying it.");
                 options.HostKeyFingerprint = fingerprint;
             }
+            if (!SftpDebugLog.IsEnabled)
+                SftpDebugLog.Enable(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "keepsake-debug.log"));
             Console.WriteLine(".NET Framework release: " + NetFrameworkRelease() + ", Windows: " + WindowsName() + ", FIPS-only policy: " + SftpDebugLog.FipsOnly());
             foreach (string line in SftpDiagnostics.Run(options))
                 Console.WriteLine(line);

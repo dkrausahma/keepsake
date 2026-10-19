@@ -73,6 +73,9 @@
                                 HorizontalAlignment="Stretch" Margin="0,18,0,0" Padding="14,8" />
                         <TextBlock Style="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,14,0,0"
                                    Text="The backup is only read. Restored files get the permissions of the target folder." />
+                        <CheckBox Content="Write a debug log (SFTP connection details for support, no passwords)" IsChecked="{Binding DebugLog}" Margin="0,12,0,0" />
+                        <TextBlock Text="{Binding DebugLogText}" Style="{StaticResource Muted}" TextWrapping="Wrap" Margin="22,2,0,0"
+                                   Visibility="{Binding DebugLogText, Converter={StaticResource Visible}}" />
                     </StackPanel>
                 </Border>
             </ScrollViewer>

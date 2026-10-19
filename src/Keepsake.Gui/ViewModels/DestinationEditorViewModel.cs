@@ -99,6 +99,7 @@ namespace Keepsake.Gui.ViewModels
             LoadKeyCommand = new RelayCommand(LoadKey);
             ForgetHostKeyCommand = new RelayCommand(() => HostKey = null, () => !string.IsNullOrEmpty(HostKey));
             CheckCommand = new AsyncCommand(async () => await Check(null));
+            UsePort23Command = new AsyncCommand(UsePort23, () => CanUsePort23);
         }
 
         public Func<string> JobName { get; }
@@ -142,8 +143,27 @@ namespace Keepsake.Gui.ViewModels
         public string UsbFolder { get => _usbFolder; set { if (Set(ref _usbFolder, value)) Changed(); } }
 
         // SFTP
-        public string Host { get => _host; set { if (Set(ref _host, value)) Changed(); } }
-        public int Port { get => _port; set { if (Set(ref _port, value)) Changed(); } }
+        public string Host
+        {
+            get => _host;
+            set
+            {
+                if (!Set(ref _host, value))
+                    return;
+                // A new Hetzner Storage Box destination starts on port 23 (OpenSSH, AES-GCM) instead of 22 (mod_sftp, AES-CTR only).
+                if (_jobId == null && IsHetznerStorageBox && _port == 22)
+                    Port = 23;
+                OnPropertyChanged(nameof(CanUsePort23));
+                Changed();
+            }
+        }
+
+        public int Port { get => _port; set { if (Set(ref _port, value)) { OnPropertyChanged(nameof(CanUsePort23)); Changed(); } } }
+
+        public bool IsHetznerStorageBox => (Host ?? "").Trim().EndsWith(".your-storagebox.de", StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>Hetzner Storage Box on port 22: port 23 offers authenticated encryption (AES-GCM).</summary>
+        public bool CanUsePort23 => IsHetznerStorageBox && Port == 22;
         public string User { get => _user; set { if (Set(ref _user, value)) Changed(); } }
         public bool AuthIsKey { get => _authIsKey; set { if (Set(ref _authIsKey, value)) { OnPropertyChanged(nameof(AuthIsPassword)); Changed(); } } }
         public bool AuthIsPassword { get => !_authIsKey; set => AuthIsKey = !value; }
@@ -175,6 +195,7 @@ namespace Keepsake.Gui.ViewModels
         public ICommand LoadKeyCommand { get; }
         public ICommand ForgetHostKeyCommand { get; }
         public ICommand CheckCommand { get; }
+        public ICommand UsePort23Command { get; }
 
         public Destination Build()
         {
@@ -233,6 +254,27 @@ namespace Keepsake.Gui.ViewModels
             var share = ShareCredential();
             if (share != null && !string.IsNullOrEmpty(SharePassword))
                 secrets.SharePasswords[share.Share] = SharePassword;
+        }
+
+        /// <summary>
+        /// Switches a Hetzner Storage Box from port 22 to 23. Port 23 is a different SSH server with its own host key,
+        /// so the key is confirmed again; the check then shows whether the repository is found there (same storage).
+        /// </summary>
+        private async Task UsePort23()
+        {
+            string oldKey = HostKey;
+            Port = 23;
+            HostKey = null;
+            var result = await Check(null);
+            if (result == null || !result.Reachable || result.UntrustedHostKey != null)
+            {
+                Status = (Status ?? "") + Environment.NewLine + "Port 23 is not usable – switched back to port 22.";
+                Port = 22;
+                HostKey = oldKey;
+                return;
+            }
+            if (!result.Exists)
+                Status += Environment.NewLine + "Note: no repository was found at this path on port 23. If this job already has backups, check the path or switch back to port 22.";
         }
 
         /// <summary>Tests the destination; asks to trust an unknown SFTP host key and retries.</summary>
