@@ -46,6 +46,9 @@ namespace Keepsake.Gui.ViewModels
 
         /// <summary>Whether the periodic timer should call <see cref="Refresh"/>.</summary>
         public virtual bool AutoRefresh => false;
+
+        /// <summary>F1 on this page opens this help page (relative to help\).</summary>
+        public abstract string HelpPage { get; }
     }
 
     /// <summary>Main window content after login: sidebar navigation and the active page.</summary>

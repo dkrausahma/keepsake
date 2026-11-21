@@ -31,6 +31,8 @@
             </StackPanel>
             <StackPanel DockPanel.Dock="Bottom" Margin="20,0,20,16">
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                    <Button Content="Help" Command="ApplicationCommands.Help" CommandParameter="index.html" Style="{StaticResource LinkButton}"
+                            Foreground="{StaticResource SidebarTextBrush}" Margin="0,0,18,0" ToolTip="User guide (F1: help for the current page)" />
                     <Button x:Name="AboutButton" Content="About" Click="OnAbout" Style="{StaticResource LinkButton}" Foreground="{StaticResource SidebarTextBrush}" Margin="0,0,18,0" />
                     <Button Content="Log out" Command="{Binding LogoutCommand}" Style="{StaticResource LinkButton}" Foreground="{StaticResource SidebarTextBrush}" />
                 </StackPanel>

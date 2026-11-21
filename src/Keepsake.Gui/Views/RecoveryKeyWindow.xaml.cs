@@ -13,6 +13,7 @@ namespace Keepsake.Gui.Views
         private RecoveryKeyWindow(string key, string location, string keePassEntry)
         {
             InitializeComponent();
+            HelpFiles.Attach(this, "PASSWORDS-AND-KEYS.html");
             _key = key;
             _entry = keePassEntry;
             KeyBox.Text = key;

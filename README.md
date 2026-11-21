@@ -2,6 +2,10 @@
 
 Encrypted, compressed, deduplicated file backup for Windows Server 2008 R2 SP1 and Windows 10/11.
 
+**User guide:** [docs/index.md](docs/index.md) – installation, backup jobs, restore, recovery mode, settings,
+monitoring, command line and troubleshooting. It ships with the programs as offline help (`help\` in the install
+folder; **Help** and F1 in the program) and is built with `python tools/help-docs/build.py`.
+
 - Requirements: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md)
 - Repository format: [docs/FORMAT.md](docs/FORMAT.md)
 - Changes per version: [CHANGELOG.md](CHANGELOG.md)

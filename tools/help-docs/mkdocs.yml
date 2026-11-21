@@ -1,0 +1,80 @@
+# Keepsake help: Markdown in docs/, built into src/Keepsake.Gui/help/ (shipped with the programs, opened offline).
+# Build with:  python tools/help-docs/build.py
+site_name: Keepsake Backup Help
+site_description: User guide for Keepsake Backup – encrypted, deduplicated file backup for Windows
+copyright: Keepsake Backup &copy; 2026 Kraus-Ahma IT Consulting &amp; Anwendungsentwicklung
+docs_dir: ../../docs
+site_dir: ../../src/Keepsake.Gui/help
+# file:// pages: links to page.html, not page/
+use_directory_urls: false
+# Requirements are a project document, not user help.
+exclude_docs: |
+  REQUIREMENTS.md
+
+theme:
+  name: material
+  language: en
+  # no Google Fonts: the help must work without internet (disaster recovery on a replacement computer)
+  font: false
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: red
+      accent: pink
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: red
+      accent: pink
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - search.highlight
+    - content.code.copy
+    - toc.follow
+
+plugins:
+  - search
+  # inlines the search index etc. so search and navigation work from file:// without a web server
+  - offline
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.keys
+
+nav:
+  - Overview: index.md
+  - Getting started: guide/getting-started.md
+  - Installation and upgrade: guide/installation.md
+  - Backup jobs:
+      - The Backup jobs page: guide/jobs.md
+      - What to back up and exclusions: guide/job-sources.md
+      - Destination: guide/job-destination.md
+      - Schedule: guide/job-schedule.md
+      - Retention and checks: guide/job-retention.md
+      - Options: guide/job-options.md
+  - Restore:
+      - Restoring files: guide/restore.md
+      - Recovery mode: guide/recovery-mode.md
+      - Disaster recovery: DISASTER-RECOVERY.md
+  - History and logs: guide/history.md
+  - Settings: guide/settings.md
+  - Monitoring and notifications: guide/monitoring.md
+  - Passwords and keys: PASSWORDS-AND-KEYS.md
+  - Command line: guide/command-line.md
+  - Troubleshooting: guide/troubleshooting.md
+  - Reference:
+      - Windows Server 2008 R2: WINDOWS-2008R2.md
+      - Repository format: FORMAT.md

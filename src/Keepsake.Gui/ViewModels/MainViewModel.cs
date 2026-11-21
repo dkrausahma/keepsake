@@ -30,6 +30,23 @@ namespace Keepsake.Gui.ViewModels
             private set => Set(ref _screen, value);
         }
 
+        /// <summary>F1: the help page of the current screen (in the shell: of the current page).</summary>
+        public string HelpPage
+        {
+            get
+            {
+                switch (Screen)
+                {
+                    case ShellViewModel shell: return shell.Current?.HelpPage ?? HelpFiles.Index;
+                    case RecoveryViewModel _: return "guide/recovery-mode.html";
+                    case MessageScreen message when message.CanRetry: return "guide/troubleshooting.html";
+                    case LoginViewModel _:
+                    case SetupViewModel _: return "guide/getting-started.html";
+                    default: return HelpFiles.Index;
+                }
+            }
+        }
+
         public void Start() => Start(null);
 
         public async void Start(string autoLoginPassword)

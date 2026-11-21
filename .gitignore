@@ -18,3 +18,6 @@ claudeinput/
 *.key
 *.env
 *password*.txt
+
+# Help build environment (tools/help-docs/build.py creates it)
+tools/help-docs/.venv/

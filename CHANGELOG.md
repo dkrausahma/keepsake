@@ -2,6 +2,17 @@
 
 All notable changes to Keepsake Backup. Newest first; versions as in `Directory.Build.props`.
 
+## Unreleased
+
+- **User guide and offline help:** a complete user guide (`docs/index.md`, `docs/guide/`): getting started,
+  installation and upgrade, the Backup jobs page and every job editor tab, restore, recovery mode, history and logs,
+  settings, monitoring and notifications, a full command-line reference and troubleshooting, together with the
+  existing passwords-and-keys, disaster-recovery, 2008 R2 and format pages. It is built into static HTML
+  (`tools/help-docs/build.py`, MkDocs Material) and installed in `help\` next to the programs (MSI and portable ZIP),
+  so it opens offline.
+- **Help in the program:** **Help** in the sidebar and in recovery mode; F1 opens the page of the current page,
+  job editor tab or dialog.
+
 ## 0.9.14 – 2026-11-21
 
 - **KeePass entry:** the recovery key dialog gets **Copy KeePass entry** (location as `sftp://user@host:port/path`,

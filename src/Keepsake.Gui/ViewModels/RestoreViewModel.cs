@@ -90,6 +90,7 @@ namespace Keepsake.Gui.ViewModels
         public ICommand RecoveryCommand { get; }
         public bool CanOpenLocation => RecoveryCommand != null;
         public override bool AutoRefresh => IsRunning;
+        public override string HelpPage => "guide/restore.html";
 
         public JobChoice Job
         {

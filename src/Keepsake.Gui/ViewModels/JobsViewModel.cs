@@ -27,6 +27,7 @@ namespace Keepsake.Gui.ViewModels
 
         public bool IsEmpty => _loaded && Items.Count == 0;
         public override bool AutoRefresh => true;
+        public override string HelpPage => "guide/jobs.html";
 
         public override async Task Refresh()
         {

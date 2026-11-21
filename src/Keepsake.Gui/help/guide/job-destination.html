@@ -1,0 +1,1595 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="User guide for Keepsake Backup – encrypted, deduplicated file backup for Windows">
+      
+      
+      
+      
+        <link rel="prev" href="job-sources.html">
+      
+      
+        <link rel="next" href="job-schedule.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Destination - Keepsake Backup Help</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="../assets/javascripts/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="pink">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#destination" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="Keepsake Backup Help" class="md-header__button md-logo" aria-label="Keepsake Backup Help" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Keepsake Backup Help
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Destination
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="pink"  aria-label="Dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="pink"  aria-label="Light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="Keepsake Backup Help" class="md-nav__button md-logo" aria-label="Keepsake Backup Help" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Keepsake Backup Help
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="getting-started.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="installation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation and upgrade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backup jobs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Backup jobs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="jobs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Backup jobs page
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="job-sources.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What to back up and exclusions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Destination
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="job-destination.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Destination
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#folder-or-network-share" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Folder or network share
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usb-disk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        USB disk
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="USB disk">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#several-disks-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Several disks (rotation)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sftp-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SFTP server
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SFTP server">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#host-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Host key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hetzner-storage-box" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hetzner Storage Box
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repository-password" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repository password
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-destination" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check destination
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#copy-for-keepass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Copy for KeePass
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-the-repository-and-store-the-recovery-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create the repository and store the recovery key
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="job-schedule.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Schedule
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="job-retention.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retention and checks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="job-options.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Options
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restore
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Restore
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="restore.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restoring files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="recovery-mode.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recovery mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DISASTER-RECOVERY.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disaster recovery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="history.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    History and logs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="settings.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="monitoring.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring and notifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PASSWORDS-AND-KEYS.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Passwords and keys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="command-line.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command line
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WINDOWS-2008R2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Windows Server 2008 R2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FORMAT.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repository format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#folder-or-network-share" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Folder or network share
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usb-disk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        USB disk
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="USB disk">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#several-disks-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Several disks (rotation)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sftp-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SFTP server
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SFTP server">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#host-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Host key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hetzner-storage-box" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hetzner Storage Box
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repository-password" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repository password
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-destination" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check destination
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#copy-for-keepass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Copy for KeePass
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-the-repository-and-store-the-recovery-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create the repository and store the recovery key
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="destination">Destination<a class="headerlink" href="#destination" title="Permanent link">&para;</a></h1>
+<p>The <strong>Destination</strong> tab decides where a job stores its backups and with which password they are encrypted. The backups go into an encrypted repository in a folder, on a network share, on one or more USB disks or on an SFTP server. Keepsake creates the repository when you save the job, or uses an existing one.</p>
+<p>Under <strong>Where are the backups stored?</strong> choose <strong>Folder or network share</strong>, <strong>USB disk</strong> or <strong>SFTP server</strong>.</p>
+<h2 id="folder-or-network-share">Folder or network share<a class="headerlink" href="#folder-or-network-share" title="Permanent link">&para;</a></h2>
+<p>Enter the path in <strong>Folder (local disk or \server\share\folder)</strong> or pick it with <strong>Browse…</strong>. The path must be absolute, for example <code>E:\Backups\Fileserver</code> or <code>\\nas\backup\fileserver</code>.</p>
+<p>For a network path, Keepsake connects with the computer account (the service runs as LocalSystem) unless you enter an account of its own:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>User (DOMAIN\user)</strong></td>
+<td>Account for the share, <code>DOMAIN\user</code> or <code>server\user</code>.</td>
+</tr>
+<tr>
+<td><strong>Password</strong></td>
+<td>Its password. If a password is already stored, the field stays empty; leave it empty to keep the stored one.</td>
+</tr>
+</tbody>
+</table>
+<p>The credentials are used only for the connection to this share.</p>
+<h2 id="usb-disk">USB disk<a class="headerlink" href="#usb-disk" title="Permanent link">&para;</a></h2>
+<p>Keepsake recognises USB disks by their volume ID, not by drive letter, so the disk is found whatever letter Windows gives it.</p>
+<ol>
+<li>Connect the disk.</li>
+<li>Select it in the list and click <strong>Add disk</strong>. Click <strong>Refresh</strong> if a disk you just connected is missing.</li>
+<li>Enter <strong>Folder on the disk (without drive letter)</strong>, for example <code>Keepsake\Fileserver</code>. The default is <code>Keepsake</code>.</li>
+</ol>
+<p><strong>Disks of this job</strong> lists the registered disks with label, size and <strong>connected as E:</strong> or <strong>not connected</strong>. <strong>Remove</strong> unregisters a disk; the data on it stays.</p>
+<h3 id="several-disks-rotation">Several disks (rotation)<a class="headerlink" href="#several-disks-rotation" title="Permanent link">&para;</a></h3>
+<p>Register several disks to rotate them, for example one on site and one off site. Each disk holds its own, independent repository with the same repository password. A backup goes to the first registered disk that is connected. If none is connected, the run fails with <em>None of the USB disks of this job is connected</em>.</p>
+<p>When you save, Keepsake creates the repository on the connected disk. For every other disk, connect it, click <strong>Refresh</strong> and then <strong>Prepare this disk</strong> next to it. This creates the repository on that disk and shows its own recovery key. If no disk is connected when you save, the job is saved anyway; prepare each disk later.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Every disk gets a different recovery key. Store each one in KeePass.</p>
+</div>
+<h2 id="sftp-server">SFTP server<a class="headerlink" href="#sftp-server" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Server</strong></td>
+<td>Host name or IP address.</td>
+</tr>
+<tr>
+<td><strong>Port</strong></td>
+<td>Default 22.</td>
+</tr>
+<tr>
+<td><strong>User</strong></td>
+<td>SFTP user name.</td>
+</tr>
+<tr>
+<td><strong>Password</strong> / <strong>Private key</strong></td>
+<td>How Keepsake logs in.</td>
+</tr>
+<tr>
+<td><strong>SFTP password</strong></td>
+<td>For password login. Leave empty to keep a stored password.</td>
+</tr>
+<tr>
+<td><strong>Load key file…</strong></td>
+<td>For key login: an OpenSSH or PuTTY (<code>.ppk</code>) private key file. The key is stored on this server; load a new file to replace it.</td>
+</tr>
+<tr>
+<td><strong>Key passphrase (if the key is protected)</strong></td>
+<td>Passphrase of the private key.</td>
+</tr>
+<tr>
+<td><strong>Remote folder</strong></td>
+<td>Absolute path on the server, for example <code>/backups/fileserver</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="host-key">Host key<a class="headerlink" href="#host-key" title="Permanent link">&para;</a></h3>
+<p>On the first connection, Keepsake shows the server's host key (<code>SHA256:...</code>) and asks whether to trust it. Compare it with the fingerprint on the server (<code>ssh-keygen -lf</code> on the server's key file) before you confirm. The trusted key is then shown as <strong>Trusted host key: ...</strong>. <strong>Forget</strong> removes it; the next check asks again.</p>
+<p>If the server later presents a different key, Keepsake warns that the host key has <strong>CHANGED</strong> and shows the new and the trusted key. This can mean the server was reinstalled, or that the connection is intercepted. Only trust the new key if the server administrator confirms it. Scheduled runs do not connect to a server whose key changed.</p>
+<h3 id="hetzner-storage-box">Hetzner Storage Box<a class="headerlink" href="#hetzner-storage-box" title="Permanent link">&para;</a></h3>
+<p>For a host ending in <code>.your-storagebox.de</code>, a new job starts on port 23. Port 23 is OpenSSH and offers authenticated encryption (AES-GCM); port 22 is ProFTPD and only offers AES-CTR. If a job uses port 22, a hint with the button <strong>Use port 23</strong> appears. It switches the port, asks you to trust the host key of port 23 and checks the destination. If port 23 does not work, Keepsake switches back to port 22. Both ports reach the same storage, so an existing repository is found on either port.</p>
+<h2 id="repository-password">Repository password<a class="headerlink" href="#repository-password" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>When to fill it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Repository password (encrypts the backups)</strong></td>
+<td>Always for a new job. For an existing job only if you change the destination or want to enter the password again.</td>
+</tr>
+<tr>
+<td><strong>Repeat password (only needed for a new repository)</strong></td>
+<td>Only when Keepsake creates a new repository.</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>New repository</strong>: the password needs at least 8 characters, and both fields must match.</li>
+<li><strong>Existing repository</strong>: enter the password that repository already has. The <strong>Repeat password</strong> field is not needed. If the password is wrong, the job is not saved.</li>
+</ul>
+<p>The repository password is stored on this server, protected by Windows, so scheduled backups can run. Keepsake never shows stored passwords again. What the password and the recovery key are for is explained in <a href="../PASSWORDS-AND-KEYS.html">Passwords and keys</a>.</p>
+<h2 id="check-destination">Check destination<a class="headerlink" href="#check-destination" title="Permanent link">&para;</a></h2>
+<p><strong>Check destination</strong> tests the destination with the values on the tab, without saving. The result appears in the box below the buttons:</p>
+<table>
+<thead>
+<tr>
+<th>Line</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Location</td>
+<td>The resolved location, for example the USB path with its current drive letter.</td>
+</tr>
+<tr>
+<td><strong>Repository found, password correct – N snapshot(s).</strong></td>
+<td>An existing repository opens with the entered or stored password.</td>
+</tr>
+<tr>
+<td><strong>Repository found.</strong></td>
+<td>A repository exists, but no password was tested.</td>
+</tr>
+<tr>
+<td><strong>No repository yet – a new encrypted repository is created when you save.</strong></td>
+<td>The location is empty.</td>
+</tr>
+<tr>
+<td><strong>Writable, deletable · N GB free</strong></td>
+<td>Keepsake can write and delete there. Free space is shown where the destination reports it.</td>
+</tr>
+<tr>
+<td><strong>Writable, but files cannot be deleted</strong></td>
+<td>Backups work, but cleanup of old backups will not.</td>
+</tr>
+<tr>
+<td><strong>NOT writable</strong></td>
+<td>Backups will fail.</td>
+</tr>
+<tr>
+<td><strong>Encryption: ... – strong / good / weak</strong></td>
+<td>SFTP only: the negotiated encryption. See below.</td>
+</tr>
+<tr>
+<td>Further lines</td>
+<td>Problems, for example a wrong password or a share that cannot be reached.</td>
+</tr>
+</tbody>
+</table>
+<p>The encryption rating describes the SSH connection, not the backups, which are always encrypted by Keepsake:</p>
+<ul>
+<li><strong>strong</strong>: authenticated encryption (AES-GCM or ChaCha20-Poly1305) with a modern key exchange.</li>
+<li><strong>good</strong>: AES-CTR with HMAC-SHA2. A note explains that the server offers no authenticated encryption.</li>
+<li><strong>weak</strong>: CBC, 3DES or SHA-1. Ask the server administrator to enable stronger algorithms.</li>
+</ul>
+<p>For USB destinations, the check uses the first connected disk.</p>
+<h2 id="copy-for-keepass">Copy for KeePass<a class="headerlink" href="#copy-for-keepass" title="Permanent link">&para;</a></h2>
+<p><strong>Copy for KeePass</strong> copies a text block for the job's KeePass entry: job name, location, SFTP host key, which logins belong in the entry, the repository ID (after a check), this computer's name and how to restore. It contains no passwords and no recovery key. Paste it into KeePass and add the repository password, the recovery key and the storage login there.</p>
+<h2 id="create-the-repository-and-store-the-recovery-key">Create the repository and store the recovery key<a class="headerlink" href="#create-the-repository-and-store-the-recovery-key" title="Permanent link">&para;</a></h2>
+<p>When you save a job whose destination holds no repository, Keepsake asks <em>Create a new encrypted repository on ... ?</em>. After you confirm, the window <strong>Store your recovery key</strong> shows the recovery key once.</p>
+<table>
+<thead>
+<tr>
+<th>Button</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Copy KeePass entry</strong></td>
+<td>Copies the same text block as <strong>Copy for KeePass</strong>, plus the recovery key on a line of its own.</td>
+</tr>
+<tr>
+<td><strong>Copy key only</strong></td>
+<td>Copies only the key.</td>
+</tr>
+<tr>
+<td><strong>Save as file…</strong></td>
+<td>Saves the KeePass text block, including the key, as a text file readable only by you. Move it off this server, for example as an attachment of the KeePass entry.</td>
+</tr>
+</tbody>
+</table>
+<p>Keepsake clears the clipboard two minutes after copying. <strong>Done</strong> becomes available once you tick <strong>I have stored the recovery key in a safe place outside this server.</strong> If you close the window without ticking it, Keepsake asks for confirmation.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The repository password and the recovery key are the only ways to open the backups. Without them, the backups cannot be restored. Test them later with <strong>Check keys</strong> on the job card.</p>
+</div>
+<p>If you cancel the confirmation, the job is not saved.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="job-sources.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: What to back up and exclusions">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                What to back up and exclusions
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="job-schedule.html" class="md-footer__link md-footer__link--next" aria-label="Next: Schedule">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Schedule
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Keepsake Backup &copy; 2026 Kraus-Ahma IT Consulting &amp; Anwendungsentwicklung
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.footer", "search.highlight", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2809 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="User guide for Keepsake Backup – encrypted, deduplicated file backup for Windows">
+      
+      
+      
+      
+        <link rel="prev" href="../PASSWORDS-AND-KEYS.html">
+      
+      
+        <link rel="next" href="troubleshooting.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Command line - Keepsake Backup Help</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="../assets/javascripts/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="pink">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#command-line" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="Keepsake Backup Help" class="md-header__button md-logo" aria-label="Keepsake Backup Help" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Keepsake Backup Help
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Command line
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="pink"  aria-label="Dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="pink"  aria-label="Light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="Keepsake Backup Help" class="md-nav__button md-logo" aria-label="Keepsake Backup Help" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Keepsake Backup Help
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="getting-started.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="installation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation and upgrade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backup jobs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Backup jobs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="jobs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Backup jobs page
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="job-sources.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What to back up and exclusions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="job-destination.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Destination
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="job-schedule.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Schedule
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="job-retention.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retention and checks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="job-options.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Options
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restore
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Restore
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="restore.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restoring files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="recovery-mode.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recovery mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DISASTER-RECOVERY.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disaster recovery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="history.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    History and logs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="settings.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="monitoring.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring and notifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PASSWORDS-AND-KEYS.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Passwords and keys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command line
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="command-line.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command line
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting started
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common options
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exit-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exit codes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        status
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#jobs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        jobs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="jobs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#job-file-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Job file format
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cancel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cancel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#runs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        runs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        log
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#init" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        init
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#backup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        backup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#snapshots" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        snapshots
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="snapshots">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#selecting-a-snapshot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Selecting a snapshot
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#restore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        restore
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prune" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prune
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#protect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        protect
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repair" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        repair
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unlock" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        unlock
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sftp-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sftp-test
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#doctor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        doctor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        version
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        help
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#automation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Automation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Automation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unattended-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unattended scripts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-start-a-job-from-a-scheduled-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: start a job from a scheduled task
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-monitoring-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: monitoring check
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sftp-repositories-without-a-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SFTP repositories without a prompt
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WINDOWS-2008R2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Windows Server 2008 R2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FORMAT.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repository format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting started
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common options
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exit-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exit codes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        status
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#jobs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        jobs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="jobs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#job-file-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Job file format
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cancel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cancel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#runs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        runs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        log
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#init" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        init
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#backup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        backup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#snapshots" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        snapshots
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="snapshots">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#selecting-a-snapshot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Selecting a snapshot
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#restore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        restore
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prune" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prune
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#protect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        protect
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repair" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        repair
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unlock" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        unlock
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sftp-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sftp-test
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#doctor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        doctor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        version
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#help" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        help
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#automation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Automation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Automation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unattended-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unattended scripts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-start-a-job-from-a-scheduled-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: start a job from a scheduled task
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-monitoring-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: monitoring check
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sftp-repositories-without-a-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SFTP repositories without a prompt
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="command-line">Command line<a class="headerlink" href="#command-line" title="Permanent link">&para;</a></h1>
+<p><code>keepsake.exe</code> is the command-line interface of Keepsake Backup. It does two jobs. It works directly on a repository without the service: create one, back up, list, restore, check, clean up and manage keys. It also controls the running Keepsake service: import and export jobs, start and cancel runs, read the run history and logs. Every command can print machine-readable JSON and returns a defined exit code, so you can drive Keepsake from scripts, scheduled tasks and monitoring systems.</p>
+<h2 id="getting-started">Getting started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
+<p><strong>Where it is.</strong> The MSI installs <code>keepsake.exe</code> into the program folder (by default <code>C:\Program Files\dkait\keepsake</code>) and adds that folder to the <code>PATH</code>, so <code>keepsake</code> works in any new command prompt. The portable ZIP (<code>Keepsake-&lt;version&gt;-portable.zip</code>) contains the same <code>keepsake.exe</code>. Extract it and run it from that folder. The repository commands need nothing else than .NET Framework 4.8, which makes the portable ZIP useful for restoring on a replacement computer (see <a href="../DISASTER-RECOVERY.html">Disaster recovery</a>).</p>
+<p><strong>Elevation.</strong> The service accepts connections from elevated administrators only, so run the service commands from an elevated prompt ("Run as administrator"). The repository commands do not need elevation as such. Your account still has to be able to read the files you back up, write to the repository and write to the restore target. Restoring to the original location under <code>C:\</code> or into other protected folders usually needs an elevated prompt.</p>
+<p><strong>Two kinds of commands, two kinds of passwords.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Commands</th>
+<th>Talks to</th>
+<th>Needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Repository commands</td>
+<td><code>init</code>, <code>backup</code>, <code>snapshots</code>, <code>ls</code>, <code>restore</code>, <code>check</code>, <code>prune</code>, <code>protect</code>, <code>repair</code>, <code>key</code>, <code>unlock</code>, <code>sftp-test</code></td>
+<td>The repository directly (folder, share, USB disk, SFTP). The service is not involved</td>
+<td>The <strong>repository password</strong> or a <strong>recovery key</strong> (<code>KS1-...</code>). Either one opens the repository on any computer. <code>sftp-test</code> needs only the SFTP login</td>
+</tr>
+<tr>
+<td>Service commands</td>
+<td><code>setup</code>, <code>status</code>, <code>jobs</code>, <code>run</code>, <code>cancel</code>, <code>runs</code>, <code>log</code></td>
+<td>The local Keepsake service through its named pipe</td>
+<td>The <strong>application password</strong>. It protects the service and cannot decrypt backups</td>
+</tr>
+<tr>
+<td>Tools</td>
+<td><code>doctor</code>, <code>version</code>, <code>help</code></td>
+<td>Neither (<code>doctor</code> only tests whether the service is reachable)</td>
+<td>Nothing</td>
+</tr>
+</tbody>
+</table>
+<p>The application password and the repository passwords are separate. Mixing them up is the most common cause of exit code 4. See <a href="../PASSWORDS-AND-KEYS.html">Passwords and keys</a>.</p>
+<p><strong>Syntax.</strong> <code>keepsake &lt;command&gt; [arguments] [options]</code>. Options start with <code>--</code> and may also be written as <code>--name=value</code>. Options and positional arguments can come in any order. Everything after a bare <code>--</code> counts as a positional argument. <code>keepsake help &lt;command&gt;</code> and <code>keepsake &lt;command&gt; --help</code> show the built-in help for a command.</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span><span class="nb">help</span><span class="w"> </span>restore
+</code></pre></div>
+<h2 id="common-options">Common options<a class="headerlink" href="#common-options" title="Permanent link">&para;</a></h2>
+<p>These options are accepted by every command. A command uses only the ones that apply to it. For example, <code>--repo</code> matters only to repository commands.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Environment variable</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--repo &lt;location&gt;</code></td>
+<td><code>KEEPSAKE_REPOSITORY</code></td>
+<td>Repository location: a local folder (<code>E:\Backups\fileserver</code>), a USB disk folder, a network share (<code>\\nas\backup\fileserver</code>) or <code>sftp://user@host[:port]/path</code> (port 22 if omitted, for example <code>sftp://backup@nas.example.org/backups/fileserver</code>).</td>
+</tr>
+<tr>
+<td><code>--password-file &lt;file&gt;</code></td>
+<td><code>KEEPSAKE_PASSWORD</code></td>
+<td>Repository password, read from the first line of the file. The environment variable holds the password itself.</td>
+</tr>
+<tr>
+<td><code>--recovery-key-file &lt;file&gt;</code></td>
+<td><code>KEEPSAKE_RECOVERY_KEY</code></td>
+<td>Unlock with a recovery key instead of the password. The file holds the <code>KS1-...</code> text (a file written by <code>--recovery-key-out</code> works as is). The environment variable holds the key text itself.</td>
+</tr>
+<tr>
+<td><code>--use-recovery-key</code></td>
+<td></td>
+<td>When prompting, ask for the recovery key instead of the password.</td>
+</tr>
+<tr>
+<td><code>--sftp-password-file &lt;file&gt;</code></td>
+<td><code>KEEPSAKE_SFTP_PASSWORD</code></td>
+<td>SFTP password (first line of the file). Without it and without a key, you are prompted.</td>
+</tr>
+<tr>
+<td><code>--sftp-key-file &lt;file&gt;</code></td>
+<td></td>
+<td>SFTP private key file. When given, the SFTP password is not used.</td>
+</tr>
+<tr>
+<td><code>--sftp-key-passphrase-file &lt;file&gt;</code></td>
+<td><code>KEEPSAKE_SFTP_KEY_PASSPHRASE</code></td>
+<td>Passphrase of the SFTP private key (first line of the file).</td>
+</tr>
+<tr>
+<td><code>--sftp-host-key &lt;SHA256:...&gt;</code></td>
+<td><code>KEEPSAKE_SFTP_HOST_KEY</code></td>
+<td>Trusted host key fingerprint of the SFTP server. Without it you are asked to trust the key on first connection.</td>
+</tr>
+<tr>
+<td><code>--json</code></td>
+<td></td>
+<td>Machine-readable JSON on stdout instead of text. Implies <code>--quiet</code>. Errors are printed as JSON too.</td>
+</tr>
+<tr>
+<td><code>--non-interactive</code></td>
+<td></td>
+<td>Never prompt. A missing password fails with exit code 3. This is automatic when input is redirected or no interactive user is present (scheduled task, service).</td>
+</tr>
+<tr>
+<td><code>--quiet</code></td>
+<td></td>
+<td>No progress line. Results are still printed.</td>
+</tr>
+<tr>
+<td><code>--log &lt;file&gt;</code></td>
+<td></td>
+<td>Write a detailed run log (summary, phases, every problem) to the file. Used by <code>backup</code>, <code>restore</code>, <code>check</code>, <code>prune</code> and <code>repair</code>. The folder is created if needed.</td>
+</tr>
+<tr>
+<td><code>--debug-log &lt;file&gt;</code></td>
+<td></td>
+<td>Write SFTP connection details (algorithms, errors, no passwords) to the file for support.</td>
+</tr>
+<tr>
+<td><code>--app-password-file &lt;file&gt;</code></td>
+<td><code>KEEPSAKE_APP_PASSWORD</code></td>
+<td>Application password for the service commands (first line of the file).</td>
+</tr>
+<tr>
+<td><code>--help</code></td>
+<td></td>
+<td>Show the help of the command instead of running it.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Which credential wins.</strong> For repository commands Keepsake uses the first credential it finds, in this order:</p>
+<ol>
+<li><code>--recovery-key-file</code></li>
+<li><code>KEEPSAKE_RECOVERY_KEY</code></li>
+<li><code>--password-file</code></li>
+<li><code>KEEPSAKE_PASSWORD</code></li>
+<li>A prompt for the password, or for the recovery key with <code>--use-recovery-key</code> (not with <code>--non-interactive</code>)</li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A <code>KEEPSAKE_RECOVERY_KEY</code> variable that is set in the environment beats <code>--password-file</code> on the command line. Clear environment variables you no longer need, or a wrong credential gets used and the command fails with exit code 4.</p>
+</div>
+<p>Password files are read as text. Only the first line counts, a trailing line break is ignored and a UTF-8 byte order mark is removed. Protect these files with NTFS permissions so only the account that runs the script can read them.</p>
+<h2 id="exit-codes">Exit codes<a class="headerlink" href="#exit-codes" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0</code></td>
+<td>Success</td>
+</tr>
+<tr>
+<td><code>1</code></td>
+<td>Finished with warnings (for example some files could not be read, or <code>doctor</code> found warnings)</td>
+</tr>
+<tr>
+<td><code>2</code></td>
+<td>Failed</td>
+</tr>
+<tr>
+<td><code>3</code></td>
+<td>Usage error: unknown command or option, missing argument, missing password in non-interactive mode, invalid value, or a job or run the service did not accept or find</td>
+</tr>
+<tr>
+<td><code>4</code></td>
+<td>Wrong password, recovery key or application password (also when the service has locked out logins after failed attempts)</td>
+</tr>
+<tr>
+<td><code>5</code></td>
+<td>Repository locked by another process, or the service reports a conflict (for example the job is already running)</td>
+</tr>
+<tr>
+<td><code>6</code></td>
+<td>Cancelled (Ctrl+C, or the run was cancelled)</td>
+</tr>
+</tbody>
+</table>
+<p>Press Ctrl+C once to cancel cleanly: Keepsake finishes the current block and stops (exit code 6). Press it a second time to abort immediately.</p>
+<h2 id="setup">setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h2>
+<p>Sets the application password of the service. This works only once, on a service that has no application password yet. After that, change the password in the GUI under <a href="settings.html">Settings</a>.</p>
+<div class="highlight"><pre><span></span><code>keepsake setup [--new-password-file &lt;file&gt;]
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--new-password-file &lt;file&gt;</code></td>
+<td>Read the new application password from the first line of the file. Without it you are prompted twice. Interactive entries need at least 8 characters.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>setup
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>setup<span class="w"> </span>--new-password-file<span class="w"> </span>C:<span class="se">\K</span>eepsake<span class="se">\a</span>pp-password.txt
+</code></pre></div>
+<h2 id="status">status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
+<p>Shows the service version, host, data folder and number of parallel jobs, followed by one line per job: state (<code>idle</code>, <code>running</code>, <code>waiting</code>, <code>disabled</code>), last run, result and next run. For running jobs it adds a progress line.</p>
+<div class="highlight"><pre><span></span><code>keepsake status [--app-password-file &lt;file&gt;]
+</code></pre></div>
+<p>No options of its own besides <code>--app-password-file</code> and the common options.</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>status
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>status<span class="w"> </span>--json<span class="w"> </span>--app-password-file<span class="w"> </span>C:<span class="se">\K</span>eepsake<span class="se">\a</span>pp-password.txt
+</code></pre></div>
+<h2 id="jobs">jobs<a class="headerlink" href="#jobs" title="Permanent link">&para;</a></h2>
+<p>Lists, shows, exports, imports and removes the backup jobs of the service. <code>&lt;job&gt;</code> is the job name (not case-sensitive) or its full ID.</p>
+<div class="highlight"><pre><span></span><code>keepsake jobs [list]
+keepsake jobs show &lt;job&gt;
+keepsake jobs export &lt;job&gt; [--out &lt;file&gt;]
+keepsake jobs import &lt;file&gt; [--repository-password-file &lt;file&gt;]
+keepsake jobs remove &lt;job&gt;
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Subcommand</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>list</code> (default)</td>
+<td>One line per job: short ID, name, enabled/disabled, destination, and the schedules (or <code>manual only</code>).</td>
+</tr>
+<tr>
+<td><code>show &lt;job&gt;</code></td>
+<td>Details of one job: destination, sources, exclusions, schedules, next run, missed-run handling, retries and pre/post commands. Shows <code>(NO PASSWORD STORED)</code> if the service has no repository password for the job.</td>
+</tr>
+<tr>
+<td><code>export &lt;job&gt;</code></td>
+<td>Writes the job definition as JSON, without passwords. Writes to stdout, or to the file given with <code>--out</code>.</td>
+</tr>
+<tr>
+<td><code>import &lt;file&gt;</code></td>
+<td>Creates a job from a JSON file. If a job with the same ID or name already exists, it is updated instead.</td>
+</tr>
+<tr>
+<td><code>remove &lt;job&gt;</code></td>
+<td>Deletes the job from the service. The repository and its backups are not touched.</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--out &lt;file&gt;</code></td>
+<td><code>export</code>: write the JSON to this file instead of stdout.</td>
+</tr>
+<tr>
+<td><code>--repository-password-file &lt;file&gt;</code></td>
+<td><code>import</code>: repository password of the job's destination (first line of the file). A new job needs it: without the option you are prompted, and with <code>--non-interactive</code> the import fails. When an existing job is updated, the stored password is kept unless you give a new one.</td>
+</tr>
+</tbody>
+</table>
+<p>The destination repository must already exist when you import a new job. Create it with <code>keepsake init</code> or in the GUI.</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span><span class="nb">jobs</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span><span class="nb">jobs</span><span class="w"> </span><span class="nb">export</span><span class="w"> </span>fileserver<span class="w"> </span>--out<span class="w"> </span>D:<span class="se">\K</span>eepsake<span class="se">\f</span>ileserver-job.json
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span><span class="nb">jobs</span><span class="w"> </span>import<span class="w"> </span>D:<span class="se">\K</span>eepsake<span class="se">\f</span>ileserver-job.json<span class="w"> </span>--repository-password-file<span class="w"> </span>C:<span class="se">\K</span>eepsake<span class="se">\r</span>epo-password.txt
+</code></pre></div>
+<h3 id="job-file-format">Job file format<a class="headerlink" href="#job-file-format" title="Permanent link">&para;</a></h3>
+<p>The file is the JSON produced by <code>jobs export</code>. Property names use camelCase and enum values are lower-case strings. Properties you leave out get their defaults. A minimal job:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"fileserver"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"sources"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"D:\\Data"</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"excludes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"*.tmp"</span><span class="p">,</span><span class="w"> </span><span class="s2">"D:\\Data\\**\\cache\\"</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"destination"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"folder"</span><span class="p">,</span><span class="w"> </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"\\\\nas\\backup\\fileserver"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"schedules"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"daily"</span><span class="p">,</span><span class="w"> </span><span class="nt">"times"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"22:00"</span><span class="p">],</span><span class="w"> </span><span class="nt">"mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"incremental"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"daily"</span><span class="p">,</span><span class="w"> </span><span class="nt">"times"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"23:30"</span><span class="p">],</span><span class="w"> </span><span class="nt">"weekdays"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"sunday"</span><span class="p">],</span><span class="w"> </span><span class="nt">"mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"full"</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"retention"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"keepDaily"</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w"> </span><span class="nt">"keepWeekly"</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="nt">"keepMonthly"</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"retryCount"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"retryDelayMinutes"</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span>
+<span class="p">}</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>(required)</td>
+<td>Job name. Also used to match an existing job on import.</td>
+</tr>
+<tr>
+<td><code>enabled</code></td>
+<td><code>true</code></td>
+<td>Disabled jobs do not run on schedule.</td>
+</tr>
+<tr>
+<td><code>sources</code></td>
+<td>(required)</td>
+<td>Absolute paths (<code>D:\Data</code>, <code>\\server\share\folder</code>).</td>
+</tr>
+<tr>
+<td><code>excludes</code></td>
+<td>empty</td>
+<td>Exclusion patterns, see <a href="job-sources.html">What to back up and exclusions</a>.</td>
+</tr>
+<tr>
+<td><code>useDefaultExcludes</code></td>
+<td><code>true</code></td>
+<td>Also skip recycle bin, <code>System Volume Information</code>, <code>pagefile.sys</code>, <code>hiberfil.sys</code>, <code>swapfile.sys</code> and <code>~$*</code> files.</td>
+</tr>
+<tr>
+<td><code>destination</code></td>
+<td></td>
+<td><code>type</code>: <code>folder</code> (absolute <code>path</code>), <code>usb</code> (<code>path</code> relative to the disk, for example <code>Keepsake\\Fileserver</code>, plus <code>volumes</code>) or <code>sftp</code> (<code>host</code>, <code>port</code> (default 22), <code>user</code>, <code>auth</code> <code>password</code> or <code>key</code>, absolute remote <code>path</code>, <code>hostKeyFingerprint</code>). See <a href="job-destination.html">Destination</a>.</td>
+</tr>
+<tr>
+<td><code>shareCredentials</code></td>
+<td>empty</td>
+<td>List of <code>{ "share": "\\\\server\\share", "user": "DOMAIN\\user" }</code>.</td>
+</tr>
+<tr>
+<td><code>schedules</code></td>
+<td>empty (manual only)</td>
+<td>Entries with <code>kind</code> (<code>interval</code>, <code>daily</code>, <code>monthly</code>), <code>intervalMinutes</code>, <code>times</code> (<code>HH:mm</code>), <code>weekdays</code> (<code>monday</code> ... <code>sunday</code>, empty = every day), <code>daysOfMonth</code>, <code>mode</code> (<code>incremental</code> or <code>full</code>), <code>enabled</code>. See <a href="job-schedule.html">Schedule</a>.</td>
+</tr>
+<tr>
+<td><code>runMissed</code></td>
+<td><code>true</code></td>
+<td>Run once after start-up if a scheduled run was missed.</td>
+</tr>
+<tr>
+<td><code>retryCount</code>, <code>retryDelayMinutes</code></td>
+<td><code>2</code>, <code>15</code></td>
+<td>Retries after a failed run (0-10 retries, 1 minute to 24 hours apart).</td>
+</tr>
+<tr>
+<td><code>preCommand</code>, <code>postCommand</code>, <code>commandTimeoutMinutes</code></td>
+<td>none, none, <code>30</code></td>
+<td>Commands run through <code>cmd.exe</code> before and after the backup. See <a href="job-options.html">Options</a>.</td>
+</tr>
+<tr>
+<td><code>workers</code></td>
+<td><code>0</code></td>
+<td>Parallel file workers, 0 = automatic.</td>
+</tr>
+<tr>
+<td><code>useVss</code></td>
+<td><code>true</code></td>
+<td>Read from a Volume Shadow Copy so open files are backed up.</td>
+</tr>
+<tr>
+<td><code>retention</code></td>
+<td>none (keep all)</td>
+<td><code>keepLast</code>, <code>keepDaily</code>, <code>keepWeekly</code>, <code>keepMonthly</code>, <code>keepYearly</code>, <code>keepWithinDays</code>. See <a href="job-retention.html">Retention and checks</a>.</td>
+</tr>
+<tr>
+<td><code>pruneEveryDays</code>, <code>checkEveryDays</code></td>
+<td><code>7</code>, <code>7</code></td>
+<td>Run cleanup or a check after a backup when the last one is older (0 = never).</td>
+</tr>
+<tr>
+<td><code>checkReadDataPercent</code></td>
+<td><code>10</code></td>
+<td>Share of data read by scheduled checks (0 = structure only).</td>
+</tr>
+<tr>
+<td><code>notifyOnFailure</code>, <code>notifyOnWarning</code>, <code>notifyOnSuccess</code></td>
+<td><code>true</code>, <code>true</code>, <code>false</code></td>
+<td>E-mail notifications, see <a href="monitoring.html">Monitoring and notifications</a>.</td>
+</tr>
+<tr>
+<td><code>alertNoSuccessHours</code></td>
+<td><code>0</code> (off)</td>
+<td>Alert when there was no successful backup for this many hours.</td>
+</tr>
+</tbody>
+</table>
+<p><code>id</code>, <code>created</code> and <code>modified</code> appear in an export and can stay in the file. They are managed by the service.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>jobs import</code> transfers only the repository password. SFTP passwords, SFTP private keys and network share passwords cannot be set from the command line. Enter them in the job editor of the GUI after the import. Existing secrets of an updated job are kept.</p>
+</div>
+<h2 id="run">run<a class="headerlink" href="#run" title="Permanent link">&para;</a></h2>
+<p>Starts a job now, the same as <strong>Run now</strong> in the GUI. By default it runs a backup. The run happens in the service, with the job's settings (VSS, retries, notifications, pre/post commands), and it appears in the run history.</p>
+<div class="highlight"><pre><span></span><code>keepsake run &lt;job&gt; [--full | --check | --full-check | --prune] [--wait]
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--full</code></td>
+<td>Full backup: re-read every file instead of trusting size and modification time.</td>
+</tr>
+<tr>
+<td><code>--check</code></td>
+<td>Verify the repository instead of backing up, reading the job's sample of the data (<code>checkReadDataPercent</code>).</td>
+</tr>
+<tr>
+<td><code>--full-check</code></td>
+<td>Verify the repository and read all stored data.</td>
+</tr>
+<tr>
+<td><code>--prune</code></td>
+<td>Apply the job's retention rules and free unused space.</td>
+</tr>
+<tr>
+<td><code>--wait</code></td>
+<td>Show progress until the run ends, print its result and return its exit code (0, 1, 2 or 6). Ctrl+C then cancels the run in the service.</td>
+</tr>
+</tbody>
+</table>
+<p>Without <code>--wait</code>, <code>run</code> returns 0 as soon as the service has accepted the run and prints the run ID. If the options are combined, <code>--prune</code> beats <code>--check</code>/<code>--full-check</code>, and <code>--full</code> only applies to backups.</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>run<span class="w"> </span>fileserver<span class="w"> </span>--wait
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>run<span class="w"> </span>fileserver<span class="w"> </span>--full<span class="w"> </span>--wait
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>run<span class="w"> </span>fileserver<span class="w"> </span>--full-check<span class="w"> </span>--wait<span class="w"> </span>--log<span class="w"> </span>D:<span class="se">\L</span>ogs<span class="se">\c</span>heck.log
+</code></pre></div>
+<h2 id="cancel">cancel<a class="headerlink" href="#cancel" title="Permanent link">&para;</a></h2>
+<p>Cancels a running job, or removes a job that is waiting for a free slot from the queue.</p>
+<div class="highlight"><pre><span></span><code>keepsake cancel &lt;job&gt;
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>cancel<span class="w"> </span>fileserver
+</code></pre></div>
+<h2 id="runs">runs<a class="headerlink" href="#runs" title="Permanent link">&para;</a></h2>
+<p>Shows the run history, newest first: run ID, job, start, duration, result, trigger and files/data. For runs that did not succeed, the message is shown below the line.</p>
+<div class="highlight"><pre><span></span><code>keepsake runs [&lt;job&gt;] [--limit &lt;n&gt;]
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;job&gt;</code></td>
+<td>Only runs of this job. Default: all jobs.</td>
+</tr>
+<tr>
+<td><code>--limit &lt;n&gt;</code></td>
+<td>Number of runs, 1 to 1000. Default: 20.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>runs<span class="w"> </span>fileserver<span class="w"> </span>--limit<span class="w"> </span><span class="m">5</span>
+</code></pre></div>
+<h2 id="log">log<a class="headerlink" href="#log" title="Permanent link">&para;</a></h2>
+<p>Prints the full log of one run. Take the run ID from <code>runs</code>, from the output of <code>run</code>, or from <a href="history.html">History and logs</a> in the GUI.</p>
+<div class="highlight"><pre><span></span><code>keepsake log &lt;run-id&gt;
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>log<span class="w"> </span>20261121T210000Z-3f9a1c
+</code></pre></div>
+<h2 id="init">init<a class="headerlink" href="#init" title="Permanent link">&para;</a></h2>
+<p>Creates a new encrypted repository with a password and a recovery key. The recovery key is shown only once. Store it in KeePass right away: without the password or the recovery key, the backups cannot be restored.</p>
+<div class="highlight"><pre><span></span><code>keepsake init --repo &lt;location&gt; [--password-file &lt;file&gt;] [--recovery-key-out &lt;file&gt;]
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--password-file &lt;file&gt;</code></td>
+<td>Password for the new repository (or <code>KEEPSAKE_PASSWORD</code>). Without it you are prompted twice. Interactive entries need at least 8 characters.</td>
+</tr>
+<tr>
+<td><code>--recovery-key-out &lt;file&gt;</code></td>
+<td>Also write the recovery key to this file, together with location, repository ID and date. Move the file off the server afterwards.</td>
+</tr>
+</tbody>
+</table>
+<p>With <code>--json</code> the output includes the recovery key in the <code>recoveryKey</code> field. Do not let a script log it in plain text.</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>init<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>init<span class="w"> </span>--repo<span class="w"> </span><span class="se">\\</span>nas<span class="se">\b</span>ackup<span class="se">\f</span>ileserver<span class="w"> </span>--password-file<span class="w"> </span>C:<span class="se">\K</span>eepsake<span class="se">\r</span>epo-password.txt<span class="w"> </span>--recovery-key-out<span class="w"> </span>C:<span class="se">\K</span>eepsake<span class="se">\f</span>ileserver-recovery.txt
+</code></pre></div>
+<h2 id="backup">backup<a class="headerlink" href="#backup" title="Permanent link">&para;</a></h2>
+<p>Backs up folders and files into a new snapshot. The backup is incremental: unchanged files (same size and modification time as in the previous snapshot) are not read again, and only new data is stored.</p>
+<div class="highlight"><pre><span></span><code>keepsake backup --repo &lt;location&gt; &lt;folder-or-file&gt;... [options]
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;folder-or-file&gt;...</code></td>
+<td>One or more folders or files to back up (required).</td>
+</tr>
+<tr>
+<td><code>--exclude &lt;pattern&gt;</code></td>
+<td>Exclude by name (<code>*.tmp</code>), folder (<code>cache\</code>) or path (<code>D:\Data\**\obj\</code>). Repeatable. See <a href="job-sources.html">What to back up and exclusions</a>.</td>
+</tr>
+<tr>
+<td><code>--exclude-file &lt;file&gt;</code></td>
+<td>Read exclusion patterns from a file: one per line, empty lines and lines starting with <code>#</code> are ignored. Repeatable.</td>
+</tr>
+<tr>
+<td><code>--no-default-excludes</code></td>
+<td>Also back up <code>$RECYCLE.BIN\</code>, <code>System Volume Information\</code>, <code>pagefile.sys</code>, <code>hiberfil.sys</code>, <code>swapfile.sys</code> and <code>~$*</code> files.</td>
+</tr>
+<tr>
+<td><code>--full</code></td>
+<td>Re-read every file instead of trusting size and modification time.</td>
+</tr>
+<tr>
+<td><code>--job &lt;name&gt;</code></td>
+<td>Job name stored in the snapshot. Incremental backups continue from the last snapshot of this job.</td>
+</tr>
+<tr>
+<td><code>--tag &lt;tag&gt;</code></td>
+<td>Tag the snapshot. Repeatable.</td>
+</tr>
+<tr>
+<td><code>--parent &lt;snapshot&gt;</code></td>
+<td>Use this snapshot as the base for change detection instead of the latest one of the same job, host and sources.</td>
+</tr>
+<tr>
+<td><code>--workers &lt;n&gt;</code></td>
+<td>Files processed in parallel, 1 to 32. Default: number of processors, at most 4.</td>
+</tr>
+<tr>
+<td><code>--report-excluded</code></td>
+<td>List every excluded item in the run report and <code>--log</code> file.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code>backup</code> command reads the live files. It does not create a Volume Shadow Copy and does not use the backup privilege the service uses. Files that are open or locked are reported as not backed up (exit code 1). For servers, configure a job and use <code>keepsake run</code> instead.</p>
+</div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>backup<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver<span class="w"> </span>--job<span class="w"> </span>fileserver<span class="w"> </span>D:<span class="se">\D</span>ata<span class="w"> </span>--exclude<span class="w"> </span><span class="s2">"*.tmp"</span><span class="w"> </span>--log<span class="w"> </span>D:<span class="se">\L</span>ogs<span class="se">\b</span>ackup.log
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>backup<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver<span class="w"> </span>--job<span class="w"> </span>fileserver<span class="w"> </span>D:<span class="se">\D</span>ata<span class="w"> </span>D:<span class="se">\P</span>rojects<span class="w"> </span>--exclude-file<span class="w"> </span>D:<span class="se">\K</span>eepsake<span class="se">\e</span>xcludes.txt<span class="w"> </span>--tag<span class="w"> </span>before-migration
+</code></pre></div>
+<h2 id="snapshots">snapshots<a class="headerlink" href="#snapshots" title="Permanent link">&para;</a></h2>
+<p>Lists the snapshots in the repository, oldest first: short ID, time, job, mode, files, size and paths. Protected snapshots are marked with <code>*</code>.</p>
+<div class="highlight"><pre><span></span><code>keepsake snapshots --repo &lt;location&gt; [--job &lt;name&gt;]
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--job &lt;name&gt;</code></td>
+<td>Only snapshots of this job (not case-sensitive).</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>snapshots<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>snapshots<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver<span class="w"> </span>--job<span class="w"> </span>fileserver<span class="w"> </span>--json
+</code></pre></div>
+<h3 id="selecting-a-snapshot">Selecting a snapshot<a class="headerlink" href="#selecting-a-snapshot" title="Permanent link">&para;</a></h3>
+<p>Wherever a command takes <code>&lt;snapshot&gt;</code>, you can give:</p>
+<ul>
+<li><code>latest</code>: the newest snapshot. Together with <code>--job &lt;name&gt;</code> (<code>ls</code>, <code>restore</code>), the newest snapshot of that job.</li>
+<li>An ID or the start of an ID with at least 4 hexadecimal characters, for example <code>3f9a1c2e</code> from the <code>snapshots</code> list. It must match exactly one snapshot.</li>
+</ul>
+<h2 id="ls">ls<a class="headerlink" href="#ls" title="Permanent link">&para;</a></h2>
+<p>Lists the contents of a snapshot: type (<code>d</code> folder, <code>f</code> file), modification time, size and path.</p>
+<div class="highlight"><pre><span></span><code>keepsake ls --repo &lt;location&gt; &lt;snapshot|latest&gt; [&lt;path&gt;] [--recursive] [--job &lt;name&gt;]
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;path&gt;</code></td>
+<td>Folder or file inside the snapshot, as a Windows path (<code>D:\Data\Finance</code>) or in snapshot form (<code>D/Data/Finance</code>). Default: the top level.</td>
+</tr>
+<tr>
+<td><code>--recursive</code></td>
+<td>Also list all subfolders.</td>
+</tr>
+<tr>
+<td><code>--job &lt;name&gt;</code></td>
+<td>With <code>latest</code>: the newest snapshot of this job.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>ls<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver<span class="w"> </span>latest<span class="w"> </span>D:<span class="se">\D</span>ata<span class="se">\F</span>inance
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>ls<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver<span class="w"> </span>3f9a1c2e<span class="w"> </span>D:<span class="se">\D</span>ata<span class="w"> </span>--recursive<span class="w"> </span>--json
+</code></pre></div>
+<h2 id="restore">restore<a class="headerlink" href="#restore" title="Permanent link">&para;</a></h2>
+<p>Restores files from a snapshot, either into a folder or back to their original location. Without a snapshot argument, <code>latest</code> is used. NTFS permissions are not restored: restored files inherit the permissions of the folder they land in. More on restoring: <a href="restore.html">Restoring files</a>.</p>
+<div class="highlight"><pre><span></span><code>keepsake restore --repo &lt;location&gt; [&lt;snapshot|latest&gt;] (--target &lt;folder&gt; | --original) [options]
+</code></pre></div>
+<p>Give exactly one of <code>--target</code> or <code>--original</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--target &lt;folder&gt;</code></td>
+<td>Restore into this folder. By default the full path is kept: <code>D:\Data\Finance\x.xlsx</code> lands in <code>&lt;folder&gt;\D\Data\Finance\x.xlsx</code>.</td>
+</tr>
+<tr>
+<td><code>--original</code></td>
+<td>Restore to the original location (<code>D:\Data\...</code>).</td>
+</tr>
+<tr>
+<td><code>--include &lt;path&gt;</code></td>
+<td>Only restore this folder or file (Windows path or snapshot path). Repeatable. Default: everything.</td>
+</tr>
+<tr>
+<td><code>--flat</code></td>
+<td>With <code>--target</code>: place the selected folder directly in the target (<code>&lt;folder&gt;\Finance\...</code>) instead of keeping the full path.</td>
+</tr>
+<tr>
+<td><code>--conflict &lt;policy&gt;</code></td>
+<td>What to do when a different file already exists: <code>skip</code> (default, keep the existing file), <code>overwrite</code>, <code>newer</code> (replace only if the backed-up file is newer) or <code>rename</code> (restore next to it as <code>name (restored 1).ext</code>). Files identical in size and modification time are always left alone.</td>
+</tr>
+<tr>
+<td><code>--no-attributes</code></td>
+<td>Do not restore the read-only, hidden and system attributes.</td>
+</tr>
+<tr>
+<td><code>--dry-run</code></td>
+<td>Show what would be restored without writing anything.</td>
+</tr>
+<tr>
+<td><code>--job &lt;name&gt;</code></td>
+<td>With <code>latest</code>: the newest snapshot of this job.</td>
+</tr>
+</tbody>
+</table>
+<p>Files skipped because of a conflict are listed as problems and the restore finishes with warnings (exit code 1).</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>restore<span class="w"> </span>latest<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver<span class="w"> </span>--target<span class="w"> </span>D:<span class="se">\R</span>estore<span class="w"> </span>--include<span class="w"> </span>D:<span class="se">\D</span>ata<span class="se">\F</span>inance<span class="w"> </span>--flat
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>restore<span class="w"> </span>3f9a1c2e<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver<span class="w"> </span>--original<span class="w"> </span>--include<span class="w"> </span><span class="s2">"D:\Data\Projects\Offer 2026.docx"</span><span class="w"> </span>--conflict<span class="w"> </span>rename
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>restore<span class="w"> </span>latest<span class="w"> </span>--repo<span class="w"> </span>sftp://backup@nas.example.org/backups/fileserver<span class="w"> </span>--sftp-password-file<span class="w"> </span>C:<span class="se">\K</span>eepsake<span class="se">\s</span>ftp.txt<span class="w"> </span>--recovery-key-file<span class="w"> </span>C:<span class="se">\K</span>eepsake<span class="se">\f</span>ileserver-recovery.txt<span class="w"> </span>--target<span class="w"> </span>D:<span class="se">\R</span>estore<span class="w"> </span>--dry-run
+</code></pre></div>
+<h2 id="check">check<a class="headerlink" href="#check" title="Permanent link">&para;</a></h2>
+<p>Verifies the repository. Without options it checks the structure: every snapshot, folder listing and data reference. With <code>--read-data</code> it also downloads and decrypts the stored data.</p>
+<div class="highlight"><pre><span></span><code>keepsake check --repo &lt;location&gt; [--read-data] [--read-data-percent &lt;1-100&gt;]
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--read-data</code></td>
+<td>Read and decrypt all stored data.</td>
+</tr>
+<tr>
+<td><code>--read-data-percent &lt;n&gt;</code></td>
+<td>Read and decrypt a random sample of <code>n</code> percent of the data (1 to 100). Implies <code>--read-data</code>.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>check<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver<span class="w"> </span>--read-data-percent<span class="w"> </span><span class="m">10</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>check<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver<span class="w"> </span>--read-data<span class="w"> </span>--log<span class="w"> </span>D:<span class="se">\L</span>ogs<span class="se">\c</span>heck-full.log
+</code></pre></div>
+<p>If <code>check</code> reports missing or unreadable index files, run <code>keepsake repair</code>.</p>
+<h2 id="prune">prune<a class="headerlink" href="#prune" title="Permanent link">&para;</a></h2>
+<p>Removes old snapshots by retention rules and frees the space that no snapshot uses any more. The rules combine: a snapshot is kept if any rule keeps it. Protected snapshots are always kept. Without any <code>--keep-*</code> option no snapshot is deleted, and only unused data is removed. See <a href="job-retention.html">Retention and checks</a>.</p>
+<div class="highlight"><pre><span></span><code>keepsake prune --repo &lt;location&gt; [--keep-last &lt;n&gt;] [--keep-daily &lt;n&gt;] [--keep-weekly &lt;n&gt;] [--keep-monthly &lt;n&gt;] [--keep-yearly &lt;n&gt;] [--keep-within &lt;days&gt;] [--job &lt;name&gt;] [--dry-run]
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--keep-last &lt;n&gt;</code></td>
+<td>Keep the newest <code>n</code> snapshots.</td>
+</tr>
+<tr>
+<td><code>--keep-daily &lt;n&gt;</code></td>
+<td>Keep the newest snapshot of each of the last <code>n</code> days that have snapshots.</td>
+</tr>
+<tr>
+<td><code>--keep-weekly &lt;n&gt;</code></td>
+<td>The same per week.</td>
+</tr>
+<tr>
+<td><code>--keep-monthly &lt;n&gt;</code></td>
+<td>The same per month.</td>
+</tr>
+<tr>
+<td><code>--keep-yearly &lt;n&gt;</code></td>
+<td>The same per year.</td>
+</tr>
+<tr>
+<td><code>--keep-within &lt;days&gt;</code></td>
+<td>Keep all snapshots of the last <code>days</code> days.</td>
+</tr>
+<tr>
+<td><code>--job &lt;name&gt;</code></td>
+<td>Apply the rules only to snapshots of this job. Other snapshots stay.</td>
+</tr>
+<tr>
+<td><code>--dry-run</code></td>
+<td>Show which snapshots would be removed, without changing anything.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>prune<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver<span class="w"> </span>--job<span class="w"> </span>fileserver<span class="w"> </span>--keep-daily<span class="w"> </span><span class="m">14</span><span class="w"> </span>--keep-weekly<span class="w"> </span><span class="m">8</span><span class="w"> </span>--keep-monthly<span class="w"> </span><span class="m">12</span><span class="w"> </span>--dry-run
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>prune<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver<span class="w"> </span>--job<span class="w"> </span>fileserver<span class="w"> </span>--keep-daily<span class="w"> </span><span class="m">14</span><span class="w"> </span>--keep-weekly<span class="w"> </span><span class="m">8</span><span class="w"> </span>--keep-monthly<span class="w"> </span><span class="m">12</span>
+</code></pre></div>
+<h2 id="protect">protect<a class="headerlink" href="#protect" title="Permanent link">&para;</a></h2>
+<p>Protects a snapshot from retention, so neither <code>prune</code> nor a job's cleanup ever removes it. <code>--remove</code> takes the protection away again. Protecting rewrites the snapshot record, so the snapshot gets a <strong>new ID</strong>, which is printed.</p>
+<div class="highlight"><pre><span></span><code>keepsake protect &lt;snapshot&gt; --repo &lt;location&gt; [--remove]
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--remove</code></td>
+<td>Remove the protection.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>protect<span class="w"> </span>3f9a1c2e<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver
+</code></pre></div>
+<h2 id="repair">repair<a class="headerlink" href="#repair" title="Permanent link">&para;</a></h2>
+<p>Rebuilds the repository index from the pack files. Use it when <code>check</code> reports missing or unreadable index files. It reads only the pack headers, writes a new index and removes the old index files. Snapshots and data are not changed. Run <code>check</code> afterwards to see whether any snapshot still misses data.</p>
+<div class="highlight"><pre><span></span><code>keepsake repair --repo &lt;location&gt;
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>repair<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver<span class="w"> </span>--log<span class="w"> </span>D:<span class="se">\L</span>ogs<span class="se">\r</span>epair.log
+</code></pre></div>
+<h2 id="key">key<a class="headerlink" href="#key" title="Permanent link">&para;</a></h2>
+<p>Manages the passwords and recovery keys of a repository. Every repository has at least one password and one recovery key (<code>KS1-...</code>), and each of them opens the repository on any computer. To unlock, use the repository credential options from Common options above. The application password of the service is not a repository key. Background: <a href="../PASSWORDS-AND-KEYS.html">Passwords and keys</a>.</p>
+<div class="highlight"><pre><span></span><code>keepsake key list --repo &lt;location&gt;
+keepsake key verify --repo &lt;location&gt;
+keepsake key add-password --repo &lt;location&gt; [--new-password-file &lt;file&gt;] [--label &lt;text&gt;]
+keepsake key add-recovery --repo &lt;location&gt; [--recovery-key-out &lt;file&gt;] [--label &lt;text&gt;]
+keepsake key remove &lt;id&gt; --repo &lt;location&gt;
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Subcommand</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>list</code></td>
+<td>Shows all keys: short ID, type, creation time, host and label. <code>*</code> marks the key you unlocked with.</td>
+</tr>
+<tr>
+<td><code>verify</code></td>
+<td>Checks whether the given password or recovery key opens the repository. It reads only the key files, takes no lock and works while a backup runs. Exit code 4 if the credential is not valid.</td>
+</tr>
+<tr>
+<td><code>add-password</code></td>
+<td>Adds another password.</td>
+</tr>
+<tr>
+<td><code>add-recovery</code></td>
+<td>Creates an additional recovery key and shows it once.</td>
+</tr>
+<tr>
+<td><code>remove &lt;id&gt;</code></td>
+<td>Removes a key, given by its ID or a unique start of it (from <code>key list</code>). The last key cannot be removed.</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--new-password-file &lt;file&gt;</code></td>
+<td><code>add-password</code>: the new password (first line of the file). Without it you are prompted twice. <code>KEEPSAKE_PASSWORD</code> is not used for the new password.</td>
+</tr>
+<tr>
+<td><code>--recovery-key-out &lt;file&gt;</code></td>
+<td><code>add-recovery</code>: also write the new recovery key to this file.</td>
+</tr>
+<tr>
+<td><code>--label &lt;text&gt;</code></td>
+<td><code>add-password</code>, <code>add-recovery</code>: label shown in <code>key list</code>. Default: <code>Password</code> or <code>Recovery key</code>.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Removing a key does not revoke it. Anyone who kept a copy of the old repository key files and knows that password can still open the repository. After a leak, start a new repository and let the old one expire.</p>
+</div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>key<span class="w"> </span>verify<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver<span class="w"> </span>--recovery-key-file<span class="w"> </span>C:<span class="se">\K</span>eepsake<span class="se">\f</span>ileserver-recovery.txt
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>key<span class="w"> </span>add-password<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver<span class="w"> </span>--label<span class="w"> </span><span class="s2">"Second admin"</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>key<span class="w"> </span>list<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver
+</code></pre></div>
+<h2 id="unlock">unlock<a class="headerlink" href="#unlock" title="Permanent link">&para;</a></h2>
+<p>Removes stale repository locks, for example after a crash or power loss. By default only locks older than 30 minutes are removed.</p>
+<div class="highlight"><pre><span></span><code>keepsake unlock --repo &lt;location&gt; [--all]
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--all</code></td>
+<td>Also remove current locks. Use it only when no other Keepsake process (service, GUI, another command prompt, another computer) works on the repository.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>unlock<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\B</span>ackups<span class="se">\f</span>ileserver
+</code></pre></div>
+<h2 id="sftp-test">sftp-test<a class="headerlink" href="#sftp-test" title="Permanent link">&para;</a></h2>
+<p>Tests which SSH algorithms work between this computer and an SFTP server. It connects once per key exchange, cipher, MAC and host key algorithm and reports which ones work. Nothing is read or written on the server. Use it when a connection fails with "MAC error" on one computer but works on others. The output starts with the .NET Framework release, the Windows version and the FIPS policy. A detailed log is always written: to the <code>--debug-log</code> file, or to <code>%TEMP%\keepsake-debug.log</code>. Send both to support.</p>
+<div class="highlight"><pre><span></span><code>keepsake sftp-test --repo sftp://user@host[:port]/path [--sftp-password-file &lt;file&gt; | --sftp-key-file &lt;file&gt;] [--sftp-host-key SHA256:...]
+</code></pre></div>
+<p>Uses the SFTP options from Common options above. Without <code>--sftp-host-key</code> the host key is shown and you are asked to trust it for the test. With <code>--non-interactive</code> the test then fails. The exit code is 0 once the test has run, whatever the results are.</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>sftp-test<span class="w"> </span>--repo<span class="w"> </span>sftp://backup@nas.example.org/backups/fileserver<span class="w"> </span>--sftp-password-file<span class="w"> </span>C:<span class="se">\K</span>eepsake<span class="se">\s</span>ftp.txt
+</code></pre></div>
+<h2 id="doctor">doctor<a class="headerlink" href="#doctor" title="Permanent link">&para;</a></h2>
+<p>Checks this computer for everything Keepsake needs and prints one line per check (<code>OK</code>, warning, failure or info): Windows version and Service Pack, .NET Framework 4.8, elevation, the Keepsake service and whether its interface answers, TLS 1.2 and .NET strong crypto (relevant on Windows Server 2008 R2), Volume Shadow Copy, the Event Log source, protection of the data folder, the backup privilege and free space on the system drive. It needs no password.</p>
+<div class="highlight"><pre><span></span><code>keepsake doctor [--json]
+</code></pre></div>
+<p>Exit code 2 if any check failed, 1 if there are warnings, 0 otherwise. Run it elevated, or some checks report only what a normal user can see. See also <a href="../WINDOWS-2008R2.html">Windows Server 2008 R2</a> and <a href="troubleshooting.html">Troubleshooting</a>.</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>doctor
+</code></pre></div>
+<h2 id="version">version<a class="headerlink" href="#version" title="Permanent link">&para;</a></h2>
+<p>Shows the program version and the repository format version.</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>version
+</code></pre></div>
+<p>With <code>--json</code>: <code>{"version": "...", "repositoryFormat": 1}</code>.</p>
+<h2 id="help">help<a class="headerlink" href="#help" title="Permanent link">&para;</a></h2>
+<p>Shows the overview of all commands, or the help of one command.</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span><span class="nb">help</span><span class="w"> </span>backup
+</code></pre></div>
+<h2 id="automation">Automation<a class="headerlink" href="#automation" title="Permanent link">&para;</a></h2>
+<h3 id="unattended-scripts">Unattended scripts<a class="headerlink" href="#unattended-scripts" title="Permanent link">&para;</a></h3>
+<p>For scripts and scheduled tasks:</p>
+<ul>
+<li>Never let a command prompt. Pass <code>--non-interactive</code>, so a missing password fails at once with exit code 3 instead of hanging. Keepsake also switches to non-interactive mode by itself when input is redirected.</li>
+<li>Pass secrets as files (<code>--password-file</code>, <code>--recovery-key-file</code>, <code>--app-password-file</code>, <code>--sftp-password-file</code>) or through environment variables (<code>KEEPSAKE_PASSWORD</code>, <code>KEEPSAKE_RECOVERY_KEY</code>, <code>KEEPSAKE_APP_PASSWORD</code>, <code>KEEPSAKE_SFTP_PASSWORD</code>, <code>KEEPSAKE_SFTP_KEY_PASSPHRASE</code>). Restrict the files to the account that runs the task. <code>KEEPSAKE_REPOSITORY</code> saves repeating <code>--repo</code>.</li>
+<li>Use <code>--json</code> for output a script parses. Results go to stdout as JSON, progress is switched off, and errors are printed as <code>{"status": "error", "exitCode": n, "error": "..."}</code>. Exception: <code>jobs export</code> without <code>--out</code> always prints the job JSON.</li>
+<li>Evaluate the exit code (see Exit codes above), not the text output.</li>
+<li>Prefer service jobs over scripted <code>backup</code> commands. A job uses VSS, retries, notifications and the run history, and <code>keepsake run &lt;job&gt; --wait</code> returns the result of that run as its exit code.</li>
+</ul>
+<h3 id="example-start-a-job-from-a-scheduled-task">Example: start a job from a scheduled task<a class="headerlink" href="#example-start-a-job-from-a-scheduled-task" title="Permanent link">&para;</a></h3>
+<p>A batch file that a scheduled task runs elevated (for example as <code>SYSTEM</code> or an administrator, "Run with highest privileges"):</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>run<span class="w"> </span>fileserver<span class="w"> </span>--wait<span class="w"> </span>--non-interactive<span class="w"> </span>--app-password-file<span class="w"> </span>C:<span class="se">\K</span>eepsake<span class="se">\a</span>pp-password.txt
+</code></pre></div>
+<p>The task's last result is then <code>0</code> (success), <code>1</code> (warnings), <code>2</code> (failed) or <code>6</code> (cancelled), and the run shows up in <a href="history.html">History and logs</a> like any other run.</p>
+<h3 id="example-monitoring-check">Example: monitoring check<a class="headerlink" href="#example-monitoring-check" title="Permanent link">&para;</a></h3>
+<p>A monitoring agent can read the job states as JSON. The <code>jobs</code> array contains each job's name, <code>enabled</code>, <code>lastRun</code> (with <code>state</code>, <code>start</code> and more) and <code>nextRun</code>:</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>status<span class="w"> </span>--json<span class="w"> </span>--non-interactive<span class="w"> </span>--app-password-file<span class="w"> </span>C:<span class="se">\K</span>eepsake<span class="se">\a</span>pp-password.txt
+</code></pre></div>
+<p>For a check that is independent of the service, verify the repository directly, read-only, with a 5 % data sample:</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>check<span class="w"> </span>--repo<span class="w"> </span><span class="se">\\</span>nas<span class="se">\b</span>ackup<span class="se">\f</span>ileserver<span class="w"> </span>--password-file<span class="w"> </span>C:<span class="se">\K</span>eepsake<span class="se">\r</span>epo-password.txt<span class="w"> </span>--read-data-percent<span class="w"> </span><span class="m">5</span><span class="w"> </span>--json<span class="w"> </span>--non-interactive
+</code></pre></div>
+<p>Exit code 0 means healthy, 1 warnings, 2 problems found, 4 wrong password, 5 locked (for example a backup is running right now). Also see <a href="monitoring.html">Monitoring and notifications</a> for e-mail alerts and Event Log IDs.</p>
+<h3 id="sftp-repositories-without-a-prompt">SFTP repositories without a prompt<a class="headerlink" href="#sftp-repositories-without-a-prompt" title="Permanent link">&para;</a></h3>
+<p>On the first connection to an SFTP server Keepsake shows the server's host key fingerprint and asks whether to trust it. Unattended runs cannot answer that question and fail instead. Compare the fingerprint once with the one your provider shows or with <code>ssh-keygen -lf &lt;host key file&gt;</code> on the server, then pin it with <code>--sftp-host-key</code> or <code>KEEPSAKE_SFTP_HOST_KEY</code>:</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>snapshots<span class="w"> </span>--repo<span class="w"> </span>sftp://backup@nas.example.org/backups/fileserver<span class="w"> </span>--sftp-password-file<span class="w"> </span>C:<span class="se">\K</span>eepsake<span class="se">\s</span>ftp.txt<span class="w"> </span>--sftp-host-key<span class="w"> </span>SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8<span class="w"> </span>--password-file<span class="w"> </span>C:<span class="se">\K</span>eepsake<span class="se">\r</span>epo-password.txt<span class="w"> </span>--non-interactive
+</code></pre></div>
+<p>If the server presents a different key than the pinned one, the connection is refused (exit code 2). If that happens unexpectedly, find out why before you pin the new key.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../PASSWORDS-AND-KEYS.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Passwords and keys">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Passwords and keys
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="troubleshooting.html" class="md-footer__link md-footer__link--next" aria-label="Next: Troubleshooting">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Troubleshooting
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Keepsake Backup &copy; 2026 Kraus-Ahma IT Consulting &amp; Anwendungsentwicklung
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.footer", "search.highlight", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+    
+  </body>
+</html>

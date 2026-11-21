@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Navigation;
+using Keepsake.Gui.Infrastructure;
 
 namespace Keepsake.Gui.Views
 {
@@ -12,6 +13,7 @@ namespace Keepsake.Gui.Views
         public AboutWindow()
         {
             InitializeComponent();
+            HelpFiles.Attach(this, "index.html");
             var asm = typeof(AboutWindow).Assembly;
             var version = asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                           ?? asm.GetName().Version.ToString(3);

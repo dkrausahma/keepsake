@@ -1,7 +1,8 @@
 # Keepsake Backup
 
 Encrypted, deduplicated file backup for **Windows Server 2008 R2 SP1 and Windows 10/11** – Windows only, no
-Linux target. Overview, layout, CLI and service usage: `README.md`. Requirements with IDs (JOB-01, RST-07, …):
+Linux target. User guide: `docs/index.md` and `docs/guide/` (built into the offline help, F1 in the GUI).
+Overview, layout, CLI and service usage: `README.md`. Requirements with IDs (JOB-01, RST-07, …):
 `docs/REQUIREMENTS.md`. Repository format: `docs/FORMAT.md`. Passwords and keys: `docs/PASSWORDS-AND-KEYS.md`
 (keep it, the README table, `keepsake help` and the GUI texts consistent).
 
@@ -42,3 +43,8 @@ dotnet test Keepsake.slnx -c Release --no-build
 - English only in GUI, CLI, logs and docs (NFR-10).
 - Behaviour or command changes also update `README.md`, and where relevant `docs/DISASTER-RECOVERY.md`
   and `docs/WINDOWS-2008R2.md`.
+- **User guide (help):** `docs/index.md` + `docs/guide/*.md` (plus the other `docs/*.md` except
+  REQUIREMENTS) are the help. After any change in `docs/` run `python tools/help-docs/build.py` and commit
+  `docs/` and the generated `src/Keepsake.Gui/help/` together – `HelpTests` fail otherwise. A UI change updates
+  its guide page in the same change; a new page or dialog gets a `HelpPage` / `HelpFiles.Attach` page (F1).
+  The site must stay offline (no CDN, no Google Fonts; the build script vendors the search shim).

@@ -1,0 +1,1504 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="User guide for Keepsake Backup – encrypted, deduplicated file backup for Windows">
+      
+      
+      
+      
+        <link rel="prev" href="guide/recovery-mode.html">
+      
+      
+        <link rel="next" href="guide/history.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Disaster recovery - Keepsake Backup Help</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/javascripts/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="pink">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#keepsake-backup-disaster-recovery-runbook" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Keepsake Backup Help" class="md-header__button md-logo" aria-label="Keepsake Backup Help" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Keepsake Backup Help
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Disaster recovery
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="pink"  aria-label="Dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="pink"  aria-label="Light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Keepsake Backup Help" class="md-nav__button md-logo" aria-label="Keepsake Backup Help" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Keepsake Backup Help
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/getting-started.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/installation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation and upgrade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backup jobs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Backup jobs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/jobs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Backup jobs page
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/job-sources.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What to back up and exclusions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/job-destination.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Destination
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/job-schedule.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Schedule
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/job-retention.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retention and checks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/job-options.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Options
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restore
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Restore
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/restore.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restoring files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/recovery-mode.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recovery mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disaster recovery
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="DISASTER-RECOVERY.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disaster recovery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-you-need" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What you need
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-1-the-server-is-gone-the-backups-are-on-a-share-usb-disk-or-folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 1 – The server is gone, the backups are on a share, USB disk or folder
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-2-the-backups-are-on-an-sftp-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 2 – The backups are on an SFTP server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-3-only-some-files-or-folders-are-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 3 – Only some files or folders are needed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-4-restore-into-the-original-location-on-a-rebuilt-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 4 – Restore into the original location on a rebuilt server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-5-the-password-is-lost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 5 – The password is lost
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-6-the-repository-reports-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 6 – The repository reports errors
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-7-set-up-keepsake-again-on-a-new-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 7 – Set up Keepsake again on a new server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recovery-test-do-this-before-going-live-then-once-a-year" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recovery test (do this before going live, then once a year)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/history.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    History and logs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/settings.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/monitoring.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring and notifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="PASSWORDS-AND-KEYS.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Passwords and keys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/command-line.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command line
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="WINDOWS-2008R2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Windows Server 2008 R2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="FORMAT.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repository format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-you-need" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What you need
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-1-the-server-is-gone-the-backups-are-on-a-share-usb-disk-or-folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 1 – The server is gone, the backups are on a share, USB disk or folder
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-2-the-backups-are-on-an-sftp-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 2 – The backups are on an SFTP server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-3-only-some-files-or-folders-are-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 3 – Only some files or folders are needed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-4-restore-into-the-original-location-on-a-rebuilt-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 4 – Restore into the original location on a rebuilt server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-5-the-password-is-lost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 5 – The password is lost
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-6-the-repository-reports-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 6 – The repository reports errors
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scenario-7-set-up-keepsake-again-on-a-new-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scenario 7 – Set up Keepsake again on a new server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recovery-test-do-this-before-going-live-then-once-a-year" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recovery test (do this before going live, then once a year)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="keepsake-backup-disaster-recovery-runbook">Keepsake Backup – Disaster Recovery Runbook<a class="headerlink" href="#keepsake-backup-disaster-recovery-runbook" title="Permanent link">&para;</a></h1>
+<p>This runbook is for the day something is gone. Print it and keep it with the KeePass export of
+the recovery keys. Every scenario works on <strong>any</strong> Windows computer with the .NET Framework 4.8 –
+the original server, its configuration and its Windows domain are not needed.</p>
+<h2 id="what-you-need">What you need<a class="headerlink" href="#what-you-need" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Where it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The backup repository</td>
+<td>the folder / network share / USB disk / SFTP server of the job</td>
+</tr>
+<tr>
+<td>The repository password <strong>or</strong> the recovery key (<code>KS1-…</code>) – either one is enough. A saved key file contains the same <code>KS1-…</code> text. The application password is <strong>not</strong> needed</td>
+<td>KeePass</td>
+</tr>
+<tr>
+<td>For SFTP: the location <code>sftp://user@host:port/path</code> exactly as in the job, password or private key, host key fingerprint. The account needs write access: a restore writes a temporary lock file into the repository</td>
+<td>KeePass</td>
+</tr>
+<tr>
+<td><code>keepsake.exe</code></td>
+<td><strong>preferred:</strong> the portable ZIP or the MSI from the official release (keep a copy and its SHA-256 from <code>SHA256SUMS.txt</code> with the KeePass entry). Fallback: <code>tools\keepsake-&lt;version&gt;\</code> inside every repository – see the warning below</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Test this runbook once on a second computer before you rely on Keepsake (see the end of this document).
+Which password or key is which: <code>PASSWORDS-AND-KEYS.md</code>.</p>
+</blockquote>
+<hr />
+<h2 id="scenario-1-the-server-is-gone-the-backups-are-on-a-share-usb-disk-or-folder">Scenario 1 – The server is gone, the backups are on a share, USB disk or folder<a class="headerlink" href="#scenario-1-the-server-is-gone-the-backups-are-on-a-share-usb-disk-or-folder" title="Permanent link">&para;</a></h2>
+<ol>
+<li>On any Windows computer, make the repository reachable (plug in the USB disk, open the share).</li>
+<li>Unpack the portable ZIP (or install the MSI) on the local disk, e.g. <code>C:\Keepsake</code>, and open a command
+   prompt there.</li>
+</ol>
+<blockquote>
+<p><strong>Copy in the repository:</strong> <code>tools\keepsake-&lt;version&gt;</code> works too, but it is <strong>not encrypted</strong> – whoever
+controls the backup storage could have replaced it. Before you type a password into it, check it:
+<code>Get-AuthenticodeSignature .\keepsake.exe</code> must show a valid signature of Kraus-Ahma IT Consulting
+(signed releases), or <code>Get-FileHash</code> of the files must match the release you recorded. The service
+re-checks this copy after every backup and repairs it, but on disaster day that service is gone.
+3. <strong>With the GUI</strong> (easiest): start recovery mode and confirm the administrator prompt –
+   - installed with the MSI: Start menu → <strong>Keepsake Recovery</strong>, or in <em>Keepsake Backup</em> the link
+     <strong>Restore from a backup location…</strong> on the first-start, login and <em>Restore</em> pages;
+   - portable ZIP: double-click <code>Keepsake Recovery.cmd</code> (or run <code>KeepsakeGui.exe --recovery</code>).</p>
+</blockquote>
+<p>Enter the repository location (e.g. <code>E:\Keepsake\Fileserver</code>) and the password or the recovery key, click
+   <em>Open backup</em>, pick the point in time, tick what you need, choose a target folder and <em>Start restore</em>. <em>Show log</em>
+   lists anything that could not be restored. No application password, no job and no configuration are needed;
+   the old server's settings play no role. Restore into a new folder unless the original drives and folders exist
+   on this computer.</p>
+<p>If the lost computer crashed during a cleanup less than 30 minutes ago, its lock still blocks the backup.
+   Keepsake then shows whose lock it is and offers to remove it – do so when that computer is the lost one.</p>
+<p><strong>With the command line</strong> – list the backups:</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>snapshots<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\K</span>eepsake<span class="se">\F</span>ileserver
+</code></pre></div>
+<p>Enter the repository password when asked. With the recovery key instead:</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>snapshots<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\K</span>eepsake<span class="se">\F</span>ileserver<span class="w"> </span>--use-recovery-key
+</code></pre></div>
+<ol>
+<li>Restore everything from the newest backup into a new folder:</li>
+</ol>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>restore<span class="w"> </span>latest<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\K</span>eepsake<span class="se">\F</span>ileserver<span class="w"> </span>--target<span class="w"> </span>D:<span class="se">\R</span>estore<span class="w"> </span>--log<span class="w"> </span>D:<span class="se">\R</span>estore<span class="se">\r</span>estore.log
+</code></pre></div>
+<p>The files end up under <code>D:\Restore\&lt;drive&gt;\&lt;original path&gt;</code>. They get the permissions of
+   <code>D:\Restore</code> – NTFS permissions are not part of the backup, so the files are always readable.</p>
+<ol>
+<li>Check <code>restore.log</code> for files that could not be restored.</li>
+</ol>
+<h2 id="scenario-2-the-backups-are-on-an-sftp-server">Scenario 2 – The backups are on an SFTP server<a class="headerlink" href="#scenario-2-the-backups-are-on-an-sftp-server" title="Permanent link">&para;</a></h2>
+<p>Same as scenario 1, with the SFTP location (the <code>tools</code> folder can be downloaded with any SFTP client,
+e.g. WinSCP):</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>snapshots<span class="w"> </span>--repo<span class="w"> </span>sftp://backup@nas.example.org/backups/fileserver
+</code></pre></div>
+<p>Keepsake shows the server's host key fingerprint and asks whether to trust it. Compare it with the
+fingerprint stored in KeePass. For scripts, pass it directly and use files for the secrets:</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>restore<span class="w"> </span>latest<span class="w"> </span>--repo<span class="w"> </span>sftp://backup@nas.example.org/backups/fileserver<span class="w"> </span>--sftp-host-key<span class="w"> </span>SHA256:...<span class="w"> </span>--sftp-password-file<span class="w"> </span>sftp.txt<span class="w"> </span>--recovery-key-file<span class="w"> </span>key.txt<span class="w"> </span>--target<span class="w"> </span>D:<span class="se">\R</span>estore
+</code></pre></div>
+<p>With a private key: <code>--sftp-key-file id_ed25519</code> (and <code>--sftp-key-passphrase-file</code>).</p>
+<h2 id="scenario-3-only-some-files-or-folders-are-needed">Scenario 3 – Only some files or folders are needed<a class="headerlink" href="#scenario-3-only-some-files-or-folders-are-needed" title="Permanent link">&para;</a></h2>
+<p>Browse the snapshot, then restore just that part:</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>ls<span class="w"> </span>latest<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\K</span>eepsake<span class="se">\F</span>ileserver<span class="w"> </span>D:<span class="se">\D</span>ata<span class="se">\F</span>inance
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>restore<span class="w"> </span>latest<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\K</span>eepsake<span class="se">\F</span>ileserver<span class="w"> </span>--include<span class="w"> </span>D:<span class="se">\D</span>ata<span class="se">\F</span>inance<span class="se">\2</span><span class="m">026</span><span class="w"> </span>--target<span class="w"> </span>D:<span class="se">\R</span>estore<span class="w"> </span>--flat
+</code></pre></div>
+<p><code>--flat</code> puts <code>2026</code> directly into <code>D:\Restore</code> instead of recreating the full path.
+To restore an older state, use a snapshot ID from <code>keepsake snapshots</code> instead of <code>latest</code>.</p>
+<p>If the Keepsake service still runs on the server, the GUI (Restore page) does the same with a
+folder tree.</p>
+<h2 id="scenario-4-restore-into-the-original-location-on-a-rebuilt-server">Scenario 4 – Restore into the original location on a rebuilt server<a class="headerlink" href="#scenario-4-restore-into-the-original-location-on-a-rebuilt-server" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>restore<span class="w"> </span>latest<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\K</span>eepsake<span class="se">\F</span>ileserver<span class="w"> </span>--original<span class="w"> </span>--conflict<span class="w"> </span>newer
+</code></pre></div>
+<p><code>--conflict</code> decides what happens with existing files: <code>skip</code> (default), <code>newer</code>, <code>overwrite</code>,
+<code>rename</code>. Run with <code>--dry-run</code> first to see what would happen.</p>
+<h2 id="scenario-5-the-password-is-lost">Scenario 5 – The password is lost<a class="headerlink" href="#scenario-5-the-password-is-lost" title="Permanent link">&para;</a></h2>
+<p>Use the recovery key from KeePass (<code>--use-recovery-key</code> or <code>--recovery-key-file</code>). Then set a new
+password so the service can continue:</p>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>key<span class="w"> </span>add-password<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\K</span>eepsake<span class="se">\F</span>ileserver<span class="w"> </span>--use-recovery-key
+</code></pre></div>
+<p>Update the job in the GUI with the new password. Remove the old password key with
+<code>keepsake key list</code> / <code>keepsake key remove &lt;id&gt;</code> if it may have leaked.</p>
+<p>If both the password and the recovery key are lost, <strong>the backups cannot be decrypted</strong> – by design.</p>
+<h2 id="scenario-6-the-repository-reports-errors">Scenario 6 – The repository reports errors<a class="headerlink" href="#scenario-6-the-repository-reports-errors" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Find out what is wrong:</li>
+</ol>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>check<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\K</span>eepsake<span class="se">\F</span>ileserver<span class="w"> </span>--read-data<span class="w"> </span>--log<span class="w"> </span>check.log
+</code></pre></div>
+<ol>
+<li>If index files are missing or damaged ("index file cannot be read", "pack is not referenced"):</li>
+</ol>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>repair<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\K</span>eepsake<span class="se">\F</span>ileserver
+</code></pre></div>
+<ol>
+<li>
+<p>Check again. Remaining errors name the affected files ("data block … is missing – the file cannot
+   be restored"). Everything else is still restorable; restore it now, then investigate the
+   storage (disk errors, interrupted copies).</p>
+</li>
+<li>
+<p>If the repository is locked by a crashed process ("in use by … since …"):</p>
+</li>
+</ol>
+<div class="highlight"><pre><span></span><code>keepsake<span class="w"> </span>unlock<span class="w"> </span>--repo<span class="w"> </span>E:<span class="se">\K</span>eepsake<span class="se">\F</span>ileserver
+</code></pre></div>
+<h2 id="scenario-7-set-up-keepsake-again-on-a-new-server">Scenario 7 – Set up Keepsake again on a new server<a class="headerlink" href="#scenario-7-set-up-keepsake-again-on-a-new-server" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Install Keepsake (MSI), open the GUI, set the application password.</li>
+<li>Create a job with the same destination and the repository password. Keepsake recognises the
+   existing repository ("Repository found, password correct – N snapshots") and continues it;
+   the first backup reads all files again but only stores what changed.</li>
+</ol>
+<hr />
+<h2 id="recovery-test-do-this-before-going-live-then-once-a-year">Recovery test (do this before going live, then once a year)<a class="headerlink" href="#recovery-test-do-this-before-going-live-then-once-a-year" title="Permanent link">&para;</a></h2>
+<p>Quick check in between (or right after creating a job): <strong>Backup jobs → Check keys</strong> tests the password and the
+recovery key from KeePass against the job's repository without restoring anything; on the command line
+<code>keepsake key verify --repo &lt;location&gt; --recovery-key-file key.txt</code> (exit code 0 = valid, 4 = not valid). It does
+not replace the test below, which also proves the restore works without the server.</p>
+<ul>
+<li>[ ] On a computer that is <strong>not</strong> the backup server, with only the KeePass entry at hand:</li>
+<li>[ ] Unpack the portable ZIP from the KeePass attachment / release (not the copy in the repository), check its SHA-256.</li>
+<li>[ ] <code>Keepsake Recovery.cmd</code> (portable) or Start menu → <em>Keepsake Recovery</em> (MSI) → open the backup with the <strong>recovery key</strong> (not the password) – the backups are listed.</li>
+<li>[ ] <code>keepsake snapshots</code> with the recovery key – same list on the command line.</li>
+<li>[ ] Restore one folder with <code>--include … --flat</code> into a temp folder; open some files.</li>
+<li>[ ] <code>keepsake check --read-data-percent 10</code> – no errors.</li>
+<li>[ ] Note the date and result in the IT documentation.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="guide/recovery-mode.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Recovery mode">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Recovery mode
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="guide/history.html" class="md-footer__link md-footer__link--next" aria-label="Next: History and logs">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                History and logs
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Keepsake Backup &copy; 2026 Kraus-Ahma IT Consulting &amp; Anwendungsentwicklung
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.sections", "navigation.top", "navigation.footer", "search.highlight", "content.code.copy", "toc.follow"], "search": "assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.c21346df.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1848 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="User guide for Keepsake Backup – encrypted, deduplicated file backup for Windows">
+      
+      
+      
+      
+        <link rel="prev" href="WINDOWS-2008R2.html">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Repository format - Keepsake Backup Help</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+        <script src="assets/javascripts/iframe-worker-shim.js"></script>
+      
+    
+    
+      
+    
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="pink">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#keepsake-backup-repository-format-version-1" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Keepsake Backup Help" class="md-header__button md-logo" aria-label="Keepsake Backup Help" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Keepsake Backup Help
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Repository format
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="pink"  aria-label="Dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="pink"  aria-label="Light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Keepsake Backup Help" class="md-nav__button md-logo" aria-label="Keepsake Backup Help" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Keepsake Backup Help
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/getting-started.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/installation.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation and upgrade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backup jobs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Backup jobs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/jobs.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Backup jobs page
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/job-sources.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What to back up and exclusions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/job-destination.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Destination
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/job-schedule.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Schedule
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/job-retention.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retention and checks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/job-options.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Options
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restore
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Restore
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/restore.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restoring files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/recovery-mode.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recovery mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="DISASTER-RECOVERY.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disaster recovery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/history.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    History and logs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/settings.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/monitoring.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring and notifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="PASSWORDS-AND-KEYS.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Passwords and keys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/command-line.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command line
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="guide/troubleshooting.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="WINDOWS-2008R2.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Windows Server 2008 R2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repository format
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="FORMAT.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repository format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-algorithms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Algorithms
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Algorithms">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-sealed-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Sealed data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-codec-envelope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Codec envelope
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Keys
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Keys">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-master-key-and-derived-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Master key and derived keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-key-slots-keysrandom-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Key slots (keys/&lt;random id&gt;)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-recovery-key-text-form" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Recovery key text form
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-encrypted-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Encrypted files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Encrypted files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 config
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-blobs-and-packs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Blobs and packs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Blobs and packs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-chunking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Chunking
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-index-indexid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Index (index/&lt;id&gt;)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-trees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Trees
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Trees">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-path-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Path mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-snapshots-snapshotsid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Snapshots (snapshots/&lt;id&gt;)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-locks-locksrandom-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Locks (locks/&lt;random id&gt;)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-write-order-and-crash-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Write order and crash safety
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-restoring-without-keepsake-outline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Restoring without Keepsake (outline)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-algorithms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Algorithms
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Algorithms">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-sealed-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Sealed data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-codec-envelope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Codec envelope
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Keys
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Keys">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-master-key-and-derived-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Master key and derived keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-key-slots-keysrandom-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Key slots (keys/&lt;random id&gt;)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-recovery-key-text-form" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Recovery key text form
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-encrypted-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Encrypted files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Encrypted files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 config
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-blobs-and-packs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Blobs and packs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Blobs and packs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-chunking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Chunking
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-index-indexid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Index (index/&lt;id&gt;)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-trees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Trees
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Trees">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-path-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Path mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-snapshots-snapshotsid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Snapshots (snapshots/&lt;id&gt;)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-locks-locksrandom-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Locks (locks/&lt;random id&gt;)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-write-order-and-crash-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Write order and crash safety
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-restoring-without-keepsake-outline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Restoring without Keepsake (outline)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="keepsake-backup-repository-format-version-1">Keepsake Backup Repository Format – Version 1<a class="headerlink" href="#keepsake-backup-repository-format-version-1" title="Permanent link">&para;</a></h1>
+<p>This document describes how Keepsake stores backups, precisely enough to write an independent
+reader (requirement REP-10). Everything uses standard, published algorithms.</p>
+<h2 id="1-overview">1. Overview<a class="headerlink" href="#1-overview" title="Permanent link">&para;</a></h2>
+<p>A repository is a folder (local disk, USB disk, network share; later SFTP) with this layout:</p>
+<div class="highlight"><pre><span></span><code>keepsake.json          plain text   header: format, version, repository ID
+README.txt             plain text   how to restore, for humans
+config                 encrypted    chunking and pack parameters
+keys/&lt;id&gt;              plain text   key slots: the master key, wrapped by a password or recovery key
+data/&lt;xx&gt;/&lt;pack-id&gt;    encrypted    pack files with the actual file contents and folder listings
+index/&lt;id&gt;             encrypted    which blob is stored in which pack, at which offset
+snapshots/&lt;id&gt;         encrypted    one file per backup run
+locks/&lt;id&gt;             encrypted    in-use markers
+tools/keepsake-&lt;ver&gt;/  plain        portable keepsake.exe with its libraries (for restores without installation)
+</code></pre></div>
+<p><code>&lt;xx&gt;</code> is the first two hex characters of the pack ID. Content-addressed IDs (packs, blobs, index files, snapshots) are
+64 lowercase hex characters; random IDs (repository, key slots, locks) are 32. Readers ignore files whose name does
+not match (they are never parsed or deleted). All IDs are lowercase hex
+(256 bits). Files whose name contains <code>.tmp-</code> are incomplete uploads and must be ignored.</p>
+<p>The repository is <strong>self-describing</strong>: storage location + password (or recovery key) are enough to
+restore. No local database or configuration is needed.</p>
+<h2 id="2-algorithms">2. Algorithms<a class="headerlink" href="#2-algorithms" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Purpose</th>
+<th>Algorithm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Encryption</td>
+<td>AES-256-GCM, random 96-bit nonce, 128-bit tag</td>
+</tr>
+<tr>
+<td>Password → key</td>
+<td>Argon2id (version 0x13), parameters stored per key slot</td>
+</tr>
+<tr>
+<td>Key derivation</td>
+<td>HKDF-SHA256 (RFC 5869)</td>
+</tr>
+<tr>
+<td>Blob IDs</td>
+<td>HMAC-SHA256 with a repository-specific key</td>
+</tr>
+<tr>
+<td>File IDs (packs, index, snapshots)</td>
+<td>SHA-256 of the stored (encrypted) bytes</td>
+</tr>
+<tr>
+<td>Chunking</td>
+<td>FastCDC with normalized chunking, keyed gear table</td>
+</tr>
+<tr>
+<td>Compression</td>
+<td>Zstandard (RFC 8878), level 3</td>
+</tr>
+<tr>
+<td>Serialization</td>
+<td>UTF-8 JSON, camelCase property names</td>
+</tr>
+</tbody>
+</table>
+<h3 id="21-sealed-data">2.1 Sealed data<a class="headerlink" href="#21-sealed-data" title="Permanent link">&para;</a></h3>
+<p><code>Seal(key, plaintext, ad)</code> produces <code>nonce (12 bytes) || ciphertext || tag (16 bytes)</code> using
+AES-256-GCM with associated data <code>ad</code>. Where associated data is used, it is the UTF-8 string
+<code>keepsake/v1/&lt;kind&gt;</code>, binding the ciphertext to its purpose (a snapshot cannot be swapped for an index).</p>
+<h3 id="22-codec-envelope">2.2 Codec envelope<a class="headerlink" href="#22-codec-envelope" title="Permanent link">&para;</a></h3>
+<p>Every encrypted payload is prefixed with one codec byte before encryption:</p>
+<table>
+<thead>
+<tr>
+<th>Byte</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0x00</code></td>
+<td>Stored: the rest is the raw data</td>
+</tr>
+<tr>
+<td><code>0x01</code></td>
+<td>Zstandard: the rest is one Zstandard frame (with content size)</td>
+</tr>
+</tbody>
+</table>
+<p>Compression is only used when it saves at least ~3 %; known compressed formats (zip, jpg, mp4,
+docx, …) are never compressed.</p>
+<h2 id="3-keys">3. Keys<a class="headerlink" href="#3-keys" title="Permanent link">&para;</a></h2>
+<h3 id="31-master-key-and-derived-keys">3.1 Master key and derived keys<a class="headerlink" href="#31-master-key-and-derived-keys" title="Permanent link">&para;</a></h3>
+<p>The repository has one random 32-byte <strong>master key</strong>. It never changes. With
+<code>salt = repository ID bytes</code> (hex-decoded <code>id</code> from <code>keepsake.json</code>):</p>
+<div class="highlight"><pre><span></span><code>encryptionKey = HKDF(master, salt, "keepsake/v1/encryption", 32)
+idKey         = HKDF(master, salt, "keepsake/v1/blob-id",    32)
+chunkerKey    = HKDF(master, salt, "keepsake/v1/chunker",    32)
+</code></pre></div>
+<h3 id="32-key-slots-keysrandom-id">3.2 Key slots (<code>keys/&lt;random id&gt;</code>)<a class="headerlink" href="#32-key-slots-keysrandom-id" title="Permanent link">&para;</a></h3>
+<p>Plain JSON. The master key is wrapped by a key-encryption key (KEK):</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"password"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Initial password"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"created"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-10-17T11:43:17Z"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"host"</span><span class="p">:</span><span class="w"> </span><span class="s2">"FILESERVER"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"kdf"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"algorithm"</span><span class="p">:</span><span class="w"> </span><span class="s2">"argon2id"</span><span class="p">,</span><span class="w"> </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">19</span><span class="p">,</span><span class="w"> </span><span class="nt">"memoryKiB"</span><span class="p">:</span><span class="w"> </span><span class="mi">65536</span><span class="p">,</span><span class="w"> </span><span class="nt">"iterations"</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="nt">"parallelism"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nt">"salt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;base64&gt;"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;base64 Seal(KEK, payload, 'keepsake/v1/key/&lt;repository id&gt;')&gt;"</span>
+<span class="p">}</span>
+</code></pre></div>
+<ul>
+<li><code>password</code> slots: <code>KEK = Argon2id(UTF-8(NFC(password)), kdf)</code> (32 bytes).</li>
+<li><code>recovery</code> slots have <code>"salt": "&lt;base64 16 bytes&gt;"</code> instead of <code>kdf</code>:
+  <code>KEK = HKDF(recoveryKey, salt, "keepsake/v1/recovery-kek", 32)</code>.</li>
+<li><code>payload</code> is the JSON <code>{"masterKey":"&lt;base64&gt;"}</code>.</li>
+</ul>
+<p>To open a repository, try every slot of the matching type; the slot whose GCM tag verifies holds the
+master key. Adding or removing passwords never re-encrypts data.</p>
+<h3 id="33-recovery-key-text-form">3.3 Recovery key text form<a class="headerlink" href="#33-recovery-key-text-form" title="Permanent link">&para;</a></h3>
+<p><code>KS1-</code> followed by Crockford Base32 (<code>0123456789ABCDEFGHJKMNPQRSTVWXYZ</code>, most significant bit first)
+of <code>recoveryKey (32 bytes) || first 2 bytes of SHA-256(recoveryKey)</code>, in groups of five separated
+by <code>-</code>. When reading, case, spaces and dashes are ignored, <code>O</code> reads as <code>0</code>, <code>I</code>/<code>L</code> as <code>1</code>.</p>
+<h2 id="4-encrypted-files">4. Encrypted files<a class="headerlink" href="#4-encrypted-files" title="Permanent link">&para;</a></h2>
+<p><code>config</code>, <code>index/*</code>, <code>snapshots/*</code> and <code>locks/*</code> have the layout</p>
+<div class="highlight"><pre><span></span><code>0x01 || Seal(encryptionKey, codec || JSON, "keepsake/v1/&lt;kind&gt;")
+</code></pre></div>
+<p>with kind <code>config</code>, <code>index</code>, <code>snapshot</code> or <code>lock</code>. For <code>index/*</code> and <code>snapshots/*</code> the file name is
+the SHA-256 of the complete file, so damage is detectable without the key.</p>
+<h3 id="41-config">4.1 config<a class="headerlink" href="#41-config" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">"chunkerMin"</span><span class="p">:</span><span class="w"> </span><span class="mi">524288</span><span class="p">,</span><span class="w"> </span><span class="nt">"chunkerAvg"</span><span class="p">:</span><span class="w"> </span><span class="mi">1048576</span><span class="p">,</span><span class="w"> </span><span class="nt">"chunkerMax"</span><span class="p">:</span><span class="w"> </span><span class="mi">8388608</span><span class="p">,</span><span class="w"> </span><span class="nt">"packSize"</span><span class="p">:</span><span class="w"> </span><span class="mi">16777216</span><span class="p">,</span><span class="w"> </span><span class="nt">"compression"</span><span class="p">:</span><span class="w"> </span><span class="s2">"zstd"</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<h2 id="5-blobs-and-packs">5. Blobs and packs<a class="headerlink" href="#5-blobs-and-packs" title="Permanent link">&para;</a></h2>
+<p>A <strong>blob</strong> is either a chunk of file content (<code>data</code>) or a folder listing (<code>tree</code>).</p>
+<ul>
+<li>Blob ID = <code>HMAC-SHA256(idKey, plaintext)</code>. Identical content always has the same ID, which is how
+  deduplication works. Keying the HMAC prevents outsiders from confirming that a known file is stored.</li>
+<li>Stored blob = <code>Seal(encryptionKey, codec || plaintext, no associated data)</code>.</li>
+</ul>
+<p>A <strong>pack file</strong> concatenates stored blobs and ends with a header:</p>
+<div class="highlight"><pre><span></span><code>blob_1 || blob_2 || … || blob_n || Seal(encryptionKey, header, "keepsake/v1/pack-header") || uint32 LE length of the sealed header
+</code></pre></div>
+<p>Plain header:</p>
+<div class="highlight"><pre><span></span><code>0x01 (version) || uint32 LE n || n × entry
+entry = type (1 byte: 0 data, 1 tree) || blob ID (32 bytes) || uint32 LE stored length || uint32 LE plaintext length
+</code></pre></div>
+<p>Blob offsets follow from the order and lengths (first blob at offset 0). Data blobs and tree blobs
+are kept in separate packs. Pack ID = SHA-256 of the complete pack file. Packs are about 16 MiB.</p>
+<h3 id="51-chunking">5.1 Chunking<a class="headerlink" href="#51-chunking" title="Permanent link">&para;</a></h3>
+<p>FastCDC over the file content with min/avg/max from <code>config</code>:</p>
+<ul>
+<li><code>gear[i]</code> = first 8 bytes (little-endian uint64) of <code>HMAC-SHA256(chunkerKey, uint32 LE i)</code> for i = 0…255.</li>
+<li><code>bits = floor(log2(avg))</code>, <code>maskS</code> = top <code>bits+2</code> bits set, <code>maskL</code> = top <code>bits-2</code> bits set.</li>
+<li>Starting at offset <code>min</code> with <code>fp = 0</code>: <code>fp = (fp &lt;&lt; 1) + gear[byte]</code>; cut after the byte where
+  <code>fp &amp; maskS == 0</code> (before <code>avg</code>) or <code>fp &amp; maskL == 0</code> (between <code>avg</code> and <code>max</code>); cut at <code>max</code> at the latest.</li>
+<li>Files smaller than <code>min</code> are one chunk. Empty files have no chunks.</li>
+</ul>
+<p>Readers do not need the chunker: a file's content is simply its blobs concatenated in order.</p>
+<h2 id="6-index-indexid">6. Index (<code>index/&lt;id&gt;</code>)<a class="headerlink" href="#6-index-indexid" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">"packs"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;pack id&gt;"</span><span class="p">,</span><span class="w"> </span><span class="nt">"blobs"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;blob id&gt;"</span><span class="p">,</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"data"</span><span class="p">,</span><span class="w"> </span><span class="nt">"offset"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">"length"</span><span class="p">:</span><span class="w"> </span><span class="mi">1048604</span><span class="p">,</span><span class="w"> </span><span class="nt">"rawLength"</span><span class="p">:</span><span class="w"> </span><span class="mi">1048576</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>The union of all index files maps blob ID → pack, offset, stored length. A pack appears in an
+index only after it has been completely written. If an index is lost, it can be rebuilt from the
+pack headers.</p>
+<h2 id="7-trees">7. Trees<a class="headerlink" href="#7-trees" title="Permanent link">&para;</a></h2>
+<p>A tree blob is the JSON of one folder listing, nodes sorted by name (ordinal):</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">"nodes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"report.xlsx"</span><span class="p">,</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"file"</span><span class="p">,</span><span class="w"> </span><span class="nt">"size"</span><span class="p">:</span><span class="w"> </span><span class="mi">48213</span><span class="p">,</span><span class="w"> </span><span class="nt">"mTime"</span><span class="p">:</span><span class="w"> </span><span class="mi">638640000000000000</span><span class="p">,</span><span class="w"> </span><span class="nt">"cTime"</span><span class="p">:</span><span class="w"> </span><span class="mi">638640000000000000</span><span class="p">,</span><span class="w"> </span><span class="nt">"attributes"</span><span class="p">:</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="nt">"content"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"&lt;blob id&gt;"</span><span class="p">,</span><span class="w"> </span><span class="s2">"…"</span><span class="p">]</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026"</span><span class="p">,</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"dir"</span><span class="p">,</span><span class="w"> </span><span class="nt">"size"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">"mTime"</span><span class="p">:</span><span class="w"> </span><span class="mi">638640000000000000</span><span class="p">,</span><span class="w"> </span><span class="nt">"cTime"</span><span class="p">:</span><span class="w"> </span><span class="mi">638640000000000000</span><span class="p">,</span><span class="w"> </span><span class="nt">"attributes"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">"subtree"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;tree blob id&gt;"</span><span class="w"> </span><span class="p">}</span>
+<span class="p">]</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<ul>
+<li>Times are UTC .NET ticks (100 ns intervals since 0001-01-01 00:00 UTC).</li>
+<li><code>attributes</code>: Windows file attributes, limited to read-only (1), hidden (2), system (4),
+  archive (32) and not-content-indexed (8192).</li>
+<li>NTFS permissions are <strong>not</strong> stored.</li>
+</ul>
+<h3 id="71-path-mapping">7.1 Path mapping<a class="headerlink" href="#71-path-mapping" title="Permanent link">&para;</a></h3>
+<p>The root tree of a snapshot represents the whole machine:</p>
+<table>
+<thead>
+<tr>
+<th>Windows path</th>
+<th>Path in the snapshot</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>D:\Data\Finance</code></td>
+<td><code>D/Data/Finance</code></td>
+</tr>
+<tr>
+<td><code>\\server\share\Projects</code></td>
+<td><code>UNC/server/share/Projects</code></td>
+</tr>
+</tbody>
+</table>
+<p>Folders above the selected sources (<code>D</code>, <code>D/Data</code>) are included only as far as needed to reach them.</p>
+<h2 id="8-snapshots-snapshotsid">8. Snapshots (<code>snapshots/&lt;id&gt;</code>)<a class="headerlink" href="#8-snapshots-snapshotsid" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"time"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-10-17T11:43:17Z"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"host"</span><span class="p">:</span><span class="w"> </span><span class="s2">"FILESERVER"</span><span class="p">,</span><span class="w"> </span><span class="nt">"user"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DOMAIN\\SYSTEM"</span><span class="p">,</span><span class="w"> </span><span class="nt">"job"</span><span class="p">:</span><span class="w"> </span><span class="s2">"fileserver"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"paths"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"D:\\Data"</span><span class="p">],</span><span class="w"> </span><span class="nt">"excludes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"*.tmp"</span><span class="p">],</span><span class="w"> </span><span class="nt">"tags"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">  </span><span class="nt">"mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"incremental"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"tree"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;root tree blob id&gt;"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"parent"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;previous snapshot id&gt;"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"program"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Keepsake 0.1.0"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"summary"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"filesNew"</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="nt">"filesChanged"</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="nt">"filesUnchanged"</span><span class="p">:</span><span class="w"> </span><span class="mi">49985</span><span class="p">,</span><span class="w"> </span><span class="nt">"filesSkipped"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">"dirs"</span><span class="p">:</span><span class="w"> </span><span class="mi">6500</span><span class="p">,</span>
+<span class="w">               </span><span class="nt">"totalBytes"</span><span class="p">:</span><span class="w"> </span><span class="mi">139586437120</span><span class="p">,</span><span class="w"> </span><span class="nt">"bytesRead"</span><span class="p">:</span><span class="w"> </span><span class="mi">1288490188</span><span class="p">,</span><span class="w"> </span><span class="nt">"bytesAdded"</span><span class="p">:</span><span class="w"> </span><span class="mi">356515840</span><span class="p">,</span><span class="w"> </span><span class="nt">"bytesStored"</span><span class="p">:</span><span class="w"> </span><span class="mi">125829120</span><span class="p">,</span><span class="w"> </span><span class="nt">"durationSeconds"</span><span class="p">:</span><span class="w"> </span><span class="mf">92.4</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Every snapshot is complete on its own: <code>incremental</code> and <code>full</code> only describe how changes were
+detected (<code>full</code> re-reads every file), not what is needed for a restore.</p>
+<h2 id="9-locks-locksrandom-id">9. Locks (<code>locks/&lt;random id&gt;</code>)<a class="headerlink" href="#9-locks-locksrandom-id" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"> </span><span class="nt">"host"</span><span class="p">:</span><span class="w"> </span><span class="s2">"FILESERVER"</span><span class="p">,</span><span class="w"> </span><span class="nt">"user"</span><span class="p">:</span><span class="w"> </span><span class="s2">"…"</span><span class="p">,</span><span class="w"> </span><span class="nt">"pid"</span><span class="p">:</span><span class="w"> </span><span class="mi">4242</span><span class="p">,</span><span class="w"> </span><span class="nt">"time"</span><span class="p">:</span><span class="w"> </span><span class="s2">"…"</span><span class="p">,</span><span class="w"> </span><span class="nt">"exclusive"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">"purpose"</span><span class="p">:</span><span class="w"> </span><span class="s2">"backup"</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>Backup, restore and check take shared locks; operations that delete data take an exclusive lock.
+Locks are refreshed every 5 minutes and count as stale after 30 minutes.</p>
+<h2 id="10-write-order-and-crash-safety">10. Write order and crash safety<a class="headerlink" href="#10-write-order-and-crash-safety" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Pack files are written (temp file + rename).</li>
+<li>Index files listing those packs are written every 20 packs / 5 minutes and at the end.</li>
+<li>The snapshot is written last.</li>
+</ol>
+<p>A crash or cancellation can leave packs without an index (reported by <code>check</code>, removed by a later
+prune) or an index without a snapshot (reused by the next backup) – never a snapshot that points
+to missing data.</p>
+<h2 id="11-restoring-without-keepsake-outline">11. Restoring without Keepsake (outline)<a class="headerlink" href="#11-restoring-without-keepsake-outline" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Read <code>keepsake.json</code>; derive the KEK from the password with the slot's Argon2id parameters; open
+   the slot; derive <code>encryptionKey</code>.</li>
+<li>Decrypt all <code>index/*</code> files to map blob IDs to packs.</li>
+<li>Decrypt the wanted <code>snapshots/*</code> file, then walk the trees from <code>tree</code>.</li>
+<li>For each file, read its blobs from the packs (offset/length from the index), open each with
+   AES-256-GCM, strip the codec byte (decompress if <code>0x01</code>), and concatenate.</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="WINDOWS-2008R2.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Windows Server 2008 R2">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Windows Server 2008 R2
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Keepsake Backup &copy; 2026 Kraus-Ahma IT Consulting &amp; Anwendungsentwicklung
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.sections", "navigation.top", "navigation.footer", "search.highlight", "content.code.copy", "toc.follow"], "search": "assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.c21346df.min.js"></script>
+      
+    
+  </body>
+</html>

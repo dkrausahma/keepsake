@@ -9,6 +9,7 @@ namespace Keepsake.Gui.Views
         private RunDetailWindow(RunDetailViewModel vm)
         {
             InitializeComponent();
+            HelpFiles.Attach(this, "guide/history.html");
             DataContext = vm;
         }
 

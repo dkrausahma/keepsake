@@ -27,6 +27,8 @@ namespace Keepsake.Gui.ViewModels
             TestSmtpCommand = new AsyncCommand(TestSmtp);
         }
 
+        public override string HelpPage => "guide/settings.html";
+
         public ICommand SaveCommand { get; }
         public ICommand ChangePasswordCommand { get; }
         public ICommand SaveSmtpCommand { get; }

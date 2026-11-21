@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 using Keepsake.Gui.Infrastructure;
 using Keepsake.Gui.ViewModels;
@@ -15,7 +16,19 @@ namespace Keepsake.Gui.Views
             _vm = vm;
             DataContext = vm;
             Loaded += (s, e) => NameBox.Focus();
+            HelpFiles.Attach(this, () => TabPages[Math.Max(0, Math.Min(Tabs.SelectedIndex, TabPages.Length - 1))]);
         }
+
+        /// <summary>F1: the help page of the selected tab, in tab order.</summary>
+        private static readonly string[] TabPages =
+        {
+            "guide/job-sources.html",      // What to back up
+            "guide/job-sources.html",      // Exclusions
+            "guide/job-destination.html",
+            "guide/job-schedule.html",
+            "guide/job-retention.html",
+            "guide/job-options.html",
+        };
 
         /// <summary>Shows the editor; returns true when the job was saved.</summary>
         public static bool Open(ServiceConnection connection, JobDetail detail)

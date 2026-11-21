@@ -26,6 +26,13 @@
     <Resource Include="Assets\keepsake.ico" />
   </ItemGroup>
 
+  <!-- Help: generated from docs/ by tools/help-docs/build.py (committed), opened offline from help\ next to the program. -->
+  <ItemGroup>
+    <None Update="help\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <ItemGroup>
     <!-- Folder picker; referenced directly (not UseWindowsForms) to avoid WPF/WinForms name clashes. -->
     <Reference Include="System.Windows.Forms" />

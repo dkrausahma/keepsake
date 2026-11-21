@@ -70,6 +70,10 @@ foreach ($project in 'Keepsake.Service', 'Keepsake.Cli', 'Keepsake.Gui') {
         Copy-Item $_.FullName $target -Force
     }
 }
+# The help (static HTML from docs\, see tools\help-docs\build.py) next to the programs: F1 and Help open it offline.
+$help = Join-Path $root 'src\Keepsake.Gui\bin\Release\net48\help'
+if (-not (Test-Path (Join-Path $help 'index.html'))) { throw 'The help is missing: run python tools\help-docs\build.py and rebuild.' }
+Copy-Item $help (Join-Path $stage 'help') -Recurse
 Copy-Item (Join-Path $root 'tools\Enable-Tls12.ps1') $stage
 Copy-Item (Join-Path $root 'docs\DISASTER-RECOVERY.md') $stage
 Copy-Item (Join-Path $root 'docs\PASSWORDS-AND-KEYS.md') $stage

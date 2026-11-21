@@ -18,6 +18,7 @@ namespace Keepsake.Gui.Views
         private VerifyKeyWindow(ServiceConnection connection, string jobId, string jobName, string destination)
         {
             InitializeComponent();
+            HelpFiles.Attach(this, "PASSWORDS-AND-KEYS.html");
             _connection = connection;
             _jobId = jobId;
             JobName.Text = "Check the keys of '" + jobName + "'";

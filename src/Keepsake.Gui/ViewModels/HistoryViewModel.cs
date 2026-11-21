@@ -43,6 +43,7 @@ namespace Keepsake.Gui.ViewModels
         public RunRowViewModel SelectedRun { get => _selectedRun; set => Set(ref _selectedRun, value); }
         public ICommand OpenCommand { get; }
         public override bool AutoRefresh => true;
+        public override string HelpPage => "guide/history.html";
 
         public JobChoice Job
         {

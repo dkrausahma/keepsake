@@ -27,7 +27,7 @@
             <TextBlock Text="{Binding Error}" Foreground="{StaticResource DangerBrush}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,16,0" />
         </DockPanel>
 
-        <TabControl Padding="16" BorderBrush="{StaticResource BorderBrush}" Background="{StaticResource SurfaceBrush}">
+        <TabControl x:Name="Tabs" Padding="16" BorderBrush="{StaticResource BorderBrush}" Background="{StaticResource SurfaceBrush}">
             <!-- 1. Sources -->
             <TabItem Header="  What to back up  ">
                 <Grid>
