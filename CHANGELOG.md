@@ -2,7 +2,7 @@
 
 All notable changes to Keepsake Backup. Newest first; versions as in `Directory.Build.props`.
 
-## Unreleased
+## 0.9.12 – 2026-11-21
 
 - **Check keys** per job (Backup jobs page): test the repository password or the recovery key against the job's
   repository without restoring. Only the key files are read; nothing is locked, written, stored or logged.
