@@ -145,7 +145,11 @@ namespace Keepsake.Cli
                 Name = "key",
                 Summary = "Manage passwords and recovery keys",
                 Usage = "keepsake key (list | verify | add-password | add-recovery | remove <id>) --repo <path> [--label <text>]",
-                Details = "  list                      Show all keys\n" +
+                Details = "Every repository has at least one password and one recovery key (KS1-...); each of them opens\n" +
+                          "the repository on any computer. Keep both in KeePass. Unlock with --password-file, or with\n" +
+                          "--use-recovery-key / --recovery-key-file (a key file holds the same KS1-... text). The\n" +
+                          "application password of the service is not a repository key.\n\n" +
+                          "  list                      Show all keys\n" +
                           "  verify                    Check a password or recovery key (--use-recovery-key, --recovery-key-file)\n" +
                           "                            without opening the repository; exit code 4 if it is not valid\n" +
                           "  add-password              Add another password (--new-password-file <file>, or prompt)\n" +

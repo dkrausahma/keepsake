@@ -2,6 +2,16 @@
 
 All notable changes to Keepsake Backup. Newest first; versions as in `Directory.Build.props`.
 
+## Unreleased
+
+- New `docs/PASSWORDS-AND-KEYS.md` (also in the portable ZIP and the install folder): application password,
+  repository password, recovery key and destination credentials – what each protects, where it is stored, which
+  one a restore needs, KeePass layout, checking and managing keys.
+- README, disaster-recovery runbook, `keepsake help`, `keepsake help key`, the README.txt in new repositories and
+  in the portable ZIP, and the recovery-key dialog now say clearly: the repository password **or** the recovery key
+  is enough to restore; a key file is the same `KS1-…` text; the application password is not needed.
+- README: repository passwords are DPAPI-protected for the service account (not machine scope, since 0.9.2).
+
 ## 0.9.12 – 2026-11-21
 
 - **Check keys** per job (Backup jobs page): test the repository password or the recovery key against the job's

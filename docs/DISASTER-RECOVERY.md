@@ -9,11 +9,12 @@ the original server, its configuration and its Windows domain are not needed.
 | Item | Where it is |
 |---|---|
 | The backup repository | the folder / network share / USB disk / SFTP server of the job |
-| The repository password **or** the recovery key (`KS1-…`) | KeePass |
+| The repository password **or** the recovery key (`KS1-…`) – either one is enough. A saved key file contains the same `KS1-…` text. The application password is **not** needed | KeePass |
 | For SFTP: user, password or private key, host key fingerprint | KeePass |
 | `keepsake.exe` | **preferred:** the portable ZIP or the MSI from the official release (keep a copy and its SHA-256 from `SHA256SUMS.txt` with the KeePass entry). Fallback: `tools\keepsake-<version>\` inside every repository – see the warning below |
 
 > Test this runbook once on a second computer before you rely on Keepsake (see the end of this document).
+> Which password or key is which: `PASSWORDS-AND-KEYS.md`.
 
 ---
 

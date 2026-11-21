@@ -72,6 +72,7 @@ foreach ($project in 'Keepsake.Service', 'Keepsake.Cli', 'Keepsake.Gui') {
 }
 Copy-Item (Join-Path $root 'tools\Enable-Tls12.ps1') $stage
 Copy-Item (Join-Path $root 'docs\DISASTER-RECOVERY.md') $stage
+Copy-Item (Join-Path $root 'docs\PASSWORDS-AND-KEYS.md') $stage
 @"
 Keepsake $version
 
@@ -85,6 +86,10 @@ Restore on any computer – no installation, no service, no configuration
   With the GUI:   double-click "Keepsake Recovery.cmd" (or KeepsakeGui.exe --recovery),
                   enter the backup location and the password or recovery key,
                   tick what you need and restore.
+
+  You need the repository password OR the recovery key (KS1-...) - either one is
+  enough; a recovery key file holds the same KS1-... text. The application password
+  of the old server is not needed. See PASSWORDS-AND-KEYS.md.
 
   On the command line:
     keepsake snapshots --repo <backup folder or sftp://user@host/path>

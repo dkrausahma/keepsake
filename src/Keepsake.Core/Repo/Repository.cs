@@ -406,7 +406,9 @@ namespace Keepsake.Core.Repo
             "   controls this storage could have replaced it. Check its digital signature (or its SHA-256 against\r\n" +
             "   the published release) before you enter a password. .NET Framework 4.8 is required.\r\n" +
             "2. Make this folder reachable from that computer (USB disk, network share, ...).\r\n" +
-            "3. Have the repository password or the recovery key (KS1-...) ready.\r\n" +
+            "3. Have the repository password or the recovery key (KS1-...) ready - either one is enough.\r\n" +
+            "   A saved recovery key file contains the same KS1-... text. The Keepsake application\r\n" +
+            "   password of the old server is not needed.\r\n" +
             "4. List the backups:\r\n" +
             "     keepsake snapshots --repo \"<this folder>\"\r\n" +
             "5. Restore everything from the newest backup into a new folder:\r\n" +

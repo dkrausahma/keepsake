@@ -10,7 +10,7 @@
         <Border Background="{StaticResource WarningSoftBrush}" CornerRadius="4" Padding="12,10">
             <TextBlock TextWrapping="Wrap">
                 <Run FontWeight="SemiBold" Text="Store this key now, for example in KeePass." />
-                <Run Text="It is shown only once. If the password and this server are lost, the recovery key is the only way to restore the backups – on any computer." />
+                <Run Text="It is shown only once. The repository password and this key each open the backups on any computer; if you forget the password, this key is the only way back in. Keep both in KeePass, with a copy off this server." />
             </TextBlock>
         </Border>
 

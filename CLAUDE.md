@@ -2,7 +2,8 @@
 
 Encrypted, deduplicated file backup for **Windows Server 2008 R2 SP1 and Windows 10/11** – Windows only, no
 Linux target. Overview, layout, CLI and service usage: `README.md`. Requirements with IDs (JOB-01, RST-07, …):
-`docs/REQUIREMENTS.md`. Repository format: `docs/FORMAT.md`.
+`docs/REQUIREMENTS.md`. Repository format: `docs/FORMAT.md`. Passwords and keys: `docs/PASSWORDS-AND-KEYS.md`
+(keep it, the README table, `keepsake help` and the GUI texts consistent).
 
 ## Environment
 

@@ -5,6 +5,22 @@ Encrypted, compressed, deduplicated file backup for Windows Server 2008 R2 SP1 a
 - Requirements: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md)
 - Repository format: [docs/FORMAT.md](docs/FORMAT.md)
 - Changes per version: [CHANGELOG.md](CHANGELOG.md)
+- Passwords and keys – which one you need when: [docs/PASSWORDS-AND-KEYS.md](docs/PASSWORDS-AND-KEYS.md)
+- Disaster recovery: [docs/DISASTER-RECOVERY.md](docs/DISASTER-RECOVERY.md)
+
+## Passwords and keys
+
+| | Protects | Needed to restore on another computer |
+|---|---|---|
+| **Application password** (one per computer) | Access to the Keepsake service (GUI and CLI) | No |
+| **Repository password** (per repository) | The backups (encryption) | This **or** the recovery key |
+| **Recovery key** `KS1-…` (per repository, shown once) | The backups (encryption) | This **or** the repository password |
+| **Destination credentials** (share, SFTP) | Access to the storage | Yes |
+
+The service keeps the repository password on the server so backups run unattended – that copy only works there.
+Keep the repository password **and** the recovery key in KeePass, with a copy off the server; if both are lost,
+the backups cannot be decrypted. A "key file" is just the `KS1-…` text saved to a file. Details, KeePass layout and
+key management: [docs/PASSWORDS-AND-KEYS.md](docs/PASSWORDS-AND-KEYS.md).
 
 ## Status
 
@@ -27,7 +43,7 @@ src/Keepsake.Service   .NET Framework 4.8 – keepsake-service.exe (Windows serv
 src/Keepsake.Cli       .NET Framework 4.8 – keepsake.exe
 src/Keepsake.Gui       .NET Framework 4.8 – KeepsakeGui.exe (WPF GUI, runs as administrator)
 tests/                 xUnit tests (net48)
-docs/                  requirements and format specification
+docs/                  requirements, format specification, passwords and keys, disaster recovery, 2008 R2 guide
 ```
 
 ## Service
@@ -36,7 +52,7 @@ The service runs as LocalSystem, executes the jobs on their schedules and keeps 
 Its data lives in `%ProgramData%\Keepsake` (only SYSTEM and Administrators have access):
 
 ```
-config\jobs.json       job definitions; repository passwords DPAPI-encrypted (machine scope)
+config\jobs.json       job definitions; repository passwords and destination credentials DPAPI-encrypted (service account)
 config\settings.json   application password (Argon2id hash), parallel jobs, log retention
 state\scheduler.json   last run time of each schedule (for missed-run detection)
 runs\<job>\<run>.*     run record, issue list and readable log of every run

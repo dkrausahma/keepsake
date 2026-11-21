@@ -171,6 +171,13 @@ namespace Keepsake.Cli
             Console.WriteLine("  --log <file>                Write a detailed run log (backup, restore, check)");
             Console.WriteLine("  --quiet                     No progress output");
             Console.WriteLine();
+            Console.WriteLine("Passwords and keys:");
+            Console.WriteLine("  Repository commands (snapshots, restore, check, key, ...) need the repository password OR the");
+            Console.WriteLine("  recovery key (KS1-...) – either one opens the backups on any computer. A recovery key file is");
+            Console.WriteLine("  just the KS1-... text saved to a file. Service commands (status, jobs, run, ...) need the");
+            Console.WriteLine("  application password instead; it protects the service and cannot decrypt backups.");
+            Console.WriteLine("  Check a password or key without restoring: keepsake key verify. More: 'keepsake help key'.");
+            Console.WriteLine();
             Console.WriteLine("Exit codes: 0 success, 1 warnings, 2 failed, 3 usage error, 4 wrong password/key, 5 repository locked, 6 cancelled");
             Console.WriteLine("Run 'keepsake help <command>' for details.");
         }
