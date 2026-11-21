@@ -2,7 +2,7 @@
 
 All notable changes to Keepsake Backup. Newest first; versions as in `Directory.Build.props`.
 
-## Unreleased
+## 0.9.15 – 2026-11-21
 
 - **User guide and offline help:** a complete user guide (`docs/index.md`, `docs/guide/`): getting started,
   installation and upgrade, the Backup jobs page and every job editor tab, restore, recovery mode, history and logs,
