@@ -2,7 +2,7 @@
 
 All notable changes to Keepsake Backup. Newest first; versions as in `Directory.Build.props`.
 
-## Unreleased
+## 0.9.14 – 2026-11-21
 
 - **KeePass entry:** the recovery key dialog gets **Copy KeePass entry** (location as `sftp://user@host:port/path`,
   folder, share or USB disk, host key fingerprint, which logins belong in the entry, repository ID, the recovery key and
