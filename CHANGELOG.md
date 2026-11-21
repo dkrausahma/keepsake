@@ -4,6 +4,11 @@ All notable changes to Keepsake Backup. Newest first; versions as in `Directory.
 
 ## Unreleased
 
+- **Own Keepsake icon:** a locked keepsake box (red box, pink lid, keyhole on a charcoal tile) replaces the
+  Kraus-Ahma stripes as application icon (programs, windows, taskbar, Start menu, Add/Remove Programs) and as the
+  product mark next to "Keepsake Backup" in the GUI. The company logo stays on the login screens and in the About
+  dialog. Drawn by `tools/make-branding.ps1`, with simplified shapes for 16–24 px.
+
 - New `docs/PASSWORDS-AND-KEYS.md` (also in the portable ZIP and the install folder): application password,
   repository password, recovery key and destination credentials – what each protects, where it is stored, which
   one a restore needs, KeePass layout, checking and managing keys.

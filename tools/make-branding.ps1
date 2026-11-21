@@ -1,14 +1,15 @@
 <#
 .SYNOPSIS
-    Generates the GUI branding assets from the Kraus-Ahma logo files in claudeinput\Logo.
+    Generates the GUI branding assets: the company logo from claudeinput\Logo, the Keepsake icon drawn here.
 
 .DESCRIPTION
     Output in src\Keepsake.Gui\Assets\:
-      logo-color.png    original colours, cropped (light backgrounds: About dialog, login)
+      logo-color.png    Kraus-Ahma logo, original colours, cropped (light backgrounds: About dialog, login)
       logo-on-dark.png  white lettering, light grey tagline, coloured stripes (dark sidebar)
-      mark.png          the three stripes only (square)
-      keepsake.ico      application icon from the stripes (16–256 px)
-    Brand colours (claudeinput\Logo\Farbwerte.txt): red #B11E22, pink #F38594, light pink #F7ACBC.
+      mark.png          Keepsake product mark: the locked keepsake box (256 px, next to the product name)
+      keepsake.ico      application icon, the same box (16–256 px; 16–24 px use simplified shapes)
+    Brand colours (claudeinput\Logo\Farbwerte.txt): red #B11E22, pink #F38594, light pink #F7ACBC;
+    charcoal #282C2F as in the GUI sidebar. The icon is design direction A ("Keepsake box").
 #>
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
@@ -74,13 +75,80 @@ public static class Brand
         Store(b, d, px);
     }
 
-    /// <summary>Removes everything except the stripes.</summary>
-    public static void StripesOnly(Bitmap b)
+    static readonly Color Charcoal = ColorTranslator.FromHtml("#282C2F");
+    static readonly Color Red = ColorTranslator.FromHtml("#B11E22");
+    static readonly Color RedDark = ColorTranslator.FromHtml("#8A161A");
+    static readonly Color Pink = ColorTranslator.FromHtml("#F38594");
+    static readonly Color LightPink = ColorTranslator.FromHtml("#F7ACBC");
+
+    /// <summary>
+    /// The Keepsake icon at one size, drawn on a 256-unit grid: charcoal tile, red box, pink lid, light pink clasp
+    /// with a keyhole. Up to 24 px the shapes are chunkier and the keyhole and lid shadow are left out, and every
+    /// edge is snapped to whole pixels so the small sizes stay sharp.
+    /// </summary>
+    public static Bitmap KeepsakeIcon(int size)
     {
-        BitmapData d; var px = Bytes(b, out d);
-        for (int i = 0; i < px.Length; i += 4)
-            if (!Saturated(px[i + 2], px[i + 1], px[i])) px[i + 3] = 0;
-        Store(b, d, px);
+        bool small = size <= 24;
+        var bmp = new Bitmap(size, size, PixelFormat.Format32bppArgb);
+        using (var g = Graphics.FromImage(bmp))
+        {
+            g.Clear(Color.Transparent);
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            float k = size / 256f;
+            Func<float, float, float, float, float, Color, int> box = (x, y, w, h, r, c) =>
+            {
+                float x0 = x * k, y0 = y * k, x1 = (x + w) * k, y1 = (y + h) * k;
+                if (size <= 48) { x0 = (float)Math.Round(x0); y0 = (float)Math.Round(y0); x1 = (float)Math.Round(x1); y1 = (float)Math.Round(y1); }
+                using (var path = Rounded(x0, y0, x1 - x0, y1 - y0, r * k))
+                using (var brush = new SolidBrush(c))
+                    g.FillPath(brush, path);
+                return 0;
+            };
+            if (small)
+            {
+                box(0, 0, 256, 256, 48, Charcoal);
+                box(40, 112, 176, 112, 16, Red);
+                box(24, 56, 208, 64, 16, Pink);
+                box(100, 96, 56, 64, 12, LightPink);
+            }
+            else
+            {
+                box(0, 0, 256, 256, 56, Charcoal);
+                box(52, 112, 152, 94, 14, Red);
+                box(52, 118, 152, 8, 0, RedDark);
+                box(42, 74, 172, 46, 12, Pink);
+                box(110, 100, 36, 42, 7, LightPink);
+                using (var brush = new SolidBrush(Charcoal))
+                    g.FillEllipse(brush, 122 * k, 110 * k, 12 * k, 12 * k);
+                box(125, 118, 6, 14, 2, Charcoal);
+            }
+        }
+        return bmp;
+    }
+
+    static GraphicsPath Rounded(float x, float y, float w, float h, float r)
+    {
+        var p = new GraphicsPath();
+        r = Math.Min(r, Math.Min(w, h) / 2);
+        if (r < 0.5f) { p.AddRectangle(new RectangleF(x, y, w, h)); return p; }
+        float d = 2 * r;
+        p.AddArc(x, y, d, d, 180, 90);
+        p.AddArc(x + w - d, y, d, d, 270, 90);
+        p.AddArc(x + w - d, y + h - d, d, d, 0, 90);
+        p.AddArc(x, y + h - d, d, d, 90, 90);
+        p.CloseFigure();
+        return p;
+    }
+
+    /// <summary>ICO with one PNG per size, each drawn at that size (PNG entries: supported since Vista / Server 2008).</summary>
+    public static void WriteKeepsakeIco(string path, int[] sizes)
+    {
+        var images = new byte[sizes.Length][];
+        for (int i = 0; i < sizes.Length; i++)
+            using (var s = KeepsakeIcon(sizes[i]))
+            using (var ms = new MemoryStream()) { s.Save(ms, ImageFormat.Png); images[i] = ms.ToArray(); }
+        WriteIcoImages(path, sizes, images);
     }
 
     public static Bitmap Crop(Bitmap b, Rectangle r, int pad, bool square)
@@ -110,13 +178,8 @@ public static class Brand
         return dst;
     }
 
-    /// <summary>ICO with PNG-compressed images (supported since Windows Vista / Server 2008).</summary>
-    public static void WriteIco(Bitmap square, string path, int[] sizes)
+    static void WriteIcoImages(string path, int[] sizes, byte[][] images)
     {
-        var images = new byte[sizes.Length][];
-        for (int i = 0; i < sizes.Length; i++)
-            using (var s = Resize(square, sizes[i], sizes[i]))
-            using (var ms = new MemoryStream()) { s.Save(ms, ImageFormat.Png); images[i] = ms.ToArray(); }
         using (var f = new BinaryWriter(File.Create(path)))
         {
             f.Write((short)0); f.Write((short)1); f.Write((short)sizes.Length);
@@ -148,14 +211,9 @@ try {
     $small = [Brand]::Resize($color, $w, $h); $small.Save((Join-Path $out 'logo-on-dark.png'), [System.Drawing.Imaging.ImageFormat]::Png); $small.Dispose()
     $color.Dispose()
 
-    # Stripes only: mark and icon.
-    $stripes = $original.Clone()
-    [Brand]::StripesOnly($stripes)
-    $markBounds = [Brand]::Bounds($stripes, $true)
-    $mark = [Brand]::Crop($stripes, $markBounds, [int]($markBounds.Height * 0.08), $true)
-    $markPng = [Brand]::Resize($mark, 256, 256); $markPng.Save((Join-Path $out 'mark.png'), [System.Drawing.Imaging.ImageFormat]::Png); $markPng.Dispose()
-    [Brand]::WriteIco($mark, (Join-Path $out 'keepsake.ico'), [int[]](16, 20, 24, 32, 40, 48, 64, 128, 256))
-    $mark.Dispose(); $stripes.Dispose()
+    # Keepsake product mark and application icon: the locked keepsake box.
+    $mark = [Brand]::KeepsakeIcon(256); $mark.Save((Join-Path $out 'mark.png'), [System.Drawing.Imaging.ImageFormat]::Png); $mark.Dispose()
+    [Brand]::WriteKeepsakeIco((Join-Path $out 'keepsake.ico'), [int[]](16, 20, 24, 32, 40, 48, 64, 128, 256))
 }
 finally {
     $original.Dispose()
