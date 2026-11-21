@@ -150,9 +150,9 @@
                     <StackPanel MaxWidth="680" HorizontalAlignment="Left">
                         <TextBlock Text="Where are the backups stored?" Style="{StaticResource SectionTitle}" />
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                            <RadioButton x:Name="DestFolder" Content="Folder or network share" IsChecked="{Binding IsFolder}" GroupName="DestType" Margin="0,0,18,0" />
-                            <RadioButton x:Name="DestUsb" Content="USB disk" IsChecked="{Binding IsUsb}" GroupName="DestType" Margin="0,0,18,0" />
-                            <RadioButton x:Name="DestSftp" Content="SFTP server" IsChecked="{Binding IsSftp}" GroupName="DestType" />
+                            <RadioButton x:Name="DestFolder" Content="Folder or network share" IsChecked="{Binding IsFolder}" Margin="0,0,18,0" />
+                            <RadioButton x:Name="DestUsb" Content="USB disk" IsChecked="{Binding IsUsb}" Margin="0,0,18,0" />
+                            <RadioButton x:Name="DestSftp" Content="SFTP server" IsChecked="{Binding IsSftp}" />
                         </StackPanel>
 
                         <!-- Folder / share -->
@@ -234,8 +234,8 @@
                             <TextBlock Text="User" Style="{StaticResource FieldLabel}" />
                             <TextBox x:Name="SftpUserBox" Text="{Binding User, UpdateSourceTrigger=PropertyChanged}" Width="320" HorizontalAlignment="Left" />
                             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                                <RadioButton Content="Password" IsChecked="{Binding AuthIsPassword}" GroupName="SftpAuth" Margin="0,0,18,0" />
-                                <RadioButton Content="Private key" IsChecked="{Binding AuthIsKey}" GroupName="SftpAuth" />
+                                <RadioButton Content="Password" IsChecked="{Binding AuthIsPassword}" Margin="0,0,18,0" />
+                                <RadioButton Content="Private key" IsChecked="{Binding AuthIsKey}" />
                             </StackPanel>
                             <StackPanel Visibility="{Binding AuthIsPassword, Converter={StaticResource Visible}}">
                                 <TextBlock Text="SFTP password" Style="{StaticResource FieldLabel}" />

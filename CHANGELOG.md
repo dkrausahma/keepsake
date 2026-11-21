@@ -2,6 +2,14 @@
 
 All notable changes to Keepsake Backup. Newest first; versions as in `Directory.Build.props`.
 
+## Unreleased
+
+- **Fixed:** saving a job with a new SFTP destination whose host key was confirmed during **Save** created the
+  repository and showed the recovery key, but then failed with "The host key … is not trusted yet" – the job was only
+  saved by clicking **Save** a second time. The job now saves in one go with the confirmed host key.
+- **Fixed:** the job editor showed neither **Password** nor **Private key** as selected for an existing or cloned SFTP
+  job (display only; the stored setting was used correctly).
+
 ## 0.9.15 – 2026-11-21
 
 - **User guide and offline help:** a complete user guide (`docs/index.md`, `docs/guide/`): getting started,

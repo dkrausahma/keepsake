@@ -248,6 +248,9 @@ namespace Keepsake.Gui.ViewModels
                     Error = problem;
                     return false;
                 }
+                // Build again: the destination check may just have trusted an SFTP host key (or created the repository),
+                // and the service refuses an SFTP job without the fingerprint the user confirmed.
+                job = Build();
                 var secrets = ExtraSecrets();
                 Destination.FillSecrets(secrets);
                 await _connection.Call<JobDetail>(Methods.JobsSave, new JobSaveParams { Job = job, Secrets = secrets });
