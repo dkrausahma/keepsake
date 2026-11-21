@@ -120,7 +120,8 @@ without a login or a job, e.g. on a replacement computer – starts from the Sta
   tree (tick to include, untick inside a ticked folder to exclude), exclusion patterns, destination
   (creates the repository and shows the recovery key, which must be confirmed; **Copy KeePass entry** / **Copy for
   KeePass** copy location, host key and login hints for the job's KeePass entry), schedules and options;
-  **Check keys** tests a repository password or recovery key against the job's repository without restoring
+  **Check keys** tests a repository password or recovery key against the job's repository without restoring;
+  **Clone** opens the editor for a new job with the same settings (passwords and keys are not copied)
 - **Restore** – pick job and snapshot, tick folders/files, restore to another folder or the original
   location with a conflict policy, dry run
 - **History & logs** – every run; details show everything that was not backed up (filter, search,

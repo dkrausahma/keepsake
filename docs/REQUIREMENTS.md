@@ -102,6 +102,7 @@ and restores them – also on a different machine, without the original Windows 
 | JOB-05 | Pre- and post-run scripts per job (with timeout; the run is marked failed if the pre-script fails). | S |
 | JOB-06 | Export/import job configuration (without secrets). | S |
 | JOB-07 | Dry run: shows what would be backed up and the estimated size, without writing. | S |
+| JOB-08 | Clone a job in the GUI: a new job prefilled with all settings of an existing one, without its secrets (passwords and keys are entered again). | S |
 
 ### 4.2 Sources and exclusions
 

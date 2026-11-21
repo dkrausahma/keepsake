@@ -12,6 +12,10 @@ All notable changes to Keepsake Backup. Newest first; versions as in `Directory.
   so it opens offline.
 - **Help in the program:** **Help** in the sidebar and in recovery mode; F1 opens the page of the current page,
   job editor tab or dialog.
+- **Clone a job:** **Clone** on a job card opens the job editor for a new job with all settings of that job
+  (folders, exclusions, destination, schedules, retention, notifications, options). Passwords and keys are not
+  copied: keep the location and enter its repository password to share the repository (snapshots and cleanup stay
+  separate per job name), or change the location to create a new repository. The copy needs a name of its own (JOB-08).
 - **No phone number any more:** the About dialog and the installer's entry in *Programs and Features* no longer show a
   phone number; contact is via www.kraus-ahma.com (SEC-026).
 

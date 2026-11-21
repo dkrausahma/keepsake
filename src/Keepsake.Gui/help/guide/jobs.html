@@ -436,6 +436,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#clone-a-job" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Clone a job
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-a-job-card-shows" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1138,6 +1149,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#clone-a-job" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Clone a job
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-a-job-card-shows" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1261,10 +1283,22 @@
 </ol>
 <p>When you save, Keepsake checks the settings. Problems are listed in red next to the <strong>Save</strong> button and the job is not saved. If the destination holds no repository yet, Keepsake asks you to confirm creating one and then shows the recovery key (see <a href="job-destination.html">Destination</a>).</p>
 <p>A new job starts with these defaults: one schedule, daily at 22:00, incremental; keep one backup per day for 14 days, one per week for 8 weeks and one per month for 12 months; clean up and check every 7 days; VSS on; 2 retries after 15 minutes.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>There is no "clone" or "copy job" function. To create a similar job, create a new one and repeat the settings.</p>
-</div>
+<h2 id="clone-a-job">Clone a job<a class="headerlink" href="#clone-a-job" title="Permanent link">&para;</a></h2>
+<p><strong>Clone</strong> on a job card opens the job editor for a <strong>new</strong> job with all settings of that job: folders and exclusions,
+destination (location, USB disks, SFTP host, port, user, host key), share logins (user names only), schedules,
+retention and checks, notifications and options. The name gets <code>(copy)</code> appended; change it to the name you want.
+The copy must have a name of its own.</p>
+<p><strong>Passwords and keys are not copied</strong> – not the repository password, not the SFTP password or private key, not the
+share passwords. Enter them on the <a href="job-destination.html">Destination</a> tab (and in the share list on the Options tab),
+then decide where the copy stores its backups:</p>
+<ul>
+<li><strong>Same location:</strong> enter the repository password of the original job. Both jobs then write into the same
+  repository. Each job keeps its own snapshots, cleanup and restore list (they are kept apart by job name), and
+  data both jobs back up is stored only once.</li>
+<li><strong>New location:</strong> change the folder, USB folder or SFTP path. When you save, Keepsake creates a new repository
+  there, asks for a new repository password and shows the new recovery key.</li>
+</ul>
+<p>Nothing changes on the original job. A clone is saved only when you click <strong>Save</strong>.</p>
 <h2 id="what-a-job-card-shows">What a job card shows<a class="headerlink" href="#what-a-job-card-shows" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1369,6 +1403,10 @@
 <tr>
 <td><strong>Edit</strong></td>
 <td>Opens the job editor. Not available while the job runs.</td>
+</tr>
+<tr>
+<td><strong>Clone</strong></td>
+<td>Opens the job editor for a new job with the same settings, without passwords and keys. See <a href="#clone-a-job">Clone a job</a>.</td>
 </tr>
 <tr>
 <td><strong>Check</strong></td>

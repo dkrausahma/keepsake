@@ -37,6 +37,13 @@ namespace Keepsake.Gui.Views
             return window.ShowDialog() == true;
         }
 
+        /// <summary>"Clone": a new job prefilled with the settings of <paramref name="source"/>, without its secrets.</summary>
+        public static bool OpenClone(ServiceConnection connection, JobDetail source)
+        {
+            var window = new JobEditorWindow(new JobEditorViewModel(connection, null, cloneOf: source)) { Owner = Ui.Owner };
+            return window.ShowDialog() == true;
+        }
+
         private async void OnSave(object sender, RoutedEventArgs e)
         {
             SaveButton.IsEnabled = false;

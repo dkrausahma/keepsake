@@ -18,8 +18,24 @@ When you save, Keepsake checks the settings. Problems are listed in red next to 
 
 A new job starts with these defaults: one schedule, daily at 22:00, incremental; keep one backup per day for 14 days, one per week for 8 weeks and one per month for 12 months; clean up and check every 7 days; VSS on; 2 retries after 15 minutes.
 
-!!! note
-    There is no "clone" or "copy job" function. To create a similar job, create a new one and repeat the settings.
+## Clone a job
+
+**Clone** on a job card opens the job editor for a **new** job with all settings of that job: folders and exclusions,
+destination (location, USB disks, SFTP host, port, user, host key), share logins (user names only), schedules,
+retention and checks, notifications and options. The name gets ` (copy)` appended; change it to the name you want.
+The copy must have a name of its own.
+
+**Passwords and keys are not copied** – not the repository password, not the SFTP password or private key, not the
+share passwords. Enter them on the [Destination](job-destination.md) tab (and in the share list on the Options tab),
+then decide where the copy stores its backups:
+
+- **Same location:** enter the repository password of the original job. Both jobs then write into the same
+  repository. Each job keeps its own snapshots, cleanup and restore list (they are kept apart by job name), and
+  data both jobs back up is stored only once.
+- **New location:** change the folder, USB folder or SFTP path. When you save, Keepsake creates a new repository
+  there, asks for a new repository password and shows the new recovery key.
+
+Nothing changes on the original job. A clone is saved only when you click **Save**.
 
 ## What a job card shows
 
@@ -57,6 +73,7 @@ The state text also covers checks and cleanups: these appear as runs of the job,
 | **Full backup** | Starts a full backup immediately. |
 | **Cancel** | Stops the running or queued run of this job after a confirmation. Data already stored is kept and reused by the next run. A queued run is simply removed. |
 | **Edit** | Opens the job editor. Not available while the job runs. |
+| **Clone** | Opens the job editor for a new job with the same settings, without passwords and keys. See [Clone a job](#clone-a-job). |
 | **Check** | Verifies the repository now (integrity check). It reads the share of data set on the [Retention & checks](job-retention.md) tab. |
 | **Clean up** | Applies the retention rules now and frees space. Only works if the job has retention rules; otherwise Keepsake reports that there is nothing to clean up. |
 | **History** | Opens [History and logs](history.md) filtered to this job. |

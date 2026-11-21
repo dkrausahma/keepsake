@@ -52,6 +52,13 @@ namespace Keepsake.Gui.ViewModels
                 await Refresh();
         }
 
+        internal async Task Clone(string jobId)
+        {
+            var detail = await Connection.Call<JobDetail>(Methods.JobsGet, new IdParams { Id = jobId });
+            if (JobEditorWindow.OpenClone(Connection, detail))
+                await Refresh();
+        }
+
         internal async Task Edit(string jobId)
         {
             var detail = await Connection.Call<JobDetail>(Methods.JobsGet, new IdParams { Id = jobId });
@@ -73,6 +80,7 @@ namespace Keepsake.Gui.ViewModels
             RunFullCommand = new AsyncCommand(() => Run(BackupMode.Full), () => !IsBusy && _job.Enabled);
             CancelCommand = new AsyncCommand(Cancel, () => IsBusy);
             EditCommand = new AsyncCommand(() => _page.Edit(Id), () => !IsBusy);
+            CloneCommand = new AsyncCommand(() => _page.Clone(Id));
             DeleteCommand = new AsyncCommand(Delete, () => !IsBusy);
             HistoryCommand = new RelayCommand(() => _page.Shell.ShowHistory(Id));
             CheckCommand = new AsyncCommand(() => RunKindNow(RunKind.Check), () => !IsBusy);
@@ -139,6 +147,7 @@ namespace Keepsake.Gui.ViewModels
         public ICommand RunFullCommand { get; }
         public ICommand CancelCommand { get; }
         public ICommand EditCommand { get; }
+        public ICommand CloneCommand { get; }
         public ICommand DeleteCommand { get; }
         public ICommand HistoryCommand { get; }
         public ICommand CheckCommand { get; }

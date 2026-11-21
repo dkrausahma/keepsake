@@ -16,6 +16,8 @@ namespace Keepsake.Gui.ViewModels
     {
         private readonly ServiceConnection _connection;
         private readonly JobDefinition _original;
+        private readonly JobDefinition _source;
+        private readonly string _clonedFrom;
         private string _name;
         private bool _enabled = true;
         private string _patterns;
@@ -38,10 +40,21 @@ namespace Keepsake.Gui.ViewModels
         private string _previewText;
         private string _error;
 
-        public JobEditorViewModel(ServiceConnection connection, JobDetail detail)
+        /// <param name="cloneOf">Set for "Clone": the job is new, prefilled from this job without its secrets (JOB-08).</param>
+        public JobEditorViewModel(ServiceConnection connection, JobDetail detail, JobDetail cloneOf = null)
         {
             _connection = connection;
-            _original = detail?.Job;
+            if (cloneOf != null)
+            {
+                _clonedFrom = cloneOf.Job.Name;
+                detail = JobClone.ForNewJob(cloneOf);
+                _original = null;
+            }
+            else
+            {
+                _original = detail?.Job;
+            }
+            _source = detail?.Job;
             Selection.Changed += () =>
             {
                 foreach (var root in Roots)
@@ -51,39 +64,39 @@ namespace Keepsake.Gui.ViewModels
             };
             foreach (var drive in FileTreeNode.Drives(Selection))
                 Roots.Add(drive);
-            Destination = new DestinationEditorViewModel(connection, detail, () => Name);
+            Destination = new DestinationEditorViewModel(connection, detail, () => Name, _clonedFrom);
 
-            if (_original != null)
+            if (_source != null)
             {
-                _name = _original.Name;
-                _enabled = _original.Enabled;
-                _patterns = string.Join(Environment.NewLine, Selection.Load(_original.Sources, _original.Excludes));
-                _useDefaultExcludes = _original.UseDefaultExcludes;
-                foreach (var s in _original.Schedules)
+                _name = _source.Name;
+                _enabled = _source.Enabled;
+                _patterns = string.Join(Environment.NewLine, Selection.Load(_source.Sources, _source.Excludes));
+                _useDefaultExcludes = _source.UseDefaultExcludes;
+                foreach (var s in _source.Schedules)
                     Schedules.Add(new ScheduleItemViewModel(s));
-                _runMissed = _original.RunMissed;
-                _retryCount = _original.RetryCount;
-                _retryDelay = _original.RetryDelayMinutes;
-                _preCommand = _original.PreCommand;
-                _postCommand = _original.PostCommand;
-                _commandTimeout = _original.CommandTimeoutMinutes;
-                _useVss = _original.UseVss;
-                var r = _original.Retention ?? new Core.Maintenance.RetentionPolicy();
+                _runMissed = _source.RunMissed;
+                _retryCount = _source.RetryCount;
+                _retryDelay = _source.RetryDelayMinutes;
+                _preCommand = _source.PreCommand;
+                _postCommand = _source.PostCommand;
+                _commandTimeout = _source.CommandTimeoutMinutes;
+                _useVss = _source.UseVss;
+                var r = _source.Retention ?? new Core.Maintenance.RetentionPolicy();
                 _keepLast = r.KeepLast;
                 _keepDaily = r.KeepDaily;
                 _keepWeekly = r.KeepWeekly;
                 _keepMonthly = r.KeepMonthly;
                 _keepYearly = r.KeepYearly;
                 _keepWithin = r.KeepWithinDays;
-                _pruneEveryDays = _original.PruneEveryDays;
-                _checkEveryDays = _original.CheckEveryDays;
-                _checkPercent = _original.CheckReadDataPercent;
-                _notifyFailure = _original.NotifyOnFailure;
-                _notifyWarning = _original.NotifyOnWarning;
-                _notifySuccess = _original.NotifyOnSuccess;
-                _alertHours = _original.AlertNoSuccessHours;
+                _pruneEveryDays = _source.PruneEveryDays;
+                _checkEveryDays = _source.CheckEveryDays;
+                _checkPercent = _source.CheckReadDataPercent;
+                _notifyFailure = _source.NotifyOnFailure;
+                _notifyWarning = _source.NotifyOnWarning;
+                _notifySuccess = _source.NotifyOnSuccess;
+                _alertHours = _source.AlertNoSuccessHours;
                 var own = Destination.ShareCredential();
-                foreach (var c in _original.ShareCredentials ?? new List<ShareCredential>())
+                foreach (var c in _source.ShareCredentials ?? new List<ShareCredential>())
                 {
                     if (own == null || !string.Equals(own.Share, c.Share, StringComparison.OrdinalIgnoreCase))
                         ExtraShares.Add(new ShareCredentialRow(c, detail.SharesWithPassword.Any(s => string.Equals(s, c.Share, StringComparison.OrdinalIgnoreCase))));
@@ -114,7 +127,8 @@ namespace Keepsake.Gui.ViewModels
         }
 
         public bool IsNew => _original == null;
-        public string Title => IsNew ? "New backup job" : "Edit job – " + _original.Name;
+        public bool IsClone => _clonedFrom != null;
+        public string Title => IsClone ? "New backup job – copy of " + _clonedFrom : IsNew ? "New backup job" : "Edit job – " + _original.Name;
 
         public SourceSelection Selection { get; } = new SourceSelection();
         public ObservableCollection<FileTreeNode> Roots { get; } = new ObservableCollection<FileTreeNode>();
@@ -217,6 +231,9 @@ namespace Keepsake.Gui.ViewModels
             Error = null;
             var job = Build();
             var errors = JobValidation.Validate(job);
+            // Snapshots, cleanup and restore are scoped by job name; a clone that shares the repository must not reuse it.
+            if (IsClone && string.Equals(job.Name, _clonedFrom?.Trim(), StringComparison.OrdinalIgnoreCase))
+                errors.Add("Give the copy its own name – '" + _clonedFrom + "' is the name of the job it was copied from.");
             if (errors.Count > 0)
             {
                 Error = string.Join(Environment.NewLine, errors);
@@ -269,7 +286,7 @@ namespace Keepsake.Gui.ViewModels
                 PreCommand = string.IsNullOrWhiteSpace(PreCommand) ? null : PreCommand.Trim(),
                 PostCommand = string.IsNullOrWhiteSpace(PostCommand) ? null : PostCommand.Trim(),
                 CommandTimeoutMinutes = CommandTimeout,
-                Workers = _original?.Workers ?? 0,
+                Workers = _source?.Workers ?? 0,
                 UseVss = UseVss,
                 Retention = Policy(),
                 PruneEveryDays = PruneEveryDays,

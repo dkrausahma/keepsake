@@ -41,7 +41,7 @@ namespace Keepsake.Gui.ViewModels
         private bool _ok;
         private string _repositoryId;
 
-        public DestinationEditorViewModel(ServiceConnection connection, JobDetail detail, Func<string> jobName)
+        public DestinationEditorViewModel(ServiceConnection connection, JobDetail detail, Func<string> jobName, string clonedFrom = null)
         {
             _connection = connection;
             _jobId = detail?.Job?.Id;
@@ -75,7 +75,11 @@ namespace Keepsake.Gui.ViewModels
                         break;
                 }
                 _originalJson = Json.ToText(Build(), indented: false);
-                _status = HasStoredRepositoryPassword
+                _status = clonedFrom != null
+                    ? "Copied from '" + clonedFrom + "' – passwords and keys are not copied." + Environment.NewLine +
+                      "Same location: enter the repository password of '" + clonedFrom + "'; both jobs then use this repository, " +
+                      "each with its own snapshots and cleanup. For a separate repository change the location – a new one is created when you save."
+                    : HasStoredRepositoryPassword
                     ? "Passwords are stored. Leave password fields empty to keep them."
                     : "No repository password stored – enter it below.";
                 _ok = HasStoredRepositoryPassword;
