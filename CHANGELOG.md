@@ -2,7 +2,7 @@
 
 All notable changes to Keepsake Backup. Newest first; versions as in `Directory.Build.props`.
 
-## Unreleased
+## 0.9.13 – 2026-11-21
 
 - **Own Keepsake icon:** a locked keepsake box (red box, pink lid, keyhole on a charcoal tile) replaces the
   Kraus-Ahma stripes as application icon (programs, windows, taskbar, Start menu, Add/Remove Programs) and as the
