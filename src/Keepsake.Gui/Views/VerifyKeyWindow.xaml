@@ -1,0 +1,33 @@
+<Window x:Class="Keepsake.Gui.Views.VerifyKeyWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Check password or recovery key" Width="600" SizeToContent="Height" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Style="{StaticResource KeepsakeWindow}" Icon="/Assets/keepsake.ico">
+    <StackPanel Margin="28,24">
+        <TextBlock x:Name="JobName" Style="{StaticResource PageTitle}" FontSize="18" />
+        <TextBlock x:Name="Location" Style="{StaticResource Muted}" Margin="0,2,0,14" TextTrimming="CharacterEllipsis" />
+
+        <TextBlock TextWrapping="Wrap" Style="{StaticResource Muted}"
+                   Text="Test the password or recovery key from your KeePass entry before you need it. Only the repository's key files are read; nothing is changed, stored or logged." />
+
+        <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+            <RadioButton x:Name="UsePassword" Content="Repository password" GroupName="Kind" IsChecked="True" Margin="0,0,24,0" Checked="OnKindChanged" />
+            <RadioButton x:Name="UseRecoveryKey" Content="Recovery key (KS1-…)" GroupName="Kind" Checked="OnKindChanged" />
+        </StackPanel>
+        <PasswordBox x:Name="PasswordBox" Margin="0,8,0,0" />
+        <StackPanel x:Name="KeyPanel" Margin="0,8,0,0" Visibility="Collapsed">
+            <TextBox x:Name="KeyBox" FontFamily="Consolas" TextWrapping="Wrap" />
+            <Button Content="Load from file…" Click="OnLoadFile" Style="{StaticResource LinkButton}" HorizontalAlignment="Left" Margin="0,6,0,0" />
+        </StackPanel>
+
+        <ProgressBar x:Name="Busy" IsIndeterminate="True" Margin="0,14,0,0" Visibility="Collapsed" />
+        <Border x:Name="ResultPanel" CornerRadius="4" Padding="12,10" Margin="0,14,0,0" Visibility="Collapsed">
+            <TextBlock x:Name="ResultText" TextWrapping="Wrap" />
+        </Border>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+            <Button x:Name="CheckButton" Content="Check" Click="OnCheck" IsDefault="True" Style="{StaticResource PrimaryButton}" Padding="22,6" Margin="0,0,8,0" />
+            <Button Content="Close" IsCancel="True" Padding="16,6" />
+        </StackPanel>
+    </StackPanel>
+</Window>

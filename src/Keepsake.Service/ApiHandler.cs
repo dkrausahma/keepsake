@@ -19,6 +19,7 @@ namespace Keepsake.Service
 
         private readonly ServiceContext _ctx;
         private readonly object _cacheLock = new object();
+        private readonly object _verifyLock = new object();
         private readonly Dictionary<string, CachedRepo> _repoCache = new Dictionary<string, CachedRepo>(StringComparer.Ordinal);
 
         public ApiHandler(ServiceContext ctx)
@@ -214,6 +215,8 @@ namespace Keepsake.Service
                     return InitRepository(P<RepoParams>(r));
                 case Methods.RepoTest:
                     return TestRepository(P<RepoParams>(r));
+                case Methods.RepoVerifyKey:
+                    return VerifyKey(P<VerifyKeyParams>(r));
                 case Methods.VolumesList:
                     return LocalVolumes.List();
                 case Methods.SnapshotsList:
@@ -379,6 +382,47 @@ namespace Keepsake.Service
                 var init = Repository.Init(opened.Storage, secrets.RepositoryPassword);
                 ServiceLog.Info("Repository created at " + opened.Storage.Location + ".");
                 return new RepoInitResult { RepositoryId = init.Repository.Header.Id, RecoveryKey = init.RecoveryKey };
+            }
+        }
+
+        /// <summary>
+        /// Checks a password or recovery key the user types in against the job's repository, so it can be tested before
+        /// it is needed. Reads only the key slots; the key itself is never stored or logged. One check at a time, like
+        /// logins, because every attempt costs an Argon2 derivation per password slot.
+        /// </summary>
+        private VerifyKeyResult VerifyKey(VerifyKeyParams p)
+        {
+            var job = Job(p?.JobId);
+            bool hasPassword = !string.IsNullOrEmpty(p.Password);
+            bool hasKey = !string.IsNullOrWhiteSpace(p.RecoveryKey);
+            if (hasPassword == hasKey)
+                throw new ApiException(ErrorCodes.Invalid, "Enter either the repository password or the recovery key.");
+            RepoCredential credential;
+            try
+            {
+                credential = hasPassword ? RepoCredential.FromPassword(p.Password) : RepoCredential.FromRecoveryKeyText(p.RecoveryKey);
+            }
+            catch (FormatException ex)
+            {
+                throw new ApiException(ErrorCodes.Invalid, ex.Message);
+            }
+
+            lock (_verifyLock)
+            {
+                using (var opened = DestinationResolver.Open(job.Destination, job.ShareCredentials, _ctx.Jobs.GetSecrets(job.Id)))
+                {
+                    var slot = Repository.VerifyKey(opened.Storage, credential);
+                    string what = hasPassword ? "repository password" : "recovery key";
+                    ServiceLog.Info("Checked a " + what + " for '" + job.Name + "': " + (slot != null ? "valid (key " + slot.Id.Substring(0, 8) + ")." : "not valid."));
+                    return new VerifyKeyResult
+                    {
+                        Location = opened.Storage.Location,
+                        Valid = slot != null,
+                        KeyType = slot?.Type,
+                        KeyLabel = slot?.Label,
+                        KeyCreated = slot?.Created,
+                    };
+                }
             }
         }
 

@@ -144,8 +144,10 @@ namespace Keepsake.Cli
             {
                 Name = "key",
                 Summary = "Manage passwords and recovery keys",
-                Usage = "keepsake key (list | add-password | add-recovery | remove <id>) --repo <path> [--label <text>]",
+                Usage = "keepsake key (list | verify | add-password | add-recovery | remove <id>) --repo <path> [--label <text>]",
                 Details = "  list                      Show all keys\n" +
+                          "  verify                    Check a password or recovery key (--use-recovery-key, --recovery-key-file)\n" +
+                          "                            without opening the repository; exit code 4 if it is not valid\n" +
                           "  add-password              Add another password (--new-password-file <file>, or prompt)\n" +
                           "  add-recovery              Create an additional recovery key (--recovery-key-out <file>)\n" +
                           "  remove <id>               Remove a key (the last one cannot be removed).\n" +
@@ -642,8 +644,10 @@ namespace Keepsake.Cli
         private static int Key(CommandContext ctx)
         {
             if (ctx.Args.Positionals.Count == 0)
-                throw new UsageException("Usage: keepsake key (list | add-password | add-recovery | remove <id>) --repo <path>");
+                throw new UsageException("Usage: keepsake key (list | verify | add-password | add-recovery | remove <id>) --repo <path>");
             string sub = ctx.Args.Positionals[0].ToLowerInvariant();
+            if (sub == "verify")
+                return VerifyKey(ctx);
             using (var repo = ctx.OpenRepository())
             {
                 switch (sub)
@@ -694,6 +698,22 @@ namespace Keepsake.Cli
                     default:
                         throw new UsageException("Unknown key command '" + sub + "'.");
                 }
+            }
+        }
+
+        /// <summary>Reads only the key slots: works while a backup runs and never takes a lock.</summary>
+        private static int VerifyKey(CommandContext ctx)
+        {
+            using (var storage = ctx.OpenStorage())
+            {
+                var credential = ctx.Credential();
+                string what = credential.Password != null ? "password" : "recovery key";
+                var slot = Repository.VerifyKey(storage, credential);
+                if (slot == null)
+                    throw new WrongCredentialException("The " + what + " does not open the repository at " + storage.Location + ".");
+                ctx.WriteJson(new { status = "success", valid = true, id = slot.Id, type = slot.Type, label = slot.Label, created = slot.Created });
+                ctx.Info("The " + what + " is valid: it opens key " + slot.Id.Substring(0, 8) + " ('" + slot.Label + "', created " + Format.LocalTime(slot.Created) + ").");
+                return ExitCodes.Success;
             }
         }
 

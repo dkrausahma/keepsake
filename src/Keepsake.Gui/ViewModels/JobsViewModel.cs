@@ -77,6 +77,7 @@ namespace Keepsake.Gui.ViewModels
             CheckCommand = new AsyncCommand(() => RunKindNow(RunKind.Check), () => !IsBusy);
             PruneCommand = new AsyncCommand(() => RunKindNow(RunKind.Prune), () => !IsBusy);
             RestoreCommand = new RelayCommand(() => _page.Shell.ShowRestore(Id));
+            VerifyKeyCommand = new RelayCommand(() => VerifyKeyWindow.Open(_page.Shell.Connection, Id, Name, Destination));
         }
 
         public string Id => _job.Id;
@@ -142,6 +143,7 @@ namespace Keepsake.Gui.ViewModels
         public ICommand CheckCommand { get; }
         public ICommand PruneCommand { get; }
         public ICommand RestoreCommand { get; }
+        public ICommand VerifyKeyCommand { get; }
 
         public void Update(JobSummary job)
         {

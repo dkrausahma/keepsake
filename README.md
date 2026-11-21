@@ -96,7 +96,8 @@ that it offers:
 
 - **Backup jobs** – status, last result, next run, run now / full backup / cancel; job editor with folder
   tree (tick to include, untick inside a ticked folder to exclude), exclusion patterns, destination
-  (creates the repository and shows the recovery key, which must be confirmed), schedules and options
+  (creates the repository and shows the recovery key, which must be confirmed), schedules and options;
+  **Check keys** tests a repository password or recovery key against the job's repository without restoring
 - **Restore** – pick job and snapshot, tick folders/files, restore to another folder or the original
   location with a conflict policy, dry run
 - **History & logs** – every run; details show everything that was not backed up (filter, search,
@@ -198,6 +199,12 @@ keepsake restore latest --repo sftp://backup@nas.example.org/backups/fileserver 
 
 The first connection shows the server's host key fingerprint and asks to trust it; pass
 `--sftp-host-key SHA256:...` to pin it for unattended use.
+
+Check a password or recovery key without restoring (only the key files are read; exit code 4 if it is not valid):
+
+```bash
+keepsake key verify --repo E:\Backups\fileserver --recovery-key-file key.txt
+```
 
 For automation use `--password-file` (or `KEEPSAKE_PASSWORD`), `--non-interactive` and `--json`.
 `--debug-log <file>` writes SFTP connection details (algorithms, errors, no passwords) for support;

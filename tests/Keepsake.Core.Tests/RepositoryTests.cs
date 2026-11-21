@@ -22,6 +22,24 @@ namespace Keepsake.Core.Tests
         }
 
         [Fact]
+        public void VerifyKey_reports_the_matching_slot_and_null_for_wrong_keys()
+        {
+            using (var t = new TestRepo())
+            {
+                var storage = new FileSystemStorage(t.RepoPath);
+                var byPassword = Repository.VerifyKey(storage, RepoCredential.FromPassword(TestRepo.Password));
+                Assert.Equal("password", byPassword.Type);
+                var byKey = Repository.VerifyKey(storage, RepoCredential.FromRecoveryKeyText(t.RecoveryKey));
+                Assert.Equal("recovery", byKey.Type);
+                Assert.NotEqual(byPassword.Id, byKey.Id);
+
+                Assert.Null(Repository.VerifyKey(storage, RepoCredential.FromPassword("wrong password")));
+                using (var other = new TestRepo())
+                    Assert.Null(Repository.VerifyKey(storage, RepoCredential.FromRecoveryKeyText(other.RecoveryKey)));
+            }
+        }
+
+        [Fact]
         public void Only_plain_metadata_is_readable_on_storage()
         {
             using (var t = new TestRepo())

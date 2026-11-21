@@ -84,6 +84,27 @@ namespace Keepsake.Core.Repo
 
         public static Repository Open(IStorage storage, RepoCredential credential)
         {
+            var header = ReadHeader(storage);
+            var unlocked = FindSlot(storage, header, credential, out byte[] master);
+            if (unlocked == null)
+                throw new WrongCredentialException(credential.Password != null
+                    ? "The password is not valid for this repository."
+                    : "The recovery key is not valid for this repository.");
+
+            var repo = new Repository(storage, header, new RepoKeys(master, Hex.Decode(header.Id))) { KeyId = unlocked.Id };
+            repo.Config = repo.ReadFixedObject<RepoConfig>(Layout.Config, "config");
+            return repo;
+        }
+
+        /// <summary>
+        /// Checks a password or recovery key without opening the repository: only the header and the key slots are read,
+        /// nothing is locked or written. Returns the key slot it unlocks, or null if it opens none.
+        /// </summary>
+        public static KeySlotInfo VerifyKey(IStorage storage, RepoCredential credential) =>
+            FindSlot(storage, ReadHeader(storage), credential, out _);
+
+        private static RepoHeader ReadHeader(IStorage storage)
+        {
             if (!Exists(storage))
                 throw new KeepsakeException("No Keepsake repository found at " + storage.Location + ".");
             var header = Json.FromBytes<RepoHeader>(storage.Read(Layout.Header));
@@ -92,7 +113,11 @@ namespace Keepsake.Core.Repo
             if (header.Version > FormatVersion)
                 throw new RepositoryFormatException("The repository uses format version " + header.Version +
                     ", which is newer than this program supports (" + FormatVersion + "). Please update Keepsake.");
+            return header;
+        }
 
+        private static KeySlotInfo FindSlot(IStorage storage, RepoHeader header, RepoCredential credential, out byte[] master)
+        {
             // Key slots come from untrusted storage (SEC-007): only plausible files are tried, at most MaxKeySlots,
             // and a malformed slot is skipped instead of aborting the open.
             int tried = 0;
@@ -100,26 +125,21 @@ namespace Keepsake.Core.Repo
             {
                 if (entry.Size > MaxKeySlotBytes || !IsHexName(entry.Name) || ++tried > MaxKeySlots)
                     continue;
-                byte[] master;
+                KeySlot slot;
                 try
                 {
-                    var slot = Json.FromBytes<KeySlot>(storage.Read(entry.Path));
+                    slot = Json.FromBytes<KeySlot>(storage.Read(entry.Path));
                     master = Unlock(slot, credential, header.Id);
                 }
                 catch (Exception ex) when (ex is RepositoryFormatException || ex is FormatException)
                 {
                     continue;
                 }
-                if (master == null)
-                    continue;
-
-                var repo = new Repository(storage, header, new RepoKeys(master, Hex.Decode(header.Id))) { KeyId = entry.Name };
-                repo.Config = repo.ReadFixedObject<RepoConfig>(Layout.Config, "config");
-                return repo;
+                if (master != null)
+                    return new KeySlotInfo { Id = entry.Name, Type = slot.Type, Label = slot.Label, Created = slot.Created, Host = slot.Host, Current = true };
             }
-            throw new WrongCredentialException(credential.Password != null
-                ? "The password is not valid for this repository."
-                : "The recovery key is not valid for this repository.");
+            master = null;
+            return null;
         }
 
         /// <summary>Same minimum as the GUI and the service API, for every way a password key is created (SEC-022).</summary>

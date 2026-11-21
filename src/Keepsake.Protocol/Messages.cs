@@ -32,6 +32,7 @@ namespace Keepsake.Protocol
 
         public const string RepoInit = "repo.init";
         public const string RepoTest = "repo.test";
+        public const string RepoVerifyKey = "repo.verifyKey";
         public const string VolumesList = "volumes.list";
 
         public const string SnapshotsList = "snapshots.list";
@@ -356,6 +357,27 @@ namespace Keepsake.Protocol
         /// <summary>SFTP host key that is not trusted yet (or changed). The client asks the user and retries with it pinned.</summary>
         public string UntrustedHostKey { get; set; }
         public bool HostKeyChanged { get; set; }
+    }
+
+    /// <summary>repo.verifyKey: checks a password or a recovery key (exactly one) against the job's repository.</summary>
+    public sealed class VerifyKeyParams
+    {
+        public string JobId { get; set; }
+        public string Password { get; set; }
+
+        /// <summary>Text form, <c>KS1-…</c>.</summary>
+        public string RecoveryKey { get; set; }
+    }
+
+    public sealed class VerifyKeyResult
+    {
+        public string Location { get; set; }
+        public bool Valid { get; set; }
+
+        /// <summary>The key slot it unlocks (when valid): <c>password</c> or <c>recovery</c>, its label and creation time.</summary>
+        public string KeyType { get; set; }
+        public string KeyLabel { get; set; }
+        public DateTime? KeyCreated { get; set; }
     }
 
     public sealed class SnapshotInfo

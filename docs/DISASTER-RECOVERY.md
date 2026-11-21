@@ -152,6 +152,11 @@ If both the password and the recovery key are lost, **the backups cannot be decr
 
 ## Recovery test (do this before going live, then once a year)
 
+Quick check in between (or right after creating a job): **Backup jobs → Check keys** tests the password and the
+recovery key from KeePass against the job's repository without restoring anything; on the command line
+`keepsake key verify --repo <location> --recovery-key-file key.txt` (exit code 0 = valid, 4 = not valid). It does
+not replace the test below, which also proves the restore works without the server.
+
 - [ ] On a computer that is **not** the backup server, with only the KeePass entry at hand:
 - [ ] Unpack the portable ZIP from the KeePass attachment / release (not the copy in the repository), check its SHA-256.
 - [ ] `Keepsake Recovery.cmd` → open the backup with the **recovery key** (not the password) – the backups are listed.

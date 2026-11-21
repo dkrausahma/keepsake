@@ -33,7 +33,9 @@ namespace Keepsake.Service.Tests
             Directory.CreateDirectory(Source);
             for (int i = 0; i < 5; i++)
                 File.WriteAllText(Path.Combine(Source, "file" + i + ".txt"), "content " + i);
-            Repository.Init(new FileSystemStorage(RepoPath), RepoPassword).Repository.Dispose();
+            var init = Repository.Init(new FileSystemStorage(RepoPath), RepoPassword);
+            RecoveryKey = init.RecoveryKey;
+            init.Repository.Dispose();
 
             PipeName = "keepsake-test-" + Rand.HexId(6);
             Host = new ServiceHost(Path.Combine(Root, "data"), PipeName, consoleMode: true);
@@ -43,6 +45,7 @@ namespace Keepsake.Service.Tests
         public string Root { get; }
         public string Source { get; }
         public string RepoPath { get; }
+        public string RecoveryKey { get; }
         public string PipeName { get; }
         internal ServiceHost Host { get; }
         internal ServiceContext Ctx => Host.Context;
@@ -112,6 +115,37 @@ namespace Keepsake.Service.Tests
 
     public class ServiceTests
     {
+        [Fact]
+        public void Verify_key_checks_password_and_recovery_key_against_the_job_repository()
+        {
+            using (var t = new TestService())
+            using (var client = t.Client())
+            {
+                var saved = client.Call<JobDetail>(Methods.JobsSave, new JobSaveParams { Job = t.NewJob(), RepositoryPassword = TestService.RepoPassword });
+                string id = saved.Job.Id;
+
+                var password = client.Call<VerifyKeyResult>(Methods.RepoVerifyKey, new VerifyKeyParams { JobId = id, Password = TestService.RepoPassword });
+                Assert.True(password.Valid);
+                Assert.Equal("password", password.KeyType);
+                var key = client.Call<VerifyKeyResult>(Methods.RepoVerifyKey, new VerifyKeyParams { JobId = id, RecoveryKey = t.RecoveryKey.ToLowerInvariant() });
+                Assert.True(key.Valid);
+                Assert.Equal("recovery", key.KeyType);
+
+                var wrong = client.Call<VerifyKeyResult>(Methods.RepoVerifyKey, new VerifyKeyParams { JobId = id, Password = "wrong password" });
+                Assert.False(wrong.Valid);
+                Assert.Null(wrong.KeyLabel);
+
+                var typo = Assert.Throws<ApiException>(() => client.Call<VerifyKeyResult>(Methods.RepoVerifyKey,
+                    new VerifyKeyParams { JobId = id, RecoveryKey = "KS1-" + (t.RecoveryKey[4] == 'A' ? 'B' : 'A') + t.RecoveryKey.Substring(5) }));
+                Assert.Equal(ErrorCodes.Invalid, typo.Code);
+                var both = Assert.Throws<ApiException>(() => client.Call<VerifyKeyResult>(Methods.RepoVerifyKey,
+                    new VerifyKeyParams { JobId = id, Password = TestService.RepoPassword, RecoveryKey = t.RecoveryKey }));
+                Assert.Equal(ErrorCodes.Invalid, both.Code);
+
+                Assert.DoesNotContain(TestService.RepoPassword, File.ReadAllText(Path.Combine(t.Root, "data", "logs", "service.log")));
+            }
+        }
+
         [Fact]
         public void Debug_log_is_off_by_default_and_switchable()
         {

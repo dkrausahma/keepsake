@@ -2,6 +2,14 @@
 
 All notable changes to Keepsake Backup. Newest first; versions as in `Directory.Build.props`.
 
+## Unreleased
+
+- **Check keys** per job (Backup jobs page): test the repository password or the recovery key against the job's
+  repository without restoring. Only the key files are read; nothing is locked, written, stored or logged.
+  Typos in a recovery key are reported as such (checksum).
+- `keepsake key verify --repo <location>` does the same without the service (exit code 4 if not valid).
+- Service API: `repo.verifyKey`.
+
 ## 0.9.11 – 2026-11-21
 
 - System.Text.Json 8.0.5 → 10.0.15 (.NET 8 support ended in November 2026; SEC-029). Ships one new library,

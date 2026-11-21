@@ -71,6 +71,8 @@
                                             <Button Content="Clean up" Command="{Binding PruneCommand}" Style="{StaticResource LinkButton}" Margin="0,0,16,0" ToolTip="Apply the retention rules and free space now" />
                                             <Button Content="History" Command="{Binding HistoryCommand}" Style="{StaticResource LinkButton}" Margin="0,0,16,0" />
                                             <Button Content="Restore" Command="{Binding RestoreCommand}" Style="{StaticResource LinkButton}" Margin="0,0,16,0" />
+                                            <Button Content="Check keys" Command="{Binding VerifyKeyCommand}" Style="{StaticResource LinkButton}" Margin="0,0,16,0"
+                                                    ToolTip="Test the repository password or the recovery key without restoring" />
                                             <Button Content="Delete" Command="{Binding DeleteCommand}" Style="{StaticResource LinkButton}" Foreground="{StaticResource DangerBrush}" />
                                         </StackPanel>
                                     </StackPanel>
