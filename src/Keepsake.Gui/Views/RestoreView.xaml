@@ -104,7 +104,11 @@
             </Border>
 
             <Border Grid.ColumnSpan="3" Style="{StaticResource Card}" VerticalAlignment="Top" Visibility="{Binding NoJobs, Converter={StaticResource Visible}}">
-                <TextBlock Text="{Binding NoJobsText}" />
+                <StackPanel>
+                    <TextBlock Text="{Binding NoJobsText}" TextWrapping="Wrap" />
+                    <Button Content="Restore from a backup location…" Command="{Binding RecoveryCommand}" Style="{StaticResource PrimaryButton}"
+                            HorizontalAlignment="Left" Margin="0,14,0,0" Visibility="{Binding CanOpenLocation, Converter={StaticResource Visible}}" />
+                </StackPanel>
             </Border>
         </Grid>
     </DockPanel>

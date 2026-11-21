@@ -168,10 +168,11 @@ namespace Keepsake.Gui.ViewModels
             }
         });
 
-        public Task<string> StartRestore(string jobId, RestoreOptions options)
+        public async Task<string> StartRestore(string jobId, RestoreOptions options)
         {
             if (IsRunning)
                 throw new KeepsakeException("A restore is already running.");
+            await ClearBlockingLocks();
             _runId = Guid.NewGuid().ToString("N");
             _record = new RunRecord { Id = _runId, JobName = jobId == NoName ? null : jobId, Kind = RunKind.Restore, Trigger = RunTrigger.Manual, State = RunState.Running, Start = DateTime.UtcNow };
             _result = null;
@@ -179,7 +180,8 @@ namespace Keepsake.Gui.ViewModels
             _log = null;
             IsRunning = true;
             var progress = new Sink(p => _progress = p);
-            Task.Run(() =>
+            // Runs in the background; the page polls its state.
+            _ = Task.Run(() =>
             {
                 try
                 {
@@ -208,7 +210,33 @@ namespace Keepsake.Gui.ViewModels
                     IsRunning = false;
                 }
             });
-            return Task.FromResult(_runId);
+            return _runId;
+        }
+
+        /// <summary>
+        /// A computer that crashed during a cleanup leaves an exclusive lock that blocks restores for up to 30 minutes.
+        /// In recovery mode that computer is usually the lost one, so the user may remove its lock after seeing whose
+        /// it is; only the locks that block the restore are removed.
+        /// </summary>
+        private async Task ClearBlockingLocks()
+        {
+            var blocking = await Task.Run(() =>
+            {
+                lock (_lock)
+                    return RepoLock.Blocking(_repo, exclusive: false);
+            });
+            if (blocking.Count == 0)
+                return;
+            string holders = string.Join("\n", blocking.Select(b => "    " + RepoLock.Describe(b.Value)));
+            if (!Ui.Confirm("This backup is locked by:\n\n" + holders + "\n\nThe lock stops the restore. It expires by itself 30 minutes after that " +
+                            "computer stopped working on the backup. If that computer is lost or no longer runs Keepsake, the lock can be removed now.\n\n" +
+                            "Remove the lock and restore?", "Backup locked"))
+                throw new KeepsakeException("Restore not started: the backup is locked. Try again in 30 minutes, or remove the lock.");
+            await Task.Run(() =>
+            {
+                lock (_lock)
+                    RepoLock.Remove(_repo, blocking.Select(b => b.Key));
+            });
         }
 
         public Task<RestorePoll> Poll(string runId)

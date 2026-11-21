@@ -2,6 +2,18 @@
 
 All notable changes to Keepsake Backup. Newest first; versions as in `Directory.Build.props`.
 
+## Unreleased
+
+- **Recovery mode reachable after an MSI install:** new Start menu entry *Keepsake Recovery*, and the link
+  *Restore from a backup location…* on the first-start and login screens and on the *Restore* page when there are
+  no jobs. Before, a fresh install on a replacement computer (service running) only offered the service view, and
+  restoring needed a new job.
+- **Blocking lock in recovery mode:** when a current lock of another computer stops a restore (e.g. the lost server
+  crashed during a cleanup less than 30 minutes ago), recovery mode shows whose lock it is and removes only that lock
+  after confirmation, instead of failing with "wait 30 minutes or run keepsake unlock".
+- Docs: a restore writes a temporary lock file, so the storage account needs write access (README said recovery
+  mode "only reads"); the disaster-recovery runbook describes the new ways into recovery mode.
+
 ## 0.9.13 – 2026-11-21
 
 - **Own Keepsake icon:** a locked keepsake box (red box, pink lid, keyhole on a charcoal tile) replaces the

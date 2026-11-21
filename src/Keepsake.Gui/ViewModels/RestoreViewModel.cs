@@ -50,8 +50,9 @@ namespace Keepsake.Gui.ViewModels
                 ? "Pick a backup job and a point in time, tick what you need, choose where it goes."
                 : "Backups in " + location + ". Pick a point in time, tick what you need, choose where it goes.";
             NoJobsText = location == null
-                ? "There are no backup jobs yet. Create one under 'Backup jobs' first."
+                ? "There are no backup jobs on this computer yet. To restore from an existing backup – for example after replacing a lost computer – open its location directly; no job is needed."
                 : "This repository contains no backups yet.";
+            RecoveryCommand = shell?.RecoveryCommand;
             _conflict = Conflicts[0];
             BrowseTargetCommand = new RelayCommand(() =>
             {
@@ -84,6 +85,10 @@ namespace Keepsake.Gui.ViewModels
         public bool CanProtect => _backend.CanProtect;
         public string Hint { get; }
         public string NoJobsText { get; }
+
+        /// <summary>Service view only: switch to recovery mode to open a backup location directly.</summary>
+        public ICommand RecoveryCommand { get; }
+        public bool CanOpenLocation => RecoveryCommand != null;
         public override bool AutoRefresh => IsRunning;
 
         public JobChoice Job

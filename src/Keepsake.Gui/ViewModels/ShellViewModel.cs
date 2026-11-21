@@ -60,6 +60,7 @@ namespace Keepsake.Gui.ViewModels
         public ShellViewModel(MainViewModel main)
         {
             _main = main;
+            RecoveryCommand = new RelayCommand(main.StartRecovery); // before the pages: the restore page takes it over
             Jobs = new JobsViewModel(this);
             Restore = new RestoreViewModel(this);
             History = new HistoryViewModel(this);
@@ -80,6 +81,9 @@ namespace Keepsake.Gui.ViewModels
         public SettingsViewModel Settings { get; }
         public ICommand NavigateCommand { get; }
         public ICommand LogoutCommand { get; }
+
+        /// <summary>Leaves the service view for recovery mode: restore from any backup location, without a job.</summary>
+        public ICommand RecoveryCommand { get; }
 
         public PageViewModel Current
         {

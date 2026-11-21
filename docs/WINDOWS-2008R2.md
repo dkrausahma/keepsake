@@ -35,7 +35,7 @@ Notes:
 1. Install the prerequisites, reboot.
 2. Run `Keepsake-<version>.msi` (as administrator). It installs to `C:\Program Files\dkait\keepsake` (or a folder you choose in the setup),
    registers and starts the *Keepsake Backup Service* (LocalSystem, automatic, restarts on
-   failure), adds `keepsake` to the PATH and creates the Start menu entry *Keepsake Backup*.
+   failure), adds `keepsake` to the PATH and creates the Start menu entries *Keepsake Backup* and *Keepsake Recovery*.
 3. Open *Keepsake Backup*, set the application password, create the first job.
 4. Run `keepsake doctor` in an elevated prompt – everything should be OK or INFO.
 
@@ -53,6 +53,7 @@ Tick each item; note deviations.
 
 **GUI**
 - [ ] Start menu entry starts the GUI with a UAC prompt; first-time setup and login work.
+- [ ] Start menu entry *Keepsake Recovery* (and the link on the first-start screen) opens recovery mode without a login.
 - [ ] Folder tree shows all drives; tick/untick works; long folder names display.
 - [ ] Job with a folder destination: repository created, recovery key dialog requires confirmation.
 - [ ] Job with a USB disk: disk listed with label; after re-plugging under another letter the backup still finds it.

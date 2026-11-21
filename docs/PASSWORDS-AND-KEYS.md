@@ -57,7 +57,8 @@ One entry per backup job:
 - repository location (folder, share, USB disk label, or `sftp://user@host:port/path`)
 - repository password
 - recovery key (`KS1-…`) – as text or the saved key file as attachment
-- for SFTP: user, password or private key (+ passphrase), host key fingerprint (`SHA256:…`)
+- for SFTP: user, password or private key (+ passphrase), host key fingerprint (`SHA256:…`). The account needs
+  write access even for a restore: Keepsake writes a temporary lock file into the repository
 - for shares: user and password, if the job uses its own share credentials
 
 Plus, once: the application password of each server, and the portable ZIP of the installed version with its

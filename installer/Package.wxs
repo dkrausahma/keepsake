@@ -62,6 +62,10 @@
         <File Id="GuiExe" Source="$(StageDir)\KeepsakeGui.exe" KeyPath="yes">
           <Shortcut Id="GuiShortcut" Directory="ProgramMenuFolder" Name="Keepsake Backup" Description="Manage Keepsake backups"
                     WorkingDirectory="INSTALLFOLDER" Icon="KeepsakeIcon" Advertise="no" />
+          <!-- Restore from a backup location without the service, a login or a job (RST-07): the way in on a replacement computer. -->
+          <Shortcut Id="RecoveryShortcut" Directory="ProgramMenuFolder" Name="Keepsake Recovery" Arguments="--recovery"
+                    Description="Restore from a backup location – no login, no job needed"
+                    WorkingDirectory="INSTALLFOLDER" Icon="KeepsakeIcon" Advertise="no" />
         </File>
       </Component>
     </ComponentGroup>

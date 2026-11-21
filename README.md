@@ -108,7 +108,9 @@ keepsake status
 ## GUI
 
 `KeepsakeGui.exe` (elevated, Start menu "Keepsake Backup") connects to the service. First start asks for the application password; after
-that it offers:
+that it offers the pages below. **Recovery mode** – restore from a backup location with its password or recovery key,
+without a login or a job, e.g. on a replacement computer – starts from the Start menu entry "Keepsake Recovery", the link
+*Restore from a backup location…* on the first-start, login and *Restore* pages, or `KeepsakeGui.exe --recovery`.
 
 - **Backup jobs** – status, last result, next run, run now / full backup / cancel; job editor with folder
   tree (tick to include, untick inside a ticked folder to exclude), exclusion patterns, destination
@@ -150,7 +152,7 @@ powershell -ExecutionPolicy Bypass -File tools\build-release.ps1
 
 builds, tests and produces `artifacts\Keepsake-<version>.msi` and `artifacts\Keepsake-<version>-portable.zip`.
 The MSI installs to `C:\Program Files\dkait\keepsake` (the setup lets you choose another folder), registers the service (LocalSystem, automatic,
-restart on failure), puts `keepsake` on the PATH and adds *Keepsake Backup* to the Start menu.
+restart on failure), puts `keepsake` on the PATH and adds *Keepsake Backup* and *Keepsake Recovery* to the Start menu.
 It checks for .NET Framework 4.8 and Service Pack 1.
 
 - Disaster recovery: [docs/DISASTER-RECOVERY.md](docs/DISASTER-RECOVERY.md)
@@ -240,9 +242,12 @@ Exit codes: 0 success, 1 warnings, 2 failed, 3 usage error, 4 wrong password/key
   read and execute), because it holds the service and is on the system PATH.
 - **Links.** Restores never follow a junction or symbolic link below the target (or below the backed-up folder when
   restoring to the original location); folder destinations never list, write or delete through one.
-- **Recovery mode.** `KeepsakeGui.exe --recovery` (in the portable ZIP: `Keepsake Recovery.cmd`) opens a repository
-  directly – location plus password or recovery key – and restores without the service or any configuration
-  (RST-07). It runs with the rights of the logged-on administrator and only reads the backup.
+- **Recovery mode.** `KeepsakeGui.exe --recovery` (Start menu *Keepsake Recovery*; in the portable ZIP:
+  `Keepsake Recovery.cmd`) opens a repository directly – location plus password or recovery key – and restores without
+  the service or any configuration (RST-07). It runs with the rights of the logged-on administrator. It does not change
+  the backup data, but a restore writes and removes a temporary lock file in the repository, so the storage account
+  needs write access. When a current lock of another computer blocks the restore (e.g. the lost server crashed during a
+  cleanup), it shows whose lock it is and removes only that lock after confirmation.
 - **Restored permissions.** NTFS permissions are not backed up: restored files inherit the target folder's
   permissions. Restore confidential data only into folders with suitable permissions.
 - **Keys.** Removing a password or recovery key does not revoke it for someone who kept the old key file; after a

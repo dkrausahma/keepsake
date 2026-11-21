@@ -105,6 +105,7 @@ namespace Keepsake.Gui.ViewModels
             _main = main;
             _error = message;
             LoginCommand = new AsyncCommand(Login);
+            RecoveryCommand = new RelayCommand(main.StartRecovery);
         }
 
         public string Error
@@ -114,6 +115,9 @@ namespace Keepsake.Gui.ViewModels
         }
 
         public ICommand LoginCommand { get; }
+
+        /// <summary>Recovery mode without logging in: restore from a backup location (RST-07).</summary>
+        public ICommand RecoveryCommand { get; }
 
         private async Task Login(object parameter)
         {
@@ -143,6 +147,7 @@ namespace Keepsake.Gui.ViewModels
         {
             _main = main;
             SaveCommand = new AsyncCommand(Save);
+            RecoveryCommand = new RelayCommand(main.StartRecovery);
         }
 
         public string Error
@@ -152,6 +157,12 @@ namespace Keepsake.Gui.ViewModels
         }
 
         public ICommand SaveCommand { get; }
+
+        /// <summary>
+        /// A fresh install on a replacement computer lands here first: restoring from a backup location needs neither
+        /// an application password nor a job (RST-07).
+        /// </summary>
+        public ICommand RecoveryCommand { get; }
 
         private async Task Save(object parameter)
         {

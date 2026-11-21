@@ -10,7 +10,7 @@ the original server, its configuration and its Windows domain are not needed.
 |---|---|
 | The backup repository | the folder / network share / USB disk / SFTP server of the job |
 | The repository password **or** the recovery key (`KS1-…`) – either one is enough. A saved key file contains the same `KS1-…` text. The application password is **not** needed | KeePass |
-| For SFTP: user, password or private key, host key fingerprint | KeePass |
+| For SFTP: the location `sftp://user@host:port/path` exactly as in the job, password or private key, host key fingerprint. The account needs write access: a restore writes a temporary lock file into the repository | KeePass |
 | `keepsake.exe` | **preferred:** the portable ZIP or the MSI from the official release (keep a copy and its SHA-256 from `SHA256SUMS.txt` with the KeePass entry). Fallback: `tools\keepsake-<version>\` inside every repository – see the warning below |
 
 > Test this runbook once on a second computer before you rely on Keepsake (see the end of this document).
@@ -29,12 +29,19 @@ the original server, its configuration and its Windows domain are not needed.
    > `Get-AuthenticodeSignature .\keepsake.exe` must show a valid signature of Kraus-Ahma IT Consulting
    > (signed releases), or `Get-FileHash` of the files must match the release you recorded. The service
    > re-checks this copy after every backup and repairs it, but on disaster day that service is gone.
-3. **With the GUI** (easiest): double-click `Keepsake Recovery.cmd` (or run `KeepsakeGui.exe --recovery`,
-   confirm the administrator prompt). Enter the repository folder (e.g. `E:\Keepsake\Fileserver`) and the
-   password or the recovery key, click *Open backup*, pick the point in time, tick what you need, choose a target
-   folder and *Start restore*. *Show log* lists anything that could not be restored. No service, no configuration
-   and no installation are needed. On a computer with Keepsake installed whose service is not running, the GUI
-   offers the same as *Restore without the service…*.
+3. **With the GUI** (easiest): start recovery mode and confirm the administrator prompt –
+   - installed with the MSI: Start menu → **Keepsake Recovery**, or in *Keepsake Backup* the link
+     **Restore from a backup location…** on the first-start, login and *Restore* pages;
+   - portable ZIP: double-click `Keepsake Recovery.cmd` (or run `KeepsakeGui.exe --recovery`).
+
+   Enter the repository location (e.g. `E:\Keepsake\Fileserver`) and the password or the recovery key, click
+   *Open backup*, pick the point in time, tick what you need, choose a target folder and *Start restore*. *Show log*
+   lists anything that could not be restored. No application password, no job and no configuration are needed;
+   the old server's settings play no role. Restore into a new folder unless the original drives and folders exist
+   on this computer.
+
+   If the lost computer crashed during a cleanup less than 30 minutes ago, its lock still blocks the backup.
+   Keepsake then shows whose lock it is and offers to remove it – do so when that computer is the lost one.
 
    **With the command line** – list the backups:
 
@@ -160,7 +167,7 @@ not replace the test below, which also proves the restore works without the serv
 
 - [ ] On a computer that is **not** the backup server, with only the KeePass entry at hand:
 - [ ] Unpack the portable ZIP from the KeePass attachment / release (not the copy in the repository), check its SHA-256.
-- [ ] `Keepsake Recovery.cmd` → open the backup with the **recovery key** (not the password) – the backups are listed.
+- [ ] `Keepsake Recovery.cmd` (portable) or Start menu → *Keepsake Recovery* (MSI) → open the backup with the **recovery key** (not the password) – the backups are listed.
 - [ ] `keepsake snapshots` with the recovery key – same list on the command line.
 - [ ] Restore one folder with `--include … --flat` into a temp folder; open some files.
 - [ ] `keepsake check --read-data-percent 10` – no errors.

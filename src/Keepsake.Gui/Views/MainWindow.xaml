@@ -54,6 +54,9 @@
                                    Visibility="{Binding Error, Converter={StaticResource Visible}}" />
                         <Button Content="Log in" Command="{Binding LoginCommand}" CommandParameter="{Binding ElementName=Pwd}"
                                 Style="{StaticResource PrimaryButton}" HorizontalAlignment="Stretch" Margin="0,18,0,0" Padding="14,8" />
+                        <Button Content="Restore from a backup location…" Command="{Binding RecoveryCommand}" Style="{StaticResource LinkButton}"
+                                HorizontalAlignment="Left" Margin="0,16,0,0"
+                                ToolTip="Open a backup with its location and password or recovery key – no login, no job needed" />
                     </StackPanel>
                 </Border>
                 <Image Source="/Assets/logo-color.png" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,28"
@@ -87,6 +90,14 @@
                                 </MultiBinding>
                             </Button.CommandParameter>
                         </Button>
+                        <Border Margin="0,20,0,0" Padding="12,10" CornerRadius="4" Background="{StaticResource AccentSoftBrush}">
+                            <StackPanel>
+                                <TextBlock TextWrapping="Wrap"
+                                           Text="Replacing a lost computer? Restore straight from the backup location with its repository password or recovery key – no application password and no job needed." />
+                                <Button Content="Restore from a backup location…" Command="{Binding RecoveryCommand}" Style="{StaticResource LinkButton}"
+                                        HorizontalAlignment="Left" Margin="0,8,0,0" />
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
                 </Border>
                 <Image Source="/Assets/logo-color.png" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,28"

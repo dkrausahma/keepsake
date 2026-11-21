@@ -93,6 +93,29 @@ namespace Keepsake.Core.Tests
         }
 
         [Fact]
+        public void Blocking_locks_of_a_lost_computer_can_be_removed_without_touching_others()
+        {
+            using (var t = new TestRepo())
+            using (RepoLock.Acquire(t.Repo, exclusive: false, purpose: "check")) // a live shared lock that must survive
+            {
+                var crashed = new LockInfo { Host = "LOST-PC", Exclusive = true, Purpose = "prune", Time = System.DateTime.UtcNow.AddMinutes(-5) };
+                t.Repo.Storage.Write(Layout.LockPath(Keepsake.Core.Util.Rand.HexId(16)), t.Repo.EncryptObject(crashed, "lock"));
+
+                var blocking = RepoLock.Blocking(t.Repo, exclusive: false);
+                Assert.Single(blocking);
+                Assert.Contains("LOST-PC", RepoLock.Describe(blocking[0].Value));
+                Assert.Throws<RepositoryLockedException>(() => RepoLock.Acquire(t.Repo, exclusive: false, purpose: "restore"));
+
+                RepoLock.Remove(t.Repo, blocking.Select(b => b.Key));
+                Assert.Empty(RepoLock.Blocking(t.Repo, exclusive: false));
+                Assert.Single(RepoLock.List(t.Repo));
+                using (RepoLock.Acquire(t.Repo, exclusive: false, purpose: "restore"))
+                {
+                }
+            }
+        }
+
+        [Fact]
         public void Exclusive_lock_blocks_others_and_stale_locks_are_ignored()
         {
             using (var t = new TestRepo())

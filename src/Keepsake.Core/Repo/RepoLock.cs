@@ -96,20 +96,29 @@ namespace Keepsake.Core.Repo
             return removed;
         }
 
+        /// <summary>The current (not stale) locks that would stop a lock of this kind from being taken.</summary>
+        public static List<KeyValuePair<string, LockInfo>> Blocking(Repository repo, bool exclusive) =>
+            List(repo).Where(l => !IsStale(l.Value) && (exclusive || l.Value.Exclusive)).ToList();
+
+        /// <summary>Removes the given lock files, e.g. the locks of a computer that no longer exists.</summary>
+        public static void Remove(Repository repo, IEnumerable<string> lockPaths)
+        {
+            foreach (string path in lockPaths)
+                repo.Storage.Delete(path);
+        }
+
+        public static string Describe(LockInfo o) =>
+            "'" + o.Purpose + "' on " + o.Host + " (process " + o.Pid + ", user " + o.User + ", since " + o.Time.ToLocalTime().ToString("yyyy-MM-dd HH:mm") + ")";
+
         private static void ThrowIfConflicting(Repository repo, bool exclusive, string ownPath)
         {
-            foreach (var l in List(repo))
+            foreach (var l in Blocking(repo, exclusive))
             {
-                if (l.Key == ownPath || IsStale(l.Value))
+                if (l.Key == ownPath)
                     continue;
-                if (exclusive || l.Value.Exclusive)
-                {
-                    var o = l.Value;
-                    throw new RepositoryLockedException(
-                        "The repository is in use by '" + o.Purpose + "' on " + o.Host + " (process " + o.Pid + ", user " + o.User +
-                        ", since " + o.Time.ToLocalTime().ToString("yyyy-MM-dd HH:mm") + "). If that process no longer runs, " +
-                        "wait 30 minutes or run 'keepsake unlock'.");
-                }
+                throw new RepositoryLockedException(
+                    "The repository is in use by " + Describe(l.Value) + ". If that process no longer runs, " +
+                    "wait 30 minutes or run 'keepsake unlock'.");
             }
         }
 
