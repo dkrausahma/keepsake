@@ -2,7 +2,7 @@
 
 All notable changes to Keepsake Backup. Newest first; versions as in `Directory.Build.props`.
 
-## Unreleased
+## 0.9.11 – 2026-11-21
 
 - System.Text.Json 8.0.5 → 10.0.15 (.NET 8 support ended in November 2026; SEC-029). Ships one new library,
   `System.IO.Pipelines.dll`.
