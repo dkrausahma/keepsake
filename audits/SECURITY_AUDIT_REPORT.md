@@ -44,7 +44,7 @@ Fixed in the working tree unless noted. 101 tests pass (Debug and Release); new 
 | SEC-025 | Fixed | Release builds use `ContinuousIntegrationBuild`; no local paths in the binaries (checked). |
 | SEC-026, SEC-027 | Owner decision | Public contact data, commit identity, licence and third-party notices. |
 | SEC-028 | Fixed | `nuget.config` (nuget.org only, source mapping) and `packages.lock.json` for every project. |
-| SEC-029 | Partly | CSV formula cells neutralised; `.gitignore` covers key/certificate/password files; README security notes; FORMAT.md ID note; README command typo fixed. Open: System.Text.Json upgrade before Nov 2026, CI, `SECURITY.md`. |
+| SEC-029 | Partly | CSV formula cells neutralised; `.gitignore` covers key/certificate/password files; README security notes; FORMAT.md ID note; README command typo fixed. System.Text.Json upgraded to 10.0.15 (2026-11-21). Open: CI, `SECURITY.md`. |
 
 Also found while fixing (not a security issue, present in all versions): a restore into a target folder that is
 itself a junction fails ("part of the path not found") with the long-path settings of the programs.

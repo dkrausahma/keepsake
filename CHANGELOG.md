@@ -2,6 +2,11 @@
 
 All notable changes to Keepsake Backup. Newest first; versions as in `Directory.Build.props`.
 
+## Unreleased
+
+- System.Text.Json 8.0.5 → 10.0.15 (.NET 8 support ended in November 2026; SEC-029). Ships one new library,
+  `System.IO.Pipelines.dll`.
+
 ## 0.9.10 – 2026-10-19
 
 - Job editor: hosts ending in `.your-storagebox.de` on port 22 (ProFTPD mod_sftp, AES-CTR only) show a hint

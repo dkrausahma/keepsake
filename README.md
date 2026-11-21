@@ -235,4 +235,4 @@ Exit codes: 0 success, 1 warnings, 2 failed, 3 usage error, 4 wrong password/key
 | SSH.NET 2026.0.0 | SFTP destinations |
 | MailKit 4.18.0 | E-mail notifications (STARTTLS, SSL, plain) |
 | ZstdSharp.Port 0.8.1 | Zstandard compression (managed) |
-| System.Text.Json 8.0.5 | JSON serialization |
+| System.Text.Json 10.0.15 | JSON serialization (.NET 10 LTS line) |
