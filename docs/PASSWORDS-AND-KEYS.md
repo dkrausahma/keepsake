@@ -52,6 +52,11 @@ read all backups.
 
 ## Where to keep what (KeePass)
 
+Keepsake prepares the entry: when a repository is created, **Copy KeePass entry** in the recovery key dialog copies a
+text block with the location, host key, login hints and the recovery key (*Save as file…* saves the same block; it
+also works as a recovery key file). For an existing job, **Copy for KeePass** on the job editor's *Destination* tab
+copies the same block without the recovery key. Passwords are never part of it: add them yourself.
+
 One entry per backup job:
 
 - repository location (folder, share, USB disk label, or `sftp://user@host:port/path`)

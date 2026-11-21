@@ -39,6 +39,7 @@ namespace Keepsake.Gui.ViewModels
         private string _repoConfirm;
         private string _status;
         private bool _ok;
+        private string _repositoryId;
 
         public DestinationEditorViewModel(ServiceConnection connection, JobDetail detail, Func<string> jobName)
         {
@@ -100,6 +101,13 @@ namespace Keepsake.Gui.ViewModels
             ForgetHostKeyCommand = new RelayCommand(() => HostKey = null, () => !string.IsNullOrEmpty(HostKey));
             CheckCommand = new AsyncCommand(async () => await Check(null));
             UsePort23Command = new AsyncCommand(UsePort23, () => CanUsePort23);
+            CopyKeePassCommand = new RelayCommand(() =>
+            {
+                Ui.CopyToClipboard(KeePassEntry.Build(JobName(), Build(), ShareCredential()?.User, _repositoryId, null), secret: false);
+                Ui.Info("Copied the KeePass entry for this job: location, host key and which logins belong in it.\n\n" +
+                        "Paste it into the job's KeePass entry and add the repository password, the recovery key and the storage login there. " +
+                        "Keepsake never shows stored passwords again, so they are not part of the copy.");
+            });
         }
 
         public Func<string> JobName { get; }
@@ -196,6 +204,9 @@ namespace Keepsake.Gui.ViewModels
         public ICommand ForgetHostKeyCommand { get; }
         public ICommand CheckCommand { get; }
         public ICommand UsePort23Command { get; }
+
+        /// <summary>Copies the job's KeePass text block (no secrets): what a restore on another computer needs.</summary>
+        public ICommand CopyKeePassCommand { get; }
 
         public Destination Build()
         {
@@ -327,6 +338,7 @@ namespace Keepsake.Gui.ViewModels
                 return;
             }
             parts.Add(r.Location ?? "");
+            _repositoryId = r.RepositoryId ?? _repositoryId;
             if (r.Exists)
                 parts.Add(r.RepositoryId != null ? "Repository found, password correct – " + r.Snapshots + " snapshot(s)." : "Repository found.");
             else
@@ -418,7 +430,9 @@ namespace Keepsake.Gui.ViewModels
             if (!Ui.Confirm("Create a new encrypted repository on\n" + where + " ?"))
                 return false;
             var init = await _connection.Call<RepoInitResult>(Methods.RepoInit, Params(volumeId, extraShares, extraSecrets));
-            RecoveryKeyWindow.ShowKey(init.RecoveryKey, where);
+            _repositoryId = init.RepositoryId;
+            RecoveryKeyWindow.ShowKey(init.RecoveryKey, where,
+                KeePassEntry.Build(JobName(), Build(), ShareCredential()?.User, init.RepositoryId, init.RecoveryKey));
             Status = "Repository created on " + where + ".";
             Ok = true;
             return true;

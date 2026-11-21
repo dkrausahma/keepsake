@@ -53,6 +53,40 @@ namespace Keepsake.Gui.Infrastructure
             var dialog = new Microsoft.Win32.OpenFileDialog { Title = title, Filter = filter, CheckFileExists = true };
             return dialog.ShowDialog(Owner) == true ? dialog.FileName : null;
         }
+
+        /// <summary>
+        /// Copies text to the clipboard. With <paramref name="secret"/> it is kept out of Windows clipboard history and the
+        /// cloud clipboard, and cleared after two minutes if it is still there (SEC-021).
+        /// </summary>
+        public static void CopyToClipboard(string text, bool secret)
+        {
+            var data = new DataObject();
+            data.SetText(text);
+            if (secret)
+            {
+                data.SetData("ExcludeClipboardContentFromMonitorProcessing", new System.IO.MemoryStream(new byte[4]));
+                data.SetData("CanIncludeInClipboardHistory", new System.IO.MemoryStream(new byte[4]));
+                data.SetData("CanUploadToCloudClipboard", new System.IO.MemoryStream(new byte[4]));
+            }
+            Clipboard.SetDataObject(data, copy: true);
+            if (!secret)
+                return;
+            var clear = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMinutes(2) };
+            clear.Tick += (s, e) =>
+            {
+                clear.Stop();
+                try
+                {
+                    if (Clipboard.ContainsText() && Clipboard.GetText() == text)
+                        Clipboard.Clear();
+                }
+                catch (System.Runtime.InteropServices.COMException)
+                {
+                    // Clipboard busy: nothing to do.
+                }
+            };
+            clear.Start();
+        }
     }
 
     // ---- Converters --------------------------------------------------------------------------

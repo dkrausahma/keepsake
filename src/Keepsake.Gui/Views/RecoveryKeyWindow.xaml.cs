@@ -1,6 +1,4 @@
-using System;
 using System.ComponentModel;
-using System.IO;
 using System.Windows;
 using Keepsake.Gui.Infrastructure;
 
@@ -10,46 +8,32 @@ namespace Keepsake.Gui.Views
     public partial class RecoveryKeyWindow : Window
     {
         private readonly string _key;
-        private readonly string _location;
+        private readonly string _entry;
 
-        private RecoveryKeyWindow(string key, string location)
+        private RecoveryKeyWindow(string key, string location, string keePassEntry)
         {
             InitializeComponent();
             _key = key;
-            _location = location;
+            _entry = keePassEntry;
             KeyBox.Text = key;
             Location.Text = location;
         }
 
-        public static void ShowKey(string key, string location)
+        /// <param name="keePassEntry">The job's KeePass text block including this key (<see cref="KeePassEntry"/>).</param>
+        public static void ShowKey(string key, string location, string keePassEntry)
         {
-            new RecoveryKeyWindow(key, location) { Owner = Ui.Owner }.ShowDialog();
+            new RecoveryKeyWindow(key, location, keePassEntry) { Owner = Ui.Owner }.ShowDialog();
+        }
+
+        private void OnCopyEntry(object sender, RoutedEventArgs e)
+        {
+            Ui.CopyToClipboard(_entry, secret: true);
+            Feedback.Text = "Copied: location, host key, login hints and the recovery key. Paste it into the job's KeePass entry; the clipboard is cleared in two minutes.";
         }
 
         private void OnCopy(object sender, RoutedEventArgs e)
         {
-            // Kept out of Windows clipboard history and cloud clipboard, and cleared after two minutes (SEC-021).
-            var data = new DataObject();
-            data.SetText(_key);
-            data.SetData("ExcludeClipboardContentFromMonitorProcessing", new MemoryStream(new byte[4]));
-            data.SetData("CanIncludeInClipboardHistory", new MemoryStream(new byte[4]));
-            data.SetData("CanUploadToCloudClipboard", new MemoryStream(new byte[4]));
-            Clipboard.SetDataObject(data, copy: true);
-            var clear = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMinutes(2) };
-            clear.Tick += (s, args) =>
-            {
-                clear.Stop();
-                try
-                {
-                    if (Clipboard.ContainsText() && Clipboard.GetText() == _key)
-                        Clipboard.Clear();
-                }
-                catch (System.Runtime.InteropServices.COMException)
-                {
-                    // Clipboard busy: nothing to do.
-                }
-            };
-            clear.Start();
+            Ui.CopyToClipboard(_key, secret: true);
             Feedback.Text = "Copied. Paste it into KeePass; the clipboard is cleared in two minutes.";
         }
 
@@ -58,8 +42,9 @@ namespace Keepsake.Gui.Views
             string file = Ui.SaveFile("Save recovery key", "keepsake-recovery-key.txt", "Text file (*.txt)|*.txt");
             if (file == null)
                 return;
-            PrivateFile.WriteAllText(file, "Keepsake recovery key\r\nRepository: " + _location + "\r\nCreated: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm") + "\r\n\r\n" + _key + "\r\n");
-            Feedback.Text = "Saved (readable only by you). Move the file off this server.";
+            // The KeePass block holds the key on a line of its own, so the file also works with "Load from file…" and --recovery-key-file.
+            PrivateFile.WriteAllText(file, _entry);
+            Feedback.Text = "Saved (readable only by you). Move the file off this server, e.g. as attachment of the KeePass entry.";
         }
 
         private void OnConfirmChanged(object sender, RoutedEventArgs e) => CloseButton.IsEnabled = Confirmed.IsChecked == true;

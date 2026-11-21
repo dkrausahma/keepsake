@@ -114,7 +114,8 @@ without a login or a job, e.g. on a replacement computer – starts from the Sta
 
 - **Backup jobs** – status, last result, next run, run now / full backup / cancel; job editor with folder
   tree (tick to include, untick inside a ticked folder to exclude), exclusion patterns, destination
-  (creates the repository and shows the recovery key, which must be confirmed), schedules and options;
+  (creates the repository and shows the recovery key, which must be confirmed; **Copy KeePass entry** / **Copy for
+  KeePass** copy location, host key and login hints for the job's KeePass entry), schedules and options;
   **Check keys** tests a repository password or recovery key against the job's repository without restoring
 - **Restore** – pick job and snapshot, tick folders/files, restore to another folder or the original
   location with a conflict policy, dry run

@@ -4,6 +4,11 @@ All notable changes to Keepsake Backup. Newest first; versions as in `Directory.
 
 ## Unreleased
 
+- **KeePass entry:** the recovery key dialog gets **Copy KeePass entry** (location as `sftp://user@host:port/path`,
+  folder, share or USB disk, host key fingerprint, which logins belong in the entry, repository ID, the recovery key and
+  how to restore); *Save as file…* saves that block and it still works as a recovery key file. The job editor's
+  *Destination* tab gets **Copy for KeePass** with the same block without the recovery key. No passwords are included.
+
 - **Recovery mode reachable after an MSI install:** new Start menu entry *Keepsake Recovery*, and the link
   *Restore from a backup location…* on the first-start and login screens and on the *Restore* page when there are
   no jobs. Before, a fresh install on a replacement computer (service running) only offered the service view, and
