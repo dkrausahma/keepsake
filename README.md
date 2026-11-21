@@ -4,6 +4,7 @@ Encrypted, compressed, deduplicated file backup for Windows Server 2008 R2 SP1 a
 
 - Requirements: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md)
 - Repository format: [docs/FORMAT.md](docs/FORMAT.md)
+- Changes per version: [CHANGELOG.md](CHANGELOG.md)
 
 ## Status
 
@@ -11,7 +12,7 @@ Encrypted, compressed, deduplicated file backup for Windows Server 2008 R2 SP1 a
 |---|---|---|
 | 1 | Core + format: chunking, AES-256-GCM, key slots, file system destination, CLI | **done** |
 | 2 | Windows service, scheduler, job store, run logs, named-pipe API | **done** (console mode tested; not yet installed as a real service) |
-| 3 | WPF GUI | **done** (tested on Windows 11; disaster-recovery mode without the service still CLI-only) |
+| 3 | WPF GUI | **done** (tested on Windows 11; disaster-recovery mode without the service in GUI and CLI) |
 | 4 | Destinations: share credentials, USB by volume ID, SFTP | **done** (SFTP tested against OpenSSH in Docker; share credentials not tested against a real domain share) |
 | 5 | VSS, retention/prune, scheduled checks, notifications, Event Log | **done** (VSS fallback tested; real shadow copies need an elevated test on 2008 R2) |
 | 6 | 2008 R2 test pass, installer, DR runbook | **done except the 2008 R2 test pass** (MSI, portable ZIP, doctor, repair, runbook; test plan in docs/WINDOWS-2008R2.md) |
