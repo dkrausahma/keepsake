@@ -110,8 +110,14 @@ if ($certificate) {
 if ($LASTEXITCODE -ne 0) { throw 'Binding redirects do not match the staged libraries.' }
 
 Write-Host '== MSI'
-dotnet build installer\Keepsake.Installer.wixproj -c Release -nologo -v q -p:StageDir=$stage -p:ProductVersion=$version -o $artifacts
+# Own output folder: MSBuild's incremental clean deletes the previous version's MSI from its output folder,
+# so building straight into artifacts\ would remove older releases kept there.
+$msiOut = Join-Path $artifacts 'msi-build'
+dotnet build installer\Keepsake.Installer.wixproj -c Release -nologo -v q -p:StageDir=$stage -p:ProductVersion=$version -o $msiOut
 if ($LASTEXITCODE -ne 0) { throw 'MSI build failed.' }
+foreach ($ext in '.msi', '.wixpdb') {
+    Copy-Item (Join-Path $msiOut "Keepsake-$version$ext") $artifacts -Force
+}
 
 if ($certificate) {
     Write-Host '== Sign MSI'
