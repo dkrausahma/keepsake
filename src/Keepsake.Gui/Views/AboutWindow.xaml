@@ -46,18 +46,13 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Text="Phone" Style="{StaticResource Muted}" Margin="0,2" />
+                <TextBlock Grid.Row="0" Text="Web" Style="{StaticResource Muted}" Margin="0,2" />
                 <TextBlock Grid.Row="0" Grid.Column="1" Margin="0,2">
-                    <Hyperlink NavigateUri="tel:+491721853648" RequestNavigate="OnNavigate" Foreground="{StaticResource AccentBrush}">+49 172 1853648</Hyperlink>
-                </TextBlock>
-                <TextBlock Grid.Row="1" Text="Web" Style="{StaticResource Muted}" Margin="0,2" />
-                <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,2">
                     <Hyperlink NavigateUri="https://www.kraus-ahma.com" RequestNavigate="OnNavigate" Foreground="{StaticResource AccentBrush}">www.kraus-ahma.com</Hyperlink>
                 </TextBlock>
-                <TextBlock Grid.Row="2" Text="LinkedIn" Style="{StaticResource Muted}" Margin="0,2" />
-                <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,2">
+                <TextBlock Grid.Row="1" Text="LinkedIn" Style="{StaticResource Muted}" Margin="0,2" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,2">
                     <Hyperlink NavigateUri="https://www.linkedin.com/in/dominique-kraus-ahma" RequestNavigate="OnNavigate" Foreground="{StaticResource AccentBrush}">linkedin.com/in/dominique-kraus-ahma</Hyperlink>
                 </TextBlock>
             </Grid>

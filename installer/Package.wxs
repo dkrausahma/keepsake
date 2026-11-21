@@ -27,7 +27,6 @@
     <Icon Id="KeepsakeIcon" SourceFile="$(StageDir)\KeepsakeGui.exe" />
     <Property Id="ARPPRODUCTICON" Value="KeepsakeIcon" />
     <Property Id="ARPCONTACT" Value="Kraus-Ahma IT Consulting &amp; Anwendungsentwicklung, Kapuzinerstraße 2d, 94032 Passau" />
-    <Property Id="ARPHELPTELEPHONE" Value="+49 172 1853648" />
     <Property Id="ARPURLINFOABOUT" Value="https://www.kraus-ahma.com" />
 
     <!-- Default: %ProgramFiles%\dkait\keepsake; the user can choose another folder in the setup dialog. -->

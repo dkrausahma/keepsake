@@ -37,7 +37,7 @@ namespace Keepsake.Gui.Views
             }
             catch (Exception)
             {
-                // No handler for the link (e.g. tel: on a server) – nothing useful to do.
+                // No handler for the link (e.g. no browser on a server) – nothing useful to do.
             }
             e.Handled = true;
         }

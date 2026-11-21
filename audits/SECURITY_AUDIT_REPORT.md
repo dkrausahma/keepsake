@@ -42,7 +42,8 @@ Fixed in the working tree unless noted. 101 tests pass (Debug and Release); new 
 | SEC-023 | Fixed | Exclusion regexes have a 1-second timeout; on timeout the file is backed up, not skipped. |
 | SEC-024 | Open | Service SID / required-privileges list could break VSS; needs a test on 2008 R2 first. |
 | SEC-025 | Fixed | Release builds use `ContinuousIntegrationBuild`; no local paths in the binaries (checked). |
-| SEC-026, SEC-027 | Owner decision | Public contact data, commit identity, licence and third-party notices. |
+| SEC-026 | Partly | Phone number removed from the About dialog and the MSI (`ARPHELPTELEPHONE`) on 2026-11-21; the business address, website and LinkedIn stay on purpose. Open: commit identity. |
+| SEC-027 | Owner decision | Licence and third-party notices. |
 | SEC-028 | Fixed | `nuget.config` (nuget.org only, source mapping) and `packages.lock.json` for every project. |
 | SEC-029 | Partly | CSV formula cells neutralised; `.gitignore` covers key/certificate/password files; README security notes; FORMAT.md ID note; README command typo fixed. System.Text.Json upgraded to 10.0.15 (2026-11-21). Open: CI, `SECURITY.md`. |
 

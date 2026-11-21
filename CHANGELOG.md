@@ -12,6 +12,8 @@ All notable changes to Keepsake Backup. Newest first; versions as in `Directory.
   so it opens offline.
 - **Help in the program:** **Help** in the sidebar and in recovery mode; F1 opens the page of the current page,
   job editor tab or dialog.
+- **No phone number any more:** the About dialog and the installer's entry in *Programs and Features* no longer show a
+  phone number; contact is via www.kraus-ahma.com (SEC-026).
 
 ## 0.9.14 – 2026-11-21
 
