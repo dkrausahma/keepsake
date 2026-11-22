@@ -1,13 +1,13 @@
 ---
-name: release
-description: Build a Keepsake Backup release - bump the version, close the CHANGELOG section, build MSI + portable ZIP + checksums, verify them, fast-forward main and tag. Use only when Dominique runs /release.
+name: bc-release
+description: Build a Keepsake Backup release - bump the version, close the CHANGELOG section, build MSI + portable ZIP + checksums, verify them, fast-forward main and tag. Use only when Dominique runs /bc-release.
 argument-hint: "[version, e.g. 0.10.0] [cert thumbprint for signing]"
 disable-model-invocation: true
 ---
 
-# /release — Keepsake Backup
+# /bc-release — Keepsake Backup
 
-Running `/release` is Dominique's go-ahead for the bump commit, the release build (which runs the
+Running `/bc-release` is Dominique's go-ahead for the bump commit, the release build (which runs the
 tests), the fast-forward of `main` and the local tag. It is **not** a go-ahead to push: pushing and
 publishing stay with him. Report after each numbered step.
 
